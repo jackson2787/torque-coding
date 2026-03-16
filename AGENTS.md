@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Version**: 2.2 (2025-03-04) | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
+**Version**: 2.2 (2025-03-04) | **Compatibility**: Antigravity, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
 **Status**: Canonical single-file guide for AI-assisted development
 
 ---
