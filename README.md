@@ -64,9 +64,30 @@ A directory structure dynamically updated by the AI in the `DOCS` state to serve
 
 ---
 
-## Getting Started
+## Operational Guide (Based on AGENT-ZERO)
 
-1. Place `AGENTS.md` in the root of your project.
-2. Ensure your AI agent (Antigravity, Cursor, etc.) reads the `.agent/skills/` directory.
-3. When starting a new project, use the generators in `dynamic-skills/` to codify your specific architectural choices into `memory-bank/projectRules.md` or dedicated `project-*` skills.
-4. Start prompting your AI. It will automatically initialize the session, enforce compliance checks, and guide you through the `PLAN -> BUILD -> QA -> APPROVAL -> APPLY -> DOCS` loop.
+This workflow is an implementation of the [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO) operational framework for high-quality, AI-assisted software development.
+
+### Quick Start & Boot Sequence
+A field-tested routine for flawless execution:
+1. Ensure your AI agent reads the `.agent/skills/` directory and `AGENTS.md`.
+2. Clear your session memory to prevent context pollution (e.g., `/compact` or `/clear`).
+3. On every boot, provide a specific task and ensure the agent starts in **PLAN** mode.
+4. Type: `BUILD` to implement in a sandbox branch.
+5. Review the presented diff and rationale. Then type: `QA` to run tests, linters, coverage, and build.
+6. When QA passes, type: `Document it. Update the memory bank.`
+7. Clear the context window (`/compact` or `/clear`) and repeat with the next task.
+
+### Compaction Protocol
+Context compression can happen at any time without warning. This framework persists state to the `Memory Bank` at **every state transition**, so recovery is automatic. After compaction, the agent resumes from the saved state.
+
+### Sample End-to-End Task Prompt
+A minimal, high-signal task prompt that aligns with the `PLAN → BUILD → QA` flow:
+
+```text
+Task name: Add user preferences to settings
+Context: Users need a way to toggle email notifications.
+Detailed outcome: A toggle switch appears in `/settings` that updates the DB.
+Constraints (do/don't): Do not strictly bypass RLS, follow existing React patterns.
+Instructions: This is the PLAN process. Create a plan that addresses this request with code citations. Do not write code until the plan is approved.
+```
