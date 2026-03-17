@@ -2,6 +2,16 @@
 
 A robust, agentic AI coding orchestration framework designed for predictability, zero-hallucination execution, and maximum code quality. This repository contains the canonical rules, state machine, and specialized skills required to seamlessly pair-program with AI agents like Antigravity.
 
+## Start Here
+
+This repo is best understood in three layers:
+
+1. `AGENTS.md` defines the operating system: state machine, approval gates, Memory Bank rules, and workflow contract.
+2. `skills/` plus the domain skill packs provide reusable behavior the AI should load inside a real project.
+3. `dynamic-skills/` contains setup prompts that help the AI create project-specific skills for a target repo. They are not runtime skills themselves.
+
+If you want to install this into a real project, start with [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
+
 ## The Core Philosophy: "Reuse over Creation"
 
 AI agents default to creating new files and mocking data to save time. This framework forces the AI to behave like a Staff Engineer:
@@ -21,6 +31,24 @@ If you want to use it inside an actual project, follow [docs/install-into-existi
 - where to place each skill pack
 - which directories are optional
 - how to point an AI at the installed workflow
+
+In short:
+
+1. Copy `AGENTS.md` into the target repo root.
+2. Copy `skills/` into `.agent/skills/` in the target repo.
+3. Ask the user whether the target repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
+4. Copy only the relevant domain packs.
+5. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
+
+Suggested bootstrap prompt for the target repo:
+
+```text
+This repository uses the AI workflow installed in AGENTS.md and .agent/skills/.
+Read AGENTS.md first, then load the relevant skills for this repo.
+Before choosing optional skill packs, ask me whether this repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
+Follow the PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS workflow.
+If project-specific skills exist under .agent/skills/project-*/, those override generic wiring choices but defer to the universal skills.
+```
 
 ## Directory Structure
 
@@ -72,7 +100,7 @@ Drop these into Next.js/React web projects or React Native/Expo mobile projects.
 | **expo-native-data-fetching** | *(Mobile)* Best practices for handling offline state, query caching, and secure token storage on mobile devices. |
 
 ### `dynamic-skills/` (Project Data & Wiring)
-These are generator scripts intended to be run once at the start of a new project. They query the user about their specific tech stack (e.g., frontend frameworks, deployment targets, security models) and dynamically generate project-specific `SKILL.md` files.
+These are setup prompts intended to be run once at the start of a new project. They query the user about their specific tech stack (e.g., frontend frameworks, deployment targets, security models) and dynamically generate project-specific `SKILL.md` files. They are not ordinary installed runtime skills.
 
 | Dynamic Generator | Purpose |
 |---|---|
@@ -98,13 +126,14 @@ This workflow is an implementation of the [AGENT-ZERO](https://github.com/msitar
 
 ### Quick Start & Boot Sequence
 A field-tested routine for flawless execution:
-1. Ensure your AI agent reads the applicable skills directories (e.g., `skills/`, `backend-skills/`) and `AGENTS.md`.
-2. Clear your session memory to prevent context pollution (e.g., `/compact` or `/clear`).
-3. On every boot, provide a specific task and ensure the agent starts in **PLAN** mode.
-4. Type: `BUILD` to implement in a sandbox branch.
-5. Review the presented diff and rationale. Then type: `QA` to run tests, linters, coverage, and build.
-6. When QA passes, type: `Document it. Update the memory bank.`
-7. Clear the context window (`/compact` or `/clear`) and repeat with the next task.
+1. Install this workflow into the target repo using [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
+2. Ensure your AI agent reads `AGENTS.md` and the installed `.agent/skills/` directory in the target repo.
+3. Clear your session memory to prevent context pollution (e.g., `/compact` or `/clear`).
+4. On every boot, provide a specific task and ensure the agent starts in **PLAN** mode.
+5. Type: `BUILD` to implement in a sandbox branch.
+6. Review the presented diff and rationale. Then type: `QA` to run tests, linters, coverage, and build.
+7. When QA passes, type: `Document it. Update the memory bank.`
+8. Clear the context window (`/compact` or `/clear`) and repeat with the next task.
 
 ### Compaction Protocol
 Context compression can happen at any time without warning. This framework persists state to the `Memory Bank` at **every state transition**, so recovery is automatic. After compaction, the agent resumes from the saved state.
