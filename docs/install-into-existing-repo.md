@@ -102,7 +102,7 @@ This repository uses the AI workflow installed in AGENTS.md and .agent/skills/.
 Read AGENTS.md first, then load the relevant skills for this repo.
 Before choosing optional skill packs, ask me whether this repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
 Follow the PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS workflow.
-If project-specific skills exist under .agent/skills/project-*/, those override generic wiring choices but defer to the universal skills.
+If project-specific skills exist under `.agent/skills/project-*/`, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
 ```
 
 Suggested Day 1 dynamic-skills prompt:
