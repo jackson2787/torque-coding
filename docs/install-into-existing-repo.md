@@ -2,7 +2,37 @@
 
 Use this document as the single install entrypoint when you want an AI to set up this workflow inside a real project repository.
 
-## What This Repo Is
+## What You Are Installing
+
+You are bootstrapping two interconnected systems into the target repository:
+
+1. **The operating model**: `AGENTS.md`
+   This is the primary source of truth for how the agent should work in the target repo.
+
+2. **The capability layer**: the reusable skill packs
+   These complement `AGENTS.md` with domain-specific guidance for execution, planning, verification, frontend work, mobile work, backend work, and documentation.
+
+There is also an optional third layer:
+
+3. **The local project layer**: generated project-specific skills
+   These are created from the prompts in `dynamic-skills/` and live under `.agent/skills/project-*/` in the target repo.
+
+## Source Of Truth
+
+The operating-model source of truth is:
+
+- upstream conceptual source: [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO)
+- local installed source: `AGENTS.md` in the target repo
+
+Use this authority order:
+
+1. `AGENTS.md`
+2. Universal skill packs in `.agent/skills/`
+3. Generated project-specific skills in `.agent/skills/project-*/`
+
+Project-specific skills should complement the universal skills by defining local wiring and repo-specific constraints. They should not replace the workflow, approval model, or architectural discipline defined by `AGENTS.md`.
+
+## What This Template Repo Is
 
 This repository is a template and source library.
 

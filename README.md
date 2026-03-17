@@ -3,55 +3,95 @@
 This repository is an opinionated synthesis of proven agent-workflow, frontend, mobile, and backend engineering practices.
 Its value is not in claiming wholly novel ideas, but in combining strong prior art into a practical, disciplined system for AI-assisted software delivery.
 
-## Start Here
+- Version: aligned with `AGENTS.md` 2.2 (2025-03-04)
+- Compatibility: Claude, Cursor, Copilot, Cline, Aider, Codex, and other `AGENTS.md`-compatible tools
+- Status: template repo for bootstrapping an AGENT-ZERO-style operating model plus complementary skill packs
 
-This repo is best understood in three layers:
+---
 
-1. `AGENTS.md` defines the operating system: state machine, approval gates, Memory Bank rules, and workflow contract.
-2. `skills/` plus the domain skill packs provide reusable behavior the AI should load inside a real project.
-3. `dynamic-skills/` contains setup prompts that help the AI create project-specific skills for a target repo. They are not runtime skills themselves.
+## What This Repo Actually Is
 
-If you want to install this into a real project, start with [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
+This repo bootstraps **two interconnected systems** into a real project repository:
 
-## Sources & Lineage
+1. **The operating model**: `AGENTS.md`
+   This is the primary source of truth for how the agent should work. It defines the state machine, approval gates, Memory Bank behavior, task contracts, compaction protocol, and documentation discipline.
 
-This repository is an original synthesis, but it is intentionally informed by ideas, patterns, and best practices from excellent open-source projects and public engineering guidance. Credit is due to the teams and maintainers whose work shaped the thinking here.
+2. **The capability layer**: the skill packs
+   These complement `AGENTS.md` with reusable, domain-specific guidance for planning, debugging, frontend work, mobile work, backend work, verification, and documentation.
 
-- [Vercel / Next.js](https://github.com/vercel/next.js): influenced the frontend and React/Next.js guidance, especially around web architecture, rendering patterns, performance, and production-minded developer workflows.
-- [Expo](https://github.com/expo/expo): influenced the mobile and React Native guidance, including practical expectations around app structure, platform constraints, builds, updates, and native-runtime-aware development.
-- [Supabase](https://github.com/supabase/supabase): influenced the backend and data posture, especially around Postgres-first architecture, Row Level Security, API boundaries, and operational discipline for database-backed applications.
-- [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO): influenced the workflow framing, especially the emphasis on explicit phases, operational rigor, and structured execution for AI-assisted development.
-- [agency-agents](https://github.com/msitarzewski/agency-agents): influenced the broader thinking around agent workflows, reusable agent behaviors, and practical multi-agent development patterns.
-- [Obra Superpowers](https://github.com/obra/superpowers): influenced the skill-oriented composition model, agent behavior framing, and the idea that coding agents benefit from reusable, explicit operating constraints rather than loose prompting alone.
+There is also an optional third layer:
 
-This project is not presented as an official implementation of, fork of, or endorsed derivative of any of the repositories above unless explicitly stated. Where ideas overlap, the intent is attribution, adaptation, and extension rather than copying work without credit.
+3. **The local project layer**: generated project-specific skills
+   The files in `dynamic-skills/` are setup prompts that help an AI generate repo-specific skills such as local architecture rules, security constraints, and deployment conventions. These are not runtime skills themselves.
 
-## The Core Philosophy: "Reuse over Creation"
+The right way to think about this repo is:
 
-AI agents default to creating new files and mocking data to save time. This framework forces the AI to behave like a Staff Engineer:
+- `AGENTS.md` is the operating system
+- the reusable skill packs are the extensions that sharpen and specialize it
+- generated project-specific skills are local wiring and non-negotiables for one concrete repo
 
-1. **No new files without reuse analysis**: The AI must search the codebase and exhaustively justify why existing components cannot be extended.
-2. **No rewrites when refactoring possible**: Incremental improvements over full rewrites.
-3. **No generic advice**: Every suggestion must include `file:line` citations.
-4. **No ignoring existing architecture**: The AI must load and understand the existing patterns before designing changes.
+---
+
+## Source Of Truth
+
+The upstream conceptual source of truth for the operating model is **AGENT-ZERO**:
+
+- Upstream repo: [msitarzewski/AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO)
+- Upstream README: [AGENT-ZERO README](https://github.com/msitarzewski/AGENT-ZERO/blob/main/README.md)
+
+In this repository:
+
+- `AGENTS.md` is the canonical operating guide the agent should follow inside a target repo
+- the skill packs are intentionally subordinate to that operating guide
+- the generated project-specific skills are subordinate to both the operating guide and the universal skill packs
+
+If you need an authority order, use this:
+
+1. `AGENTS.md`
+2. Universal skill packs in `.agent/skills/`
+3. Generated project-specific skills in `.agent/skills/project-*/`
+
+Project-specific skills should **complement** the universal skills by defining local wiring and stack-specific constraints. They should not replace the higher-order workflow, approval model, or architectural discipline defined by `AGENTS.md`.
+
+---
+
+## Why This Repo Exists
+
+AGENT-ZERO already provides a strong operating framework for high-quality, AI-assisted software delivery:
+
+- reuse over creation
+- approval gates
+- architecture-first planning
+- high-signal context via the Memory Bank
+- repeatable, auditable execution through a state machine
+
+This repository builds on top of that operating model by packaging the parts that are usually missing in real projects:
+
+- reusable planning, debugging, QA, and documentation skills
+- frontend web skill packs
+- frontend mobile skill packs
+- backend skill packs
+- setup prompts for generating project-specific local rules
+
+In short:
+
+- **AGENT-ZERO gives the workflow discipline**
+- **this repo adds the reusable capability packs that turbocharge that workflow**
+
+---
 
 ## Install Into A Real Repo
 
 This repository is a template source, not the final installed layout.
 
-If you want to use it inside an actual project, follow [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md). That document defines:
+To install it into a target repository, use [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
 
-- what to copy into the target repo
-- where to place each skill pack
-- which directories are optional
-- how to point an AI at the installed workflow
-
-In short:
+The short version:
 
 1. Copy `AGENTS.md` into the target repo root.
 2. Copy `skills/` into `.agent/skills/` in the target repo.
 3. Ask the user whether the target repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
-4. Copy only the relevant domain packs.
+4. Copy only the relevant domain skill packs.
 5. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
 
 Suggested bootstrap prompt for the target repo:
@@ -61,104 +101,152 @@ This repository uses the AI workflow installed in AGENTS.md and .agent/skills/.
 Read AGENTS.md first, then load the relevant skills for this repo.
 Before choosing optional skill packs, ask me whether this repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
 Follow the PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS workflow.
-If project-specific skills exist under `.agent/skills/project-*/`, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
+If project-specific skills exist under .agent/skills/project-*/, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
 ```
-
-## Directory Structure
-
-### `AGENTS.md` (The Core System)
-This is the heart of the orchestration framework. `AGENTS.md` enforces a strict State Machine that the AI must follow:
-- **PLAN:** Research context, formulate an Implementation Plan, and acquire human approval.
-- **BUILD:** Write tests first, implement minimal code in a sandbox, and generate a unified diff. 
-- **QA:** Run linters, build steps, tests, and performance checks.
-- **APPROVAL:** Present the final diff and QA results to the human for sign-off.
-- **APPLY:** Apply the diff to the sandbox branch.
-- **DOCS:** Update the Memory Bank and task summaries to maintain high-fidelity context.
-
-### 🧠 The Core Skills Library
-
-The framework uses specialized markdown instructions (`SKILL.md`) that the AI loads contextually based on the task at hand. These are designed to be modular so you only plug in what you need for a given repository.
-
-#### `skills/` (Universal Skills)
-Always included in every project. Contains the state machine enforcers and meta-skills.
-
-| Skill Name | Description |
-|---|---|
-| **test-driven-development** | Enforces strict Red-Green-Refactor. The Iron Law: "No production code without a failing test first." |
-| **systematic-debugging** | A 4-phase structured approach to root cause analysis, preventing the AI from guessing or writing "quick patches". |
-| **writing-plans** | Enforces the `PLAN` state. Instructs the AI to focus on reuse over creation and generate a structural diff for approval. |
-| **executing-plans** | Enforces the `BUILD` state. Instructs the AI to write failing tests first, implement minimal code, and generate a unified diff without deploying. |
-| **verification-before-completion** | Enforces the `QA` state. Explicitly prevents the AI from claiming success before verifying output on the terminal. |
-| **writing-docs** | Enforces the `DOCS` state. Governs how the AI updates the `memory-bank` to ensure context fidelity for future tasks. |
-| **legal-compliance-checker** | Mandates security and privacy checks for GDPR, CCPA, and data handling requirements. |
-| **brainstorming-features** | Unstructured conceptual mode for helping humans brainstorm ideas before moving into PLAN mode. |
-| **writing-skills** | Meta-skill used when the AI is asked to edit, create, or test other skills within the framework. |
-
-#### `backend-skills/`
-Drop these into backend repositories (APIs, Databases, Cloud Functions).
-
-| Skill Name | Description |
-|---|---|
-| **backend-architect** | Mandates security-first design (RLS, rate limiting), horizontal scalability, and DB migration protocols. |
-| **supabase-postgres-best-practices** | Postgres performance optimization and best practices from Supabase (indexing, RLS, queries). |
-
-#### `frontend-web-skills/` & `frontend-mobile-skills/`
-Drop these into Next.js/React web projects or React Native/Expo mobile projects.
-
-| Skill Name | Description |
-|---|---|
-| **accessible-ui** | *(Shared)* Enforces WCAG compliance, semantic HTML, and proper React Native/Next.js accessible components. |
-| **composition-patterns** | *(Shared)* React composition patterns that scale, useful for refactoring components and building flexible APIs. |
-| **react-best-practices** | *(Web)* React and Next.js performance optimization guidelines from Vercel Engineering. |
-| **react-native-skills** | *(Mobile)* React Native and Expo best practices for building performant mobile apps (e.g., list performance, animations). |
-| **expo-native-data-fetching** | *(Mobile)* Best practices for handling offline state, query caching, and secure token storage on mobile devices. |
-
-### `dynamic-skills/` (Project Data & Wiring)
-These are setup prompts intended to be run once at the start of a new project. They query the user about their specific tech stack (e.g., frontend frameworks, deployment targets, security models) and dynamically generate project-specific `SKILL.md` files. They are not ordinary installed runtime skills.
-
-| Dynamic Generator | Purpose |
-|---|---|
-| **01-frontend-architecture** | Generates a project-specific skill governing state management (e.g., Redux vs Zustand) and API fetching patterns (e.g., React Query vs direct DB access). |
-| **02-secure-coding-practices** | Generates a project-specific skill governing authentication flows, rate limiting, and environmental secret handling for the target architecture. |
-| **03-deployment-pipeline** | Generates a project-specific skill detailing strict CI/CD guidelines, rollback procedures, and environment-specific build steps. |
-
-These dynamic skills complement the generic universal skills by defining specific project wiring and choices. It is a strict meta-rule that **dynamic skills defer to universal skills** (like `react-best-practices`, `backend-architect`) as the ultimate source of truth, ensuring project-specific rules never override core architectural rigor.
-
-### `memory-bank/` (The Project Brain)
-A directory structure dynamically updated by the AI in the `DOCS` state to serve as its long-term memory:
-- `projectbrief.md`: Core requirements and vision.
-- `systemPatterns.md`: Existing architectural patterns.
-- `projectRules.md`: Coding standards and emerging rules.
-- `decisions.md`: Architectural Decision Records (ADRs).
-- `tasks/`: Monthly readmes and task-specific documentation.
 
 ---
 
-## Operational Guide (Based on AGENT-ZERO)
+## Repo Contents
 
-This workflow is an implementation of the [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO) operational framework for high-quality, AI-assisted software development.
+### `AGENTS.md`
 
-### Quick Start & Boot Sequence
-A field-tested routine for flawless execution:
-1. Install this workflow into the target repo using [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
-2. Ensure your AI agent reads `AGENTS.md` and the installed `.agent/skills/` directory in the target repo.
-3. Clear your session memory to prevent context pollution (e.g., `/compact` or `/clear`).
-4. On every boot, provide a specific task and ensure the agent starts in **PLAN** mode.
-5. Type: `BUILD` to implement in a sandbox branch.
-6. Review the presented diff and rationale. Then type: `QA` to run tests, linters, coverage, and build.
-7. When QA passes, type: `Document it. Update the memory bank.`
-8. Clear the context window (`/compact` or `/clear`) and repeat with the next task.
+This is the heart of the system. It defines:
 
-### Compaction Protocol
-Context compression can happen at any time without warning. This framework persists state to the `Memory Bank` at **every state transition**, so recovery is automatic. After compaction, the agent resumes from the saved state.
+- the compliance banner
+- startup behavior
+- Memory Bank structure
+- the `PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS` state machine
+- task contracts and budgets
+- quality gates
+- documentation rules
+- compaction recovery behavior
 
-### Sample End-to-End Task Prompt
-A minimal, high-signal task prompt that aligns with the `PLAN → BUILD → QA` flow:
+If someone asks "how should the agent operate?", the answer should begin with `AGENTS.md`.
 
-```text
-Task name: Add user preferences to settings
-Context: Users need a way to toggle email notifications.
-Detailed outcome: A toggle switch appears in `/settings` that updates the DB.
-Constraints (do/don't): Do not strictly bypass RLS, follow existing React patterns.
-Instructions: This is the PLAN process. Create a plan that addresses this request with code citations. Do not write code until the plan is approved.
-```
+### `skills/`
+
+These are the universal runtime skills. They are intended to live in `.agent/skills/` inside the target repo and complement `AGENTS.md` during normal work.
+
+They cover:
+
+- brainstorming
+- planning
+- execution
+- TDD
+- debugging
+- verification
+- documentation
+- legal/compliance checks
+- writing or maintaining skills themselves
+
+### `backend-skills/`
+
+Reusable backend-oriented skill packs for APIs, databases, security posture, and backend architecture.
+
+### `frontend-web-skills/`
+
+Reusable web frontend skill packs for React and Next.js style work.
+
+### `frontend-mobile-skills/`
+
+Reusable mobile frontend skill packs for Expo and React Native style work.
+
+### `dynamic-skills/`
+
+These are **not** ordinary runtime skills. They are setup prompts intended for Day 1 bootstrapping in a target repo.
+
+Their job is to help the AI:
+
+- inspect the target repo
+- discuss repo-specific non-negotiables with the human
+- generate project-specific skills under `.agent/skills/project-*/`
+
+Examples include prompts for:
+
+- frontend architecture
+- secure coding practices
+- deployment pipeline conventions
+
+---
+
+## The Operating Model
+
+The operating model itself comes from `AGENTS.md`, which is aligned to the AGENT-ZERO approach.
+
+Key ideas:
+
+- **Reuse over creation**: extend before you create
+- **Approval gates**: do not apply changes without explicit user approval
+- **Architecture-first execution**: plans and diffs cite current code and existing patterns
+- **Memory Bank discipline**: preserve the minimum high-signal project context needed for repeatable sessions
+- **Compaction safety**: persist state continuously so recovery is possible after context compression
+
+The workflow is:
+
+`PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS`
+
+That workflow is not optional decoration. It is the execution contract.
+
+---
+
+## The Skill Model
+
+The skill packs do not replace the operating model. They make it more useful in real repositories.
+
+Think of them as:
+
+- reusable execution constraints
+- domain-specific best-practice packs
+- implementation guidance that helps the agent stay aligned under pressure
+
+The universal skills should remain broadly reusable across repos.
+The generated project-specific skills should remain narrowly local to one codebase.
+
+That means:
+
+- universal skills express stable guidance
+- project-specific skills express local wiring, constraints, and exceptions
+- `AGENTS.md` remains the highest-order behavioral contract
+
+---
+
+## Practical Boot Sequence
+
+In a target repository, the sequence should be:
+
+1. Install `AGENTS.md` and the relevant skill packs.
+2. If needed, use `dynamic-skills/` to generate local project-specific skills.
+3. Ensure the AI reads `AGENTS.md` first.
+4. Ensure the AI loads the relevant universal skills.
+5. Ensure the AI loads any generated project-specific skills.
+6. Start work in `PLAN`, not direct implementation.
+7. Use `BUILD`, `QA`, and `Document it. Update the memory bank.` as explicit workflow transitions.
+
+If the AI is confused about "what matters most," it should prefer:
+
+- `AGENTS.md` over any summary prose
+- universal skills over vague ad hoc prompting
+- project-specific skills for repo-local rules, but only within that narrower scope
+
+---
+
+## Sources & Lineage
+
+This repository is an original synthesis, but it is intentionally informed by ideas, patterns, and best practices from excellent open-source projects and public engineering guidance. Credit is due to the teams and maintainers whose work shaped the thinking here.
+
+- [Vercel / Next.js](https://github.com/vercel/next.js): influenced the frontend and React/Next.js guidance, especially around web architecture, rendering patterns, performance, and production-minded developer workflows.
+- [Expo](https://github.com/expo/expo): influenced the mobile and React Native guidance, including practical expectations around app structure, platform constraints, builds, updates, and native-runtime-aware development.
+- [Supabase](https://github.com/supabase/supabase): influenced the backend and data posture, especially around Postgres-first architecture, Row Level Security, API boundaries, and operational discipline for database-backed applications.
+- [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO): provides the core operating-model inspiration for the state machine, approval-oriented execution, and Memory Bank discipline used here.
+- [agency-agents](https://github.com/msitarzewski/agency-agents): influenced the broader thinking around agent workflows, reusable agent behaviors, and practical multi-agent development patterns.
+- [Obra Superpowers](https://github.com/obra/superpowers): influenced the skill-oriented composition model, agent behavior framing, and the idea that coding agents benefit from reusable, explicit operating constraints rather than loose prompting alone.
+
+This project is not presented as an official implementation of, fork of, or endorsed derivative of any of the repositories above unless explicitly stated. Where ideas overlap, the intent is attribution, adaptation, and extension rather than copying work without credit.
+
+---
+
+## References
+
+- Canonical operating guide in this repo: [AGENTS.md](./AGENTS.md)
+- Detailed install guide: [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md)
+- Upstream operating-model reference: [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO)
