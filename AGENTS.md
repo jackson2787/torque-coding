@@ -215,6 +215,7 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 Before beginning or transitioning states, you should load the relevant skill file:
 - **Idea Generation**: `.agent/skills/brainstorming-features/SKILL.md`
 - **PLAN State**: `.agent/skills/writing-plans/SKILL.md`
+- **Frontend API Planning**: `frontend-web-skills/api-feature-request/SKILL.md` (Mandatory gate during PLAN state for any frontend API integration)
 - **BUILD State**: `.agent/skills/executing-plans/SKILL.md`
 - **BUILD (Coding)**: `.agent/skills/test-driven-development/SKILL.md`
 - **QA (Debugging)**: `.agent/skills/systematic-debugging/SKILL.md`
@@ -241,9 +242,10 @@ Before beginning or transitioning states, you should load the relevant skill fil
 - Cannot reuse [component] because: [specific technical reason]
 
 **Steps**:
-1. [Action] - extends pattern at `file:line`
-2. [Action] - integrates with [component]
-3. [Action] - adds tests mirroring `test.ext`
+1. **[Frontend Only] API Surface Check** - Evaluated via `api-feature-request` skill
+2. [Action] - extends pattern at `file:line`
+3. [Action] - integrates with [component]
+4. [Action] - adds tests mirroring `test.ext`
 
 **Integration**: [Component A] calls via [method] | [Service B] update at `file:line`
 **Risks**: [Risk] → mitigation: [approach]
