@@ -1,6 +1,7 @@
-# Uber AI Workflow Orchestration
+# agent-engineering-playbook
 
-A robust, agentic AI coding orchestration framework designed for predictability, zero-hallucination execution, and maximum code quality. This repository contains the canonical rules, state machine, and specialized skills required to seamlessly pair-program with AI agents like Antigravity.
+This repository is an opinionated synthesis of proven agent-workflow, frontend, mobile, and backend engineering practices.
+Its value is not in claiming wholly novel ideas, but in combining strong prior art into a practical, disciplined system for AI-assisted software delivery.
 
 ## Start Here
 
