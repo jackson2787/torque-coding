@@ -24,11 +24,20 @@ There is also an optional third layer:
 3. **The local project layer**: generated project-specific skills
    The files in `dynamic-skills/` are setup prompts that help an AI generate repo-specific skills such as local architecture rules, security constraints, and deployment conventions. These are not runtime skills themselves.
 
+There is also an optional fourth layer:
+
+4. **The optional workflow layer**: installable workflow packages
+   The files in `optional-workflows/` are small, self-contained packages that add
+   human-invoked IDE workflows plus any supporting project resources those
+   workflows need. These are installed into a target repo by following the
+   package-local `README.md`.
+
 The right way to think about this repo is:
 
 - `AGENTS.md` is the operating system
 - the reusable skill packs are the extensions that sharpen and specialize it
 - generated project-specific skills are local wiring and non-negotiables for one concrete repo
+- optional workflows are installable add-ons for repo-specific IDE workflows
 
 ---
 
@@ -93,6 +102,7 @@ The short version:
 3. Ask the user whether the target repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
 4. Copy only the relevant domain skill packs.
 5. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
+6. Optionally install workflow packages from `optional-workflows/` by following [docs/install-optional-workflows.md](./docs/install-optional-workflows.md).
 
 Recommended prompts for a target repo:
 
@@ -194,6 +204,21 @@ Examples include prompts for:
 - frontend architecture
 - secure coding practices
 - deployment pipeline conventions
+
+### `optional-workflows/`
+
+These are installable workflow packages for human-invoked IDE workflows that sit
+outside the core skill-pack model.
+
+Each package includes:
+
+- a package `README.md` that acts as the install contract
+- a `workflow/` directory containing the file copied into `.agent/workflows/`
+- a `resources/` directory containing supporting project files
+
+The first package is `optional-workflows/sync-api/`, which installs a strict
+OpenAPI sync workflow for TypeScript frontend projects using Orval and related
+support scripts.
 
 ---
 
