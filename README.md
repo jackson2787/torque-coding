@@ -1,6 +1,6 @@
 # Uber AI Workflow Orchestration
 
-A robust, agentic AI coding orchestration framework designed for predictability, zero-hallucination execution, and maximum code quality. This repository contains the canonical rules, state machine, and specialized skills required to seamlessly pair-program with AI agents like Antigravity, Cursor, and Cline.
+A robust, agentic AI coding orchestration framework designed for predictability, zero-hallucination execution, and maximum code quality. This repository contains the canonical rules, state machine, and specialized skills required to seamlessly pair-program with AI agents like Antigravity.
 
 ## The Core Philosophy: "Reuse over Creation"
 
