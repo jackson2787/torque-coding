@@ -12,6 +12,19 @@ This repo is best understood in three layers:
 
 If you want to install this into a real project, start with [docs/install-into-existing-repo.md](./docs/install-into-existing-repo.md).
 
+## Sources & Lineage
+
+This repository is an original synthesis, but it is intentionally informed by ideas, patterns, and best practices from excellent open-source projects and public engineering guidance. Credit is due to the teams and maintainers whose work shaped the thinking here.
+
+- [Vercel / Next.js](https://github.com/vercel/next.js): influenced the frontend and React/Next.js guidance, especially around web architecture, rendering patterns, performance, and production-minded developer workflows.
+- [Expo](https://github.com/expo/expo): influenced the mobile and React Native guidance, including practical expectations around app structure, platform constraints, builds, updates, and native-runtime-aware development.
+- [Supabase](https://github.com/supabase/supabase): influenced the backend and data posture, especially around Postgres-first architecture, Row Level Security, API boundaries, and operational discipline for database-backed applications.
+- [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO): influenced the workflow framing, especially the emphasis on explicit phases, operational rigor, and structured execution for AI-assisted development.
+- [agency-agents](https://github.com/msitarzewski/agency-agents): influenced the broader thinking around agent workflows, reusable agent behaviors, and practical multi-agent development patterns.
+- [Obra Superpowers](https://github.com/obra/superpowers): influenced the skill-oriented composition model, agent behavior framing, and the idea that coding agents benefit from reusable, explicit operating constraints rather than loose prompting alone.
+
+This project is not presented as an official implementation of, fork of, or endorsed derivative of any of the repositories above unless explicitly stated. Where ideas overlap, the intent is attribution, adaptation, and extension rather than copying work without credit.
+
 ## The Core Philosophy: "Reuse over Creation"
 
 AI agents default to creating new files and mocking data to save time. This framework forces the AI to behave like a Staff Engineer:
