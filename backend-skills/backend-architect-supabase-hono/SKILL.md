@@ -1,6 +1,6 @@
 ---
 name: backend-architect-supabase-hono
-description: Use when designing, planning, or implementing backend work in repositories that use Hono inside Supabase Edge Functions with Supabase/Postgres. Covers integrated API and database slices, auth and authority modeling, route contracts, SQL function boundaries, migrations, and thin-route delivery. Pair with supabase-postgres-best-practices for deep Postgres tuning, indexing, query optimization, or RLS performance work.
+description: Use when designing, planning, or implementing backend work in repositories that use Hono inside Supabase Edge Functions with Supabase/Postgres. Keeps the agent aligned to the stack ethos, helps choose architect versus builder posture, and routes to the correct reference docs for philosophy, route delivery, database boundaries, and Memory Bank bootstrap. Pair with supabase-postgres-best-practices for deep Postgres tuning, indexing, query optimization, or RLS performance work.
 metadata:
   author: uber-ai-workflow
   version: "0.1.0"
@@ -8,90 +8,111 @@ metadata:
 
 # Backend Architect Supabase Hono
 
-Use this skill for backend work in repos where:
+This skill is a helper and entrypoint, not the full source of truth.
+
+Use it in repos where:
 
 - Hono runs inside Supabase Edge Functions
 - Supabase/Postgres is the system of record
 - API and database changes are expected to ship together in one repo and often one task
 
-This skill is intentionally opinionated. Its job is to keep backend work
-coherent across the HTTP layer, the database boundary, and the security model.
+The reusable stack doctrine for this package lives in `references/`.
+The repo-local truth for a specific project belongs in the Memory Bank.
 
-## What This Skill Owns
+## What This Skill Does
 
-- Backend slice architecture for Hono + Supabase
-- Exact API and database contract definition
-- Auth, authority, and data-access modeling at the slice level
-- Thin-route implementation patterns
-- Delivery rules for planning and building route + migration work together
+- Keeps the agent aligned to the design ethos of the Hono + Supabase stack
+- Helps decide whether the current task is in architect posture or builder posture
+- Routes the agent to the right reference document for the current problem
+- Reminds the agent what belongs in stack references versus repo Memory Bank files
 
-## What This Skill Does Not Own
+## What This Skill Does Not Do
 
-This skill does not replace
-`supabase-postgres-best-practices`.
-
-Load `supabase-postgres-best-practices` when the task needs:
-
-- query tuning
-- index strategy details
-- connection or pooling guidance
-- locking and concurrency guidance
-- RLS performance optimization
-- Postgres-specific performance or monitoring decisions
-
-Use this skill to decide the shape of the backend slice. Use the Supabase
-Postgres skill to tune the database internals of that slice.
+- It does not replace `AGENTS.md`
+- It does not replace `supabase-postgres-best-practices`
+- It does not try to hold the full stack philosophy inline
+- It does not turn reusable stack doctrine into repo-local Memory Bank truth
+- It does not define deep Postgres tuning strategy
 
 ## First Move
 
-1. Inspect the existing routes, schemas, migrations, SQL functions, and any
-   project-specific skills before proposing new structure.
-2. Decide whether the task is in architect posture or builder posture.
-3. If authority, contract shape, or schema impact is unclear, stay in architect
-   posture until the contract is exact.
-4. Keep API and database work coupled. Do not design the route in isolation
-   from the SQL contract it depends on.
+Before proposing or changing backend structure:
 
-## Architect Posture
+1. Inspect the existing routes, schemas, migrations, SQL functions, and any project-specific skills.
+2. Check the repo Memory Bank for local adaptations already recorded in `techContext.md`, `systemPatterns.md`, `projectRules.md`, or `decisions.md`.
+3. Decide whether the task is in architect posture or builder posture.
+4. If authority, contract shape, or schema impact is unclear, stay in architect posture until the contract is exact.
 
-Default to architect posture when the request changes behavior, authority,
-schema, or public contracts.
+## Posture Selection
 
-Produce an implementation spec that covers:
+### Architect Posture
 
-- exact route surface
-- exact request and response schemas
-- exact SQL function signatures
-- migration strategy
-- authority model and access checks
-- expected response codes and error mapping
-- reuse points in the current codebase
+Default to architect posture when the task changes:
 
-Resolve these questions before building:
+- behavior
+- authority
+- schema
+- public route contracts
+- SQL boundaries
+- response semantics
 
-- Who is acting?
-- What row, parent resource, or delegation anchors access?
-- Which rules belong in SQL and which belong in the route layer?
-- What must the client receive so it does not need to guess what happened?
+In architect posture, resolve:
 
-If those questions are not answerable from the current context, pause and ask
-the user instead of improvising the rule set.
+- who is acting
+- what row, parent resource, or delegation anchors access
+- what belongs in SQL versus the route layer
+- what exact request and response shapes are needed
+- what exact SQL contract is needed
+- what the client must receive so it does not need to guess what happened
 
-## Builder Posture
+If those answers are not explicit, stop and load the correct reference instead of improvising.
 
-Use builder posture when the contract is already approved or mechanically
-obvious from existing patterns.
+### Builder Posture
 
-Implementation rules:
+Use builder posture when the contract is already approved or mechanically obvious from existing patterns.
 
-- Keep route handlers short and boring.
-- Define request and response schemas before the handler.
-- Use the project's route factory and app factory patterns when present.
-- Use the database bridge pattern such as `callDb(...)`; do not put business
-  logic in the route.
-- Apply the database boundary rules in
-  [references/database-boundary-and-triple-lock.md](references/database-boundary-and-triple-lock.md).
-- Halt on ambiguity instead of making up authority or lifecycle rules.
+In builder posture:
+
+- keep route handlers short
+- define schemas before handlers
+- keep business rules out of route code when they belong in SQL
+- halt on ambiguity instead of inventing missing authority or lifecycle rules
+
+## Reference Loading Strategy
+
+Load references based on the current need:
+
+- [references/supabase-hono-api-philosophy.md](references/supabase-hono-api-philosophy.md)
+  Use for design ethos, stack worldview, role boundaries, and "why this stack is shaped this way."
+- [references/hono-api-delivery-rules.md](references/hono-api-delivery-rules.md)
+  Use for route design, handler behavior, middleware order, schema-first work, response contracts, and Hono delivery details.
+- [references/database-boundary-and-triple-lock.md](references/database-boundary-and-triple-lock.md)
+  Use for SQL boundaries, authority modeling, public versus internal contracts, migrations, and the triple-lock model.
+- [references/memory-bank-bootstrap-map.md](references/memory-bank-bootstrap-map.md)
+  Use when `bootstrap-memory-bank` is creating or refreshing Memory Bank files for a repo using this stack.
+
+Load `supabase-postgres-best-practices` separately when the problem becomes about:
+
+- query tuning
+- index strategy
+- connection or pooling behavior
+- locking and concurrency
+- RLS performance
+- monitoring and diagnostics
+
+## Memory Bank Boundary
+
+This package does not try to make the Memory Bank hold the full stack doctrine.
+
+Use the references as reusable stack truth.
+
+Use the Memory Bank for repo-local truth, such as:
+
+- how this repo wires Hono routes
+- whether this repo uses `callDb(...)`
+- which auth or context middleware is standard here
+- which parts of the stack philosophy are explicitly adopted as local rules
+- which variations or exceptions this repo intentionally uses
 
 ## Non-Negotiables
 
@@ -109,30 +130,13 @@ Implementation rules:
 - No skipping the Postgres best-practices skill when the task becomes a tuning
   or database-performance problem.
 
-## Delivery Contract
+## If You Feel Lost
 
-For a backend feature, this skill should drive toward a complete vertical slice:
+Do not improvise stack doctrine from memory.
 
-- migration plan
-- SQL function contract
-- API request schema
-- API response schema
-- route definition and documentation
-- error behavior
-- validation or verification steps
+Stop and load the most relevant reference file:
 
-The best outcome is usually a backend change that can be implemented and
-reviewed as one coherent unit instead of separate "DB later, API later" work.
-
-## Reference Guide
-
-Read these files as needed:
-
-- [references/supabase-hono-api-philosophy.md](references/supabase-hono-api-philosophy.md)
-  for the design logic behind this stack
-- [references/hono-api-delivery-rules.md](references/hono-api-delivery-rules.md)
-  when defining or reviewing Hono route behavior
-- [references/database-boundary-and-triple-lock.md](references/database-boundary-and-triple-lock.md)
-  when changing SQL, authority, or DB-facing architecture
-- [references/skill-specification.md](references/skill-specification.md)
-  when maintaining or evolving this skill's scope
+- philosophy confusion -> `supabase-hono-api-philosophy.md`
+- route confusion -> `hono-api-delivery-rules.md`
+- SQL or authority confusion -> `database-boundary-and-triple-lock.md`
+- Memory Bank grounding confusion -> `memory-bank-bootstrap-map.md`

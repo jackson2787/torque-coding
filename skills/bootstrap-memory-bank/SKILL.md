@@ -74,6 +74,14 @@ Read only the matching reference file:
 - `systemPatterns.md` -> `references/system-patterns.md`
 - `projectRules.md` -> `references/project-rules.md`
 
+If an installed domain skill ships a stack-specific Memory Bank bootstrap
+reference that is relevant to the current repo, load that alongside the generic
+document reference.
+
+Example:
+
+- `.agent/skills/backend-architect-supabase-hono/references/memory-bank-bootstrap-map.md`
+
 Do not load all five references at once unless the user explicitly asks for a
 full design exercise.
 
@@ -191,3 +199,5 @@ Use these references one at a time:
 - `references/tech-context.md`
 - `references/system-patterns.md`
 - `references/project-rules.md`
+
+Also load any relevant domain bootstrap reference when the repo has one.
