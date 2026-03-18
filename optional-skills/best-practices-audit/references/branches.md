@@ -44,12 +44,6 @@ Audit for:
 - data-fetching and request-boundary problems
 - repo-local drift from the installed mobile playbook
 
-## `backend`
-
-Load and use:
-
-- `backend-architect/`
-
 Also load:
 
 - `supabase-postgres-best-practices/` when the repo uses

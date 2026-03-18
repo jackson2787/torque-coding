@@ -213,9 +213,6 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 **Core Skill Usage Rule**:
 - The state machine is the source of truth for transitions and gates.
 - Universal skills nudge behavior *inside* a state; they do not redefine the state machine.
-- Frontend-web skills add stack-specific nudges inside the same states; they do not replace the core workflow.
-- Optional skills remain manual or conditional overlays.
-- Files in `dynamic-skills/` are setup-time generators for project-specific skills, not normal runtime state-machine nudges.
 
 ---
 

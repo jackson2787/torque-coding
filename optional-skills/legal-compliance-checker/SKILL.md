@@ -240,6 +240,5 @@ If you catch yourself doing any of these:
 
 ## Related Skills
 
-- **backend-architect** - For implementing security controls, encryption, and access management at the infrastructure level
 - **supabase-postgres-best-practices** - For Row-Level Security, data encryption, and access control in Postgres
 - **verification-before-completion** - Verify compliance requirements are met before claiming completion

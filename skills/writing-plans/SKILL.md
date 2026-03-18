@@ -64,7 +64,7 @@ Before you write the plan document, you MUST:
 1. Search the codebase for similar functionality to satisfy the Reuse rule.
 2. Check `memory-bank/systemPatterns.md` for existing architecture patterns.
 3. Review existing codebase structure for clear extension points.
-4. Perform an explicit **Architectural Self-Audit**: validate your proposed plan structurally complies with `backend-architect`, `react-best-practices`, and `legal-compliance-checker` before asking for approval.
+4. Perform an explicit **Architectural Self-Audit**: validate your proposed plan structurally complies with established architectural patterns, best practices, and any compliance requirements specific to your deployment before asking for approval.
 
 ## Red Flags - STOP and Start Over
 
