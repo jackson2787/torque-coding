@@ -15,7 +15,7 @@ You are bootstrapping two interconnected systems into the target repository:
 There is also an optional third layer:
 
 3. **The local project layer**: generated project-specific skills
-   These are created from the prompts in `dynamic-skills/` and live under `.agent/skills/project-*/` in the target repo.
+   These are optional repo-local helpers created from any remaining setup prompts in `dynamic-skills/` and live under `.agent/skills/project-*/` in the target repo.
 
 ## Source Of Truth
 
@@ -42,7 +42,7 @@ This repository is a template and source library.
 - The root `AGENTS.md` in this template repo is intentionally lightweight and exists only to prevent confusion.
 - The profile-aware operating-model sources live under `agent/AGENTS.core.md`, `agent/profiles/`, and `agent/generated/`.
 - `agent/AGENTS.md` is the default `backend-generic` rendered output.
-- The `dynamic-skills/` directory is different from the installed skill packs: those files are prompt-generators used to create project-specific skills, not reusable skills that the AI should load for normal day-to-day execution.
+- The `dynamic-skills/` directory is different from the installed skill packs: those files are setup prompts for any remaining generated helpers, not reusable skills that the AI should load for normal day-to-day execution.
 
 If you update the core or profile sources, regenerate the rendered outputs with:
 
@@ -64,7 +64,7 @@ Copy these files and directories into the target repository:
 - `frontend-skills/frontend-shared-skills/` -> copy if the target repo has any frontend code
 - `frontend-skills/frontend-web-skills/` -> copy only if the target repo has web frontend code
 - `frontend-skills/frontend-mobile-skills/` -> copy only if the target repo has mobile frontend code
-- `dynamic-skills/` -> optional; copy only if you want prompt-generators that help the AI create project-specific skills on Day 1
+- `dynamic-skills/` -> optional; copy only if you want the remaining deployment-pipeline setup prompt on Day 1
 
 Recommended target layout:
 
@@ -74,21 +74,23 @@ target-repo/
 └── .agent/
     └── skills/
         ├── brainstorming-features/
-        ├── executing-plans/
+        ├── bootstrap-memory-bank/
+        ├── build-execution/
         ├── legal-compliance-checker/
         ├── systematic-debugging/
-        ├── test-driven-development/
         ├── verification-before-completion/
         ├── writing-docs/
         ├── writing-plans/
-        ├── writing-skills/
-        ├── backend-architect/                 # optional
+        ├── backend-secure-coding/             # optional
         ├── backend-architect-supabase-hono/   # optional
+        ├── backend-supabase-hono-secure-coding/ # optional
         ├── supabase-postgres-best-practices/  # optional
         ├── accessible-ui/                     # optional
         ├── api-feature-request/               # optional
         ├── composition-patterns/              # optional
         ├── expo-native-data-fetching/         # optional
+        ├── frontend-mobile-secure-coding/     # optional
+        ├── frontend-web-secure-coding/        # optional
         ├── react-best-practices/              # optional
         └── react-native-skills/               # optional
 ```
@@ -119,17 +121,16 @@ Examples:
 - Backend Hono + Supabase: use `AGENTS.backend-hono-supabase.md` and add `backend-skills/`
 - Full-stack monorepo: choose the dominant production profile first, then combine the other relevant domain packs and project-specific generated skills as needed
 
-## Day 1 Optional Step: Generate Project-Specific Skills
+## Day 1 Optional Step: Generate A Project-Specific Deployment Skill
 
-If you copied `dynamic-skills/`, treat them as setup prompts, not as installed runtime skills.
+If you copied `dynamic-skills/`, treat the remaining prompt there as a setup
+prompt, not as an installed runtime skill.
 
-Use them inside the target repo to generate project-specific rules:
+Use it inside the target repo only if you want a repo-local deployment helper:
 
-- `.agent/skills/project-frontend-architecture/SKILL.md`
-- `.agent/skills/project-secure-coding/SKILL.md`
 - `.agent/skills/project-deployment-pipeline/SKILL.md`
 
-These generated skills belong in the target repo, not in this template repo.
+That generated skill belongs in the target repo, not in this template repo.
 
 ## What To Tell The AI
 
@@ -156,10 +157,9 @@ Optional Day 1 dynamic-skills prompt:
 
 ```text
 This repo already uses AGENTS.md as the operating model. We are in setup mode.
-Please run through the dynamic skill generators one at a time, starting with 01.
 Treat the files in dynamic-skills/ as setup prompts, not runtime skills.
-Analyze this repository, discuss the proposed non-negotiables with me before writing anything, then generate the approved project-specific skill files under .agent/skills/project-*/.
-Those generated skills must complement the universal skills and defer to AGENTS.md and the higher-order skill packs.
+If we need a project-specific deployment helper, run the remaining deployment prompt, discuss the proposed non-negotiables with me before writing anything, then generate the approved project-specific skill file under .agent/skills/project-*/.
+That generated skill must complement the universal skills and defer to AGENTS.md and the higher-order skill packs.
 ```
 
 Normal session commands after bootstrap:

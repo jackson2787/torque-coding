@@ -225,11 +225,13 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 
 **Core Skill Nudge**:
 - Load `.agent/skills/writing-plans/SKILL.md` while operating in PLAN.
-
-**Frontend-Web Skill Nudges**:
 - If the request is still vague and not ready for formal planning, use `.agent/skills/brainstorming-features/SKILL.md` before committing to the PLAN output.
 - If the frontend feature depends on existing or proposed API surface, load `.agent/skills/api-feature-request/SKILL.md` to validate that the API can support a thin-client implementation.
 - If the plan involves reusable component APIs, compound components, or significant component architecture choices, load `.agent/skills/composition-patterns/SKILL.md`.
+- If the task touches auth sessions, browser storage, redirects, user-generated
+  HTML, uploads, third-party scripts, or sensitive user data, also load
+  `.agent/skills/frontend-web-secure-coding/SKILL.md` before finalizing the
+  plan.
 
 **Required Content**:
 ```markdown
@@ -268,13 +270,14 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 
 **Core Skill Nudge**:
 - Load `.agent/skills/build-execution/SKILL.md` when entering BUILD.
-
-**Frontend-Web Skill Nudges**:
 - For React or Next.js implementation work, load `.agent/skills/react-best-practices/SKILL.md`.
 - For Next.js repositories or Next-specific tasks, also load `.agent/skills/next-best-practices/SKILL.md`.
 - When touching user-facing UI, forms, interaction semantics, keyboard behavior, or responsive presentation, load `.agent/skills/accessible-ui/SKILL.md`.
 - When the task involves reusable component APIs, composition-heavy refactors, or compound component design, load `.agent/skills/composition-patterns/SKILL.md`.
 - When the task touches Partial Prerendering, `use cache`, cache invalidation, `cacheLife`, `cacheTag`, or `updateTag`, load `.agent/skills/next-cache-components/SKILL.md`.
+- If the implementation touches auth sessions, browser storage, redirects,
+  unsafe HTML rendering, uploads, third-party scripts, or sensitive client
+  data, also load `.agent/skills/frontend-web-secure-coding/SKILL.md`.
 
 **Actions**:
 1. Work in branch/temp clone (never main)
@@ -348,12 +351,13 @@ tests/test.ext    | 200 +++++++++++++++++++++++++++
 **Core Skill Nudges**:
 - Load `.agent/skills/verification-before-completion/SKILL.md` before making any pass, fixed, or complete claims.
 - If checks fail, the root cause is unclear, or repeated fixes start thrashing, load `.agent/skills/systematic-debugging/SKILL.md` and return to BUILD with a grounded fix.
-
-**Frontend-Web Skill Nudges**:
 - If user-facing UI changed, reload `.agent/skills/accessible-ui/SKILL.md` during QA and verify semantics, focus handling, forms, contrast, and assistive-technology behavior.
 - If the task touched React rendering, component boundaries, data-fetching behavior, or performance-sensitive UI, reload `.agent/skills/react-best-practices/SKILL.md`.
 - If the task touched Next.js routing, RSC boundaries, route handlers, metadata, hydration, Suspense, or runtime behavior, reload `.agent/skills/next-best-practices/SKILL.md`.
 - If the task used Cache Components, `use cache`, or tag-based invalidation, reload `.agent/skills/next-cache-components/SKILL.md` to verify cache boundaries and invalidation assumptions.
+- If the task touched auth sessions, browser storage, redirects, uploads,
+  third-party scripts, unsafe HTML rendering, or sensitive client telemetry,
+  reload `.agent/skills/frontend-web-secure-coding/SKILL.md`.
 
 **Execute**:
 1. Test suite (via MCP or project command)

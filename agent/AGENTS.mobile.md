@@ -225,6 +225,10 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 - If the request is still vague and not ready for formal planning, use `.agent/skills/brainstorming-features/SKILL.md` before committing to the PLAN output.
 - If the mobile feature depends on existing or proposed API surface, load `.agent/skills/api-feature-request/SKILL.md` to validate that the API can support a thin-client implementation.
 - If the plan involves reusable component APIs, compound components, or significant component architecture choices, load `.agent/skills/composition-patterns/SKILL.md`.
+- If the task touches token storage, deep links, device permissions, WebViews,
+  uploads, or sensitive user data, also load
+  `.agent/skills/frontend-mobile-secure-coding/SKILL.md` before finalizing the
+  plan.
 
 **Required Content**:
 ```markdown
@@ -267,6 +271,9 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 - For any networking work including API requests, caching, offline handling, token flow, or request debugging, load `.agent/skills/expo-native-data-fetching/SKILL.md`.
 - When touching user-facing UI, forms, interaction semantics, accessibility behavior, or responsive typography, load `.agent/skills/accessible-ui/SKILL.md`.
 - When the task involves reusable component APIs, composition-heavy refactors, or compound component design, load `.agent/skills/composition-patterns/SKILL.md`.
+- If the implementation touches token storage, deep links, device permissions,
+  WebViews, uploads, or sensitive local caching/logging paths, also load
+  `.agent/skills/frontend-mobile-secure-coding/SKILL.md`.
 
 **Actions**:
 1. Work in branch/temp clone (never main)
@@ -340,6 +347,9 @@ tests/test.ext    | 200 +++++++++++++++++++++++++++
 - If the task touched React Native rendering, lists, animations, navigation, images, or native platform behavior, reload `.agent/skills/react-native-skills/SKILL.md` during QA.
 - If the task touched API requests, query caching, retry logic, token flow, offline handling, or network failure paths, reload `.agent/skills/expo-native-data-fetching/SKILL.md`.
 - If user-facing UI changed, reload `.agent/skills/accessible-ui/SKILL.md` during QA and verify semantics, labels, forms, modal accessibility, text scaling, and assistive-technology behavior.
+- If the task touched token storage, deep links, device permissions, WebViews,
+  uploads, or sensitive local caching/logging paths, reload
+  `.agent/skills/frontend-mobile-secure-coding/SKILL.md`.
 - `best-practices-audit` is not part of normal QA flow; use `.agent/skills/best-practices-audit/SKILL.md` only when the user explicitly requests an audit.
 
 **Execute**:

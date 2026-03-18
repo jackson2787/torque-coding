@@ -225,7 +225,9 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 - If the request is still vague and not ready for formal planning, use `.agent/skills/brainstorming-features/SKILL.md` before committing to the PLAN output.
 - For Hono inside Supabase Edge Functions with Supabase/Postgres, load `.agent/skills/backend-architect-supabase-hono/SKILL.md` as the primary backend planning skill.
 - If the plan needs query tuning, index strategy, RLS details, connection guidance, locking, or other Postgres internals, also load `.agent/skills/supabase-postgres-best-practices/SKILL.md`.
-- If the task reaches beyond the Hono + Supabase slice into broader service boundaries, infrastructure, reliability, or macro backend architecture, also load `.agent/skills/backend-architect/SKILL.md`.
+- If the task touches auth context, service-role usage, SQL boundaries, storage,
+  CORS, tokens, or other security-sensitive backend behavior, also load
+  `.agent/skills/backend-supabase-hono-secure-coding/SKILL.md`.
 - If the task touches regulated data, privacy, payments, contracts, health data, or jurisdictional compliance, load `.agent/skills/legal-compliance-checker/SKILL.md` before finalizing the plan.
 
 **Required Content**:
@@ -267,7 +269,9 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 - Load `.agent/skills/build-execution/SKILL.md` when entering BUILD.
 - For Hono inside Supabase Edge Functions with Supabase/Postgres, load `.agent/skills/backend-architect-supabase-hono/SKILL.md` as the primary backend build skill.
 - If the implementation touches SQL, schema design, indexes, RLS, locking, connection behavior, or database-performance work, also load `.agent/skills/supabase-postgres-best-practices/SKILL.md`.
-- If the implementation includes broader backend concerns such as service decomposition, security middleware posture, monitoring, or reliability strategy, also load `.agent/skills/backend-architect/SKILL.md`.
+- If the implementation touches auth context, service-role usage, SQL
+  boundaries, storage, CORS, tokens, signed URLs, or sensitive logging/error
+  paths, also load `.agent/skills/backend-supabase-hono-secure-coding/SKILL.md`.
 - If the build includes consent, retention, user-rights workflows, data handling controls, or other regulated behavior, also load `.agent/skills/legal-compliance-checker/SKILL.md`.
 
 **Actions**:
@@ -341,7 +345,9 @@ tests/test.ext    | 200 +++++++++++++++++++++++++++
 - If checks fail, the root cause is unclear, or repeated fixes start thrashing, load `.agent/skills/systematic-debugging/SKILL.md` and return to BUILD with a grounded fix.
 - Reload `.agent/skills/backend-architect-supabase-hono/SKILL.md` during QA when verifying route contracts, auth and authority behavior, DB boundary discipline, migration coherence, and API-to-SQL slice integrity.
 - If the task touched SQL performance, indexes, RLS, locking, query plans, or other Postgres internals, reload `.agent/skills/supabase-postgres-best-practices/SKILL.md`.
-- If the task touched broader backend security, reliability, observability, or service-boundary concerns, reload `.agent/skills/backend-architect/SKILL.md`.
+- If the task touched auth context, service-role usage, SQL boundaries,
+  storage, CORS, signed URLs, or sensitive logging/error exposure, reload
+  `.agent/skills/backend-supabase-hono-secure-coding/SKILL.md`.
 - If the task touches regulated data or compliance-sensitive behavior, reload `.agent/skills/legal-compliance-checker/SKILL.md` and verify the required controls and documentation assumptions.
 
 **Execute**:

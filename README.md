@@ -22,7 +22,7 @@ This repo bootstraps **two interconnected systems** into a real project reposito
 There is also an optional third layer:
 
 3. **The local project layer**: generated project-specific skills
-   The files in `dynamic-skills/` are setup prompts that help an AI generate repo-specific skills such as local architecture rules, security constraints, and deployment conventions. These are not runtime skills themselves.
+   The remaining files in `dynamic-skills/` are setup prompts for any repo-local generated helpers you still want on Day 1, such as deployment conventions. These are not runtime skills themselves.
 
 There is also an optional fourth layer:
 
@@ -80,7 +80,7 @@ This repository builds on top of that operating model by packaging the parts tha
 - frontend web skill packs
 - frontend mobile skill packs
 - backend skill packs
-- setup prompts for generating project-specific local rules
+- setup prompts for any remaining project-specific local helpers
 
 In short:
 
@@ -106,7 +106,7 @@ The short version:
 3. Copy `skills/` into `.agent/skills/` in the target repo.
 4. Ask the user which production profile the repo should use if that has not already been decided.
 5. Copy only the relevant domain skill packs for that profile.
-6. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
+6. Optionally use the remaining `dynamic-skills/` setup prompts if you want generated repo-local helper skills such as deployment conventions.
 7. Optionally install manual skill packages from `optional-skills/` by following [docs/install-optional-skills.md](./docs/install-optional-skills.md).
 
 Recommended prompts for a target repo:
@@ -124,16 +124,15 @@ After that, load the relevant universal skills from .agent/skills/ and follow th
 If project-specific skills exist under .agent/skills/project-*/, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
 ```
 
-### Optional Day 1 Project-Specific Skill Generation
+### Optional Day 1 Deployment Skill Generation
 
-Use this when you want to generate local project skills from the setup prompts in `dynamic-skills/`:
+Use this when you want to generate a repo-local deployment helper from the remaining prompt in `dynamic-skills/`:
 
 ```text
 This repo already uses AGENTS.md as the operating model. We are in setup mode.
-Please run through the dynamic skill generators one at a time, starting with 01.
 Treat the files in dynamic-skills/ as setup prompts, not runtime skills.
-Analyze this repository, discuss the proposed non-negotiables with me before writing anything, then generate the approved project-specific skill files under .agent/skills/project-*/.
-Those generated skills must complement the universal skills and defer to AGENTS.md and the higher-order skill packs.
+If we need a project-specific deployment helper, run the remaining deployment prompt, discuss the proposed non-negotiables with me before writing anything, then generate the approved project-specific skill file under .agent/skills/project-*/.
+That generated skill must complement the universal skills and defer to AGENTS.md and the higher-order skill packs.
 ```
 
 ### Normal Session Commands
@@ -238,11 +237,7 @@ Their job is to help the AI:
 - discuss repo-specific non-negotiables with the human
 - generate project-specific skills under `.agent/skills/project-*/`
 
-Examples include prompts for:
-
-- frontend architecture
-- secure coding practices
-- deployment pipeline conventions
+The remaining prompt covers deployment pipeline conventions.
 
 ### `optional-skills/`
 
@@ -313,7 +308,7 @@ In a target repository, the sequence should be:
 
 1. Install `agent/AGENTS.md` into the target repo as `AGENTS.md` and add the relevant skill packs.
 2. Use the initial repository bootstrap prompt to create the Memory Bank according to the AGENTS 2.2 spec.
-3. If needed, use `dynamic-skills/` to generate local project-specific skills.
+3. If needed, use the remaining `dynamic-skills/` prompt to generate a local deployment helper.
 4. On subsequent boots, use `startup`.
 5. Start work in `PLAN`, not direct implementation.
 6. Use `BUILD`, `QA`, and `Document it. Update the memory bank.` as explicit workflow transitions.

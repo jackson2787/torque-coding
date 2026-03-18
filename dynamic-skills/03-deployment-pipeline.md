@@ -41,7 +41,7 @@ Using the agreed-upon constraints from Phase 2, generate a highly specific const
 **Critical Formatting Constraints:**
 *   You must generate a valid `SKILL.md` format, including YAML frontmatter with a `name: project-deployment-pipeline` and a `description:` that starts with "Use when..."
 *   The skill must be highly concise, bulleted, and no longer than necessary to prevent LLM context bloat. Avoid verbose explanations.
-*   You MUST include an explicit meta-rule stating: *"This skill defers to `react-best-practices`, `composition-patterns`, and `backend-architect` as the ultimate sources of truth. This skill ONLY defines our specific project wiring and choices."*
+*   You MUST include an explicit meta-rule stating: *"This skill defers to `AGENTS.md`, the relevant installed domain skills, and the repo Memory Bank as the higher-order sources of truth. This skill ONLY defines our specific project wiring and choices."*
 
 ## Phase 4: Output and Delivery 💾
 You MUST adhere to the `AGENTS.md` state machine (PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY).
