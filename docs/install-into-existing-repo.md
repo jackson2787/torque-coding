@@ -6,8 +6,8 @@ Use this document as the single install entrypoint when you want an AI to set up
 
 You are bootstrapping two interconnected systems into the target repository:
 
-1. **The operating model**: `agent/AGENTS.md`
-   This is the source asset in this template repo. Copy it into the target repo root as `AGENTS.md`; that installed file becomes the primary source of truth for how the agent should work in the target repo.
+1. **The operating model**: a rendered `AGENTS` production profile
+   Select one rendered file from `agent/generated/AGENTS.<profile>.md` and copy it into the target repo root as `AGENTS.md`; that installed file becomes the primary source of truth for how the agent should work in the target repo.
 
 2. **The capability layer**: the reusable skill packs
    These complement `AGENTS.md` with domain-specific guidance for execution, planning, verification, frontend work, mobile work, backend work, and documentation.
@@ -39,14 +39,26 @@ This repository is a template and source library.
 - The files here are the canonical source assets.
 - You do not run day-to-day work inside this template repo.
 - You copy the relevant files into the target repository, then point your AI at the copied files inside that target repo.
-- The root `AGENTS.md` in this template repo is intentionally lightweight and exists only to prevent confusion; the deployable operating model source is `agent/AGENTS.md`.
+- The root `AGENTS.md` in this template repo is intentionally lightweight and exists only to prevent confusion.
+- The profile-aware operating-model sources live under `agent/AGENTS.core.md`, `agent/profiles/`, and `agent/generated/`.
+- `agent/AGENTS.md` is the default `backend-generic` rendered output.
 - The `dynamic-skills/` directory is different from the installed skill packs: those files are prompt-generators used to create project-specific skills, not reusable skills that the AI should load for normal day-to-day execution.
+
+If you update the core or profile sources, regenerate the rendered outputs with:
+
+```text
+node agent/scripts/render-agents.js --all
+```
 
 ## Copy Targets
 
 Copy these files and directories into the target repository:
 
-- `agent/AGENTS.md` -> copy to the target repo root as `AGENTS.md`
+- One of the rendered production profiles:
+  - `agent/generated/AGENTS.frontend-web.md` -> copy to the target repo root as `AGENTS.md`
+  - `agent/generated/AGENTS.frontend-mobile.md` -> copy to the target repo root as `AGENTS.md`
+  - `agent/generated/AGENTS.backend-generic.md` -> copy to the target repo root as `AGENTS.md`
+  - `agent/generated/AGENTS.backend-hono-supabase.md` -> copy to the target repo root as `AGENTS.md`
 - `skills/` -> copy to the target repo as `.agent/skills/`
 - `backend-skills/` -> copy only if the target repo has backend code
 - `frontend-skills/frontend-shared-skills/` -> copy if the target repo has any frontend code
@@ -83,10 +95,10 @@ target-repo/
 
 ## First Question To Ask
 
-Before choosing skill packs, the AI should ask the user:
+Before choosing an `AGENTS` profile or skill packs, the AI should ask the user:
 
 ```text
-Is this repository frontend web, frontend mobile, backend, or a full-stack/monorepo combination?
+Which production profile should this repository use: frontend web, frontend mobile, backend generic, or backend hono-supabase?
 ```
 
 Do not force the AI to infer this when the user can answer it directly in one line.
@@ -95,16 +107,17 @@ Do not force the AI to infer this when the user can answer it directly in one li
 
 For most repos, the minimum useful install is:
 
-1. Copy `agent/AGENTS.md` to the target repo root as `AGENTS.md`.
+1. Copy the selected rendered `AGENTS.<profile>.md` file to the target repo root as `AGENTS.md`.
 2. Copy `skills/` to `.agent/skills/` in the target repo.
-3. Copy only the domain packs the target repo actually needs.
+3. Copy only the domain packs the target repo actually needs for that profile.
 
 Examples:
 
-- Frontend web: add `frontend-skills/frontend-shared-skills/` and `frontend-skills/frontend-web-skills/`
-- Frontend mobile: add `frontend-skills/frontend-shared-skills/` and `frontend-skills/frontend-mobile-skills/`
-- Backend: add `backend-skills/`
-- Full-stack monorepo: combine `backend-skills/` with the relevant frontend packs
+- Frontend web: use `AGENTS.frontend-web.md` and add `frontend-skills/frontend-shared-skills/` plus `frontend-skills/frontend-web-skills/`
+- Frontend mobile: use `AGENTS.frontend-mobile.md` and add `frontend-skills/frontend-shared-skills/` plus `frontend-skills/frontend-mobile-skills/`
+- Backend generic: use `AGENTS.backend-generic.md` and add `backend-skills/`
+- Backend Hono + Supabase: use `AGENTS.backend-hono-supabase.md` and add `backend-skills/`
+- Full-stack monorepo: choose the dominant production profile first, then combine the other relevant domain packs and project-specific generated skills as needed
 
 ## Day 1 Optional Step: Generate Project-Specific Skills
 
@@ -132,7 +145,7 @@ Initial repository bootstrap prompt:
 
 ```text
 Read AGENTS.md first. This repository uses AGENTS.md as the primary operating model and .agent/skills/ as the complementary capability layer.
-Before choosing optional domain skill packs, ask me whether this repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
+Before loading domain skills, confirm which production profile this repo is using: frontend web, frontend mobile, backend generic, or backend hono-supabase.
 Examine the code base to create the memory bank according to the AGENTS 2.2 spec. Do not use readme files or other documentation as the primary source; examine the code and logic.
 After that, load the relevant universal skills from .agent/skills/ and follow the PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS workflow.
 If project-specific skills exist under .agent/skills/project-*/, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
@@ -163,4 +176,5 @@ Document it. Update the memory bank.
 - Treat this template repo as the source of truth for reusable workflow assets.
 - Treat the target repo as the place where installation, generated skills, and project memory live.
 - Do not write generated project-specific skills back into this template repo.
+- Choose the target repo's production profile deliberately; it tunes `AGENTS.md` toward that production domain.
 - Only install the skill packs the target repo actually needs.

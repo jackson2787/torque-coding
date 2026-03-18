@@ -97,22 +97,27 @@ To install it into a target repository, use [docs/install-into-existing-repo.md]
 
 The short version:
 
-1. Copy `agent/AGENTS.md` into the target repo root as `AGENTS.md`.
-2. Copy `skills/` into `.agent/skills/` in the target repo.
-3. Ask the user whether the target repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
-4. Copy only the relevant domain skill packs.
-5. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
-6. Optionally install manual skill packages from `optional-skills/` by following [docs/install-optional-skills.md](./docs/install-optional-skills.md).
+1. Choose the target repo's production profile:
+   - `agent/generated/AGENTS.frontend-web.md`
+   - `agent/generated/AGENTS.frontend-mobile.md`
+   - `agent/generated/AGENTS.backend-generic.md`
+   - `agent/generated/AGENTS.backend-hono-supabase.md`
+2. Copy the selected rendered file into the target repo root as `AGENTS.md`.
+3. Copy `skills/` into `.agent/skills/` in the target repo.
+4. Ask the user which production profile the repo should use if that has not already been decided.
+5. Copy only the relevant domain skill packs for that profile.
+6. Optionally use `dynamic-skills/` as setup prompts to generate `.agent/skills/project-*/SKILL.md` files in the target repo.
+7. Optionally install manual skill packages from `optional-skills/` by following [docs/install-optional-skills.md](./docs/install-optional-skills.md).
 
 Recommended prompts for a target repo:
 
 ### Initial Repository Bootstrap
 
-Use this once, after installing `agent/AGENTS.md` as `AGENTS.md` and the skill packs into the target repo:
+Use this once, after installing the selected rendered `AGENTS` profile and the skill packs into the target repo:
 
 ```text
 Read AGENTS.md first. This repository uses AGENTS.md as the primary operating model and .agent/skills/ as the complementary capability layer.
-Before choosing optional domain skill packs, ask me whether this repo is frontend web, frontend mobile, backend, or a full-stack/monorepo combination.
+Before loading domain skill packs, confirm which production profile this repo is using: frontend web, frontend mobile, backend generic, or backend hono-supabase.
 Examine the code base to create the memory bank according to the AGENTS 2.2 spec. Do not use readme files or other documentation as the primary source; examine the code and logic.
 After that, load the relevant universal skills from .agent/skills/ and follow the PLAN -> BUILD -> DIFF -> QA -> APPROVAL -> APPLY -> DOCS workflow.
 If project-specific skills exist under .agent/skills/project-*/, use them alongside the universal skills: they define this repo's specific wiring and local constraints, while the universal skills remain the higher-level source of truth for architecture, quality, and execution discipline.
@@ -149,7 +154,22 @@ Document it. Update the memory bank.
 ### `agent/AGENTS.md`
 
 This is the heart of the system. It is the deployable operating-model asset
-that gets copied into the target repo root as `AGENTS.md`. It defines:
+that gets copied into the target repo root as `AGENTS.md`. In this repository,
+`agent/AGENTS.md` is the default `backend-generic` rendered profile, while the
+profile system is authored in:
+
+- `agent/AGENTS.core.md`
+- `agent/profiles/*.md`
+- `agent/generated/AGENTS.<profile>.md`
+- `agent/scripts/render-agents.js`
+
+Regenerate the rendered outputs with:
+
+```text
+node agent/scripts/render-agents.js --all
+```
+
+The installed `AGENTS.md` defines:
 
 - the compliance banner
 - startup behavior
@@ -161,8 +181,8 @@ that gets copied into the target repo root as `AGENTS.md`. It defines:
 - compaction recovery behavior
 
 If someone asks "how should the agent operate in the installed repo?", the
-answer should begin with `AGENTS.md` in that target repo, sourced from
-`agent/AGENTS.md`.
+answer should begin with `AGENTS.md` in that target repo, sourced from the
+selected rendered profile under `agent/generated/`.
 
 ### `AGENTS.md`
 

@@ -1,4 +1,3 @@
-<!-- Generated file. Edit agent/AGENTS.core.md, agent/profiles/*.md, or agent/scripts/render-agents.js instead. -->
 # AGENTS.md
 
 **Version**: 2.2 (2025-03-04) | **Compatibility**: Antigravity, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
@@ -220,38 +219,7 @@ production-domain profile. The selected profile narrows the default bias for
 planning, implementation, review, and domain-skill loading without changing the
 core workflow contract.
 
-<!-- ACTIVE_PROFILE: backend-generic -->
-**Profile Label**: Backend Generic
-
-**Active Profile**: `backend-generic`
-
-Use this profile for general backend repositories where the production surface
-is an API, service layer, worker, or data system, but the stack is not tightly
-opinionated around Hono + Supabase Edge Functions.
-
-**Default Domain Skill Packs**:
-- `.agent/skills/backend-architect/SKILL.md`
-- `.agent/skills/supabase-postgres-best-practices/SKILL.md` when the repo uses Postgres or Supabase
-
-**Primary Bias**:
-- Optimize for durable service boundaries, security-first APIs, migration discipline, observability, and reliability under real production load.
-
-**PLAN Bias**:
-- Treat auth/authz, data contracts, service boundaries, and migration strategy as expensive-to-reverse decisions.
-- Require explicit integration points, rollback thinking, and test strategy for backend changes.
-
-**BUILD Bias**:
-- Prefer incremental extension of existing services over parallel architecture.
-- Keep API contracts explicit, validation strong, and operational behavior visible.
-- Treat migrations, background jobs, and failure handling as part of the feature, not follow-up work.
-
-**QA Bias**:
-- Check contract correctness, security boundaries, migrations, error handling, observability hooks, and scalability/reliability regressions.
-
-**Red Flags**:
-- Public interfaces without validation or auth.
-- Database or infra changes without migration/rollback thinking.
-- “We will add security, monitoring, or operational hardening later.”
+{{PRODUCTION_PROFILE_SECTION}}
 
 ### Available Workflow Skills
 
@@ -1075,4 +1043,3 @@ Major changes: Return to `PLAN`
 **Mission**: Build software respecting existing architecture, following established patterns, improving incrementally. Reuse over creation. Quality over speed. Approval over assumption.
 
 **Let's build smarter — together.**
-

@@ -220,38 +220,39 @@ production-domain profile. The selected profile narrows the default bias for
 planning, implementation, review, and domain-skill loading without changing the
 core workflow contract.
 
-<!-- ACTIVE_PROFILE: backend-generic -->
-**Profile Label**: Backend Generic
+<!-- ACTIVE_PROFILE: frontend-mobile -->
+**Profile Label**: Frontend Mobile
 
-**Active Profile**: `backend-generic`
+**Active Profile**: `frontend-mobile`
 
-Use this profile for general backend repositories where the production surface
-is an API, service layer, worker, or data system, but the stack is not tightly
-opinionated around Hono + Supabase Edge Functions.
+Use this profile for Expo and React Native repositories where the primary
+production surface is a mobile app running on device.
 
 **Default Domain Skill Packs**:
-- `.agent/skills/backend-architect/SKILL.md`
-- `.agent/skills/supabase-postgres-best-practices/SKILL.md` when the repo uses Postgres or Supabase
+- `.agent/skills/react-native-skills/SKILL.md`
+- `.agent/skills/expo-native-data-fetching/SKILL.md`
+- `.agent/skills/composition-patterns/SKILL.md`
+- `.agent/skills/api-feature-request/SKILL.md` for any backend integration planning
 
 **Primary Bias**:
-- Optimize for durable service boundaries, security-first APIs, migration discipline, observability, and reliability under real production load.
+- Optimize for device reality: permissions, offline tolerance, secure storage, performance on constrained hardware, and production-safe mobile data flows.
 
 **PLAN Bias**:
-- Treat auth/authz, data contracts, service boundaries, and migration strategy as expensive-to-reverse decisions.
-- Require explicit integration points, rollback thinking, and test strategy for backend changes.
+- Treat navigation, data synchronization, auth token handling, and platform-specific behavior as first-class architecture concerns.
+- Make backend/API dependencies explicit before UI work hardens around them.
 
 **BUILD Bias**:
-- Prefer incremental extension of existing services over parallel architecture.
-- Keep API contracts explicit, validation strong, and operational behavior visible.
-- Treat migrations, background jobs, and failure handling as part of the feature, not follow-up work.
+- Follow Expo/React Native platform constraints instead of web assumptions.
+- Prefer stable mobile data-fetching patterns, resilient retry/offline behavior, and secure handling of tokens and secrets.
+- Keep device permissions, native capabilities, and app lifecycle behavior explicit.
 
 **QA Bias**:
-- Check contract correctness, security boundaries, migrations, error handling, observability hooks, and scalability/reliability regressions.
+- Check platform-specific flows, device performance, offline/poor-network behavior, permission prompts, and secure storage/session behavior.
 
 **Red Flags**:
-- Public interfaces without validation or auth.
-- Database or infra changes without migration/rollback thinking.
-- “We will add security, monitoring, or operational hardening later.”
+- Applying web-only assumptions to mobile navigation or storage.
+- Ignoring offline/error states for important device workflows.
+- Weak token storage or brittle permission handling.
 
 ### Available Workflow Skills
 

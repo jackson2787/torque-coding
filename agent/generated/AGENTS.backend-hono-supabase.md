@@ -220,38 +220,41 @@ production-domain profile. The selected profile narrows the default bias for
 planning, implementation, review, and domain-skill loading without changing the
 core workflow contract.
 
-<!-- ACTIVE_PROFILE: backend-generic -->
-**Profile Label**: Backend Generic
+<!-- ACTIVE_PROFILE: backend-hono-supabase -->
+**Profile Label**: Backend Hono Supabase
 
-**Active Profile**: `backend-generic`
+**Active Profile**: `backend-hono-supabase`
 
-Use this profile for general backend repositories where the production surface
-is an API, service layer, worker, or data system, but the stack is not tightly
-opinionated around Hono + Supabase Edge Functions.
+Use this profile for repositories where backend production work is centered on
+Hono running inside Supabase Edge Functions with Supabase/Postgres as the
+system of record.
 
 **Default Domain Skill Packs**:
+- `.agent/skills/backend-architect-supabase-hono/SKILL.md`
 - `.agent/skills/backend-architect/SKILL.md`
-- `.agent/skills/supabase-postgres-best-practices/SKILL.md` when the repo uses Postgres or Supabase
+- `.agent/skills/supabase-postgres-best-practices/SKILL.md`
 
 **Primary Bias**:
-- Optimize for durable service boundaries, security-first APIs, migration discipline, observability, and reliability under real production load.
+- Optimize for complete API + database vertical slices, thin Hono routes, explicit request/response contracts, database-centered business logic, and Supabase-safe operational discipline.
 
 **PLAN Bias**:
-- Treat auth/authz, data contracts, service boundaries, and migration strategy as expensive-to-reverse decisions.
-- Require explicit integration points, rollback thinking, and test strategy for backend changes.
+- Treat route contracts, SQL function signatures, authority modeling, and migration strategy as one design problem.
+- Prefer architect posture until request/response schema, SQL boundary, and access model are explicit.
 
 **BUILD Bias**:
-- Prefer incremental extension of existing services over parallel architecture.
-- Keep API contracts explicit, validation strong, and operational behavior visible.
-- Treat migrations, background jobs, and failure handling as part of the feature, not follow-up work.
+- Keep route handlers thin and boring.
+- Prefer shared route factories and database bridge patterns such as `callDb(...)`.
+- Push durable business logic into SQL boundaries, not TypeScript route code.
+- Treat the API and database as one integrated delivery surface for each backend feature.
 
 **QA Bias**:
-- Check contract correctness, security boundaries, migrations, error handling, observability hooks, and scalability/reliability regressions.
+- Check route-schema alignment, auth and authority boundaries, migration correctness, error mapping, and whether the response contract is strong enough for zero-inference clients.
 
 **Red Flags**:
-- Public interfaces without validation or auth.
-- Database or infra changes without migration/rollback thinking.
-- “We will add security, monitoring, or operational hardening later.”
+- Direct `supabase.from(...)` table orchestration in Hono handlers where a DB bridge exists.
+- Generic mutation payloads like `{ success: true }`.
+- Backend work planned as “route now, schema later”.
+- Blurring this profile with deep Postgres tuning instead of loading `supabase-postgres-best-practices`.
 
 ### Available Workflow Skills
 
