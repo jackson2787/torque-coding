@@ -89,6 +89,55 @@ In short:
 
 ---
 
+## Domains And Stacks
+
+When installing this playbook into a target repo, choose the domain that best
+matches the production codebase you are operating.
+
+| Domain | `AGENTS` Source | Designed For | Domain Skill Packs |
+|---|---|---|---|
+| `universal` | `agent/AGENTS.md` | Repos that only need the core AGENT-ZERO workflow and universal execution skills | None beyond `skills/` |
+| `web` | `agent/AGENTS.web.md` | React and Next.js frontend repositories | `frontend-skills/frontend-shared-skills/` and `frontend-skills/frontend-web-skills/` |
+| `mobile` | `agent/AGENTS.mobile.md` | Expo and React Native frontend repositories | `frontend-skills/frontend-shared-skills/` and `frontend-skills/frontend-mobile-skills/` |
+| `supabase backend` | `agent/AGENTS.backend.supabase.md` | Backends built around Hono inside Supabase Edge Functions with Supabase/Postgres | `backend-skills/` |
+
+All installed skills should live directly under:
+
+```text
+.agent/skills/<skill-root>/
+```
+
+Do not nest them by source area such as `frontend-skills/` or
+`backend-skills/` inside the target repo.
+
+## Skill Reference
+
+| Skill Root | Layer | Designed For | What It Does | Use When |
+|---|---|---|---|---|
+| `bootstrap-memory-bank` | universal | Any repo using the Memory Bank | Creates or refreshes `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, and `projectRules.md` with explicit human confirmation | Day 1 bootstrap or deliberate Memory Bank recalibration |
+| `build-execution` | universal | Any repo in BUILD | Keeps implementation disciplined inside BUILD, including TDD, tight scope, and stop-before-apply behavior | Entering BUILD after plan approval |
+| `systematic-debugging` | universal | Any repo | Drives root-cause-first debugging instead of random patching | QA failures, unclear bugs, repeated failed fixes |
+| `verification-before-completion` | universal | Any repo | Forces evidence-based verification before claiming work is done | QA and final verification before “fixed” or “complete” claims |
+| `writing-docs` | universal | Any repo | Updates docs and Memory Bank entries after approved work | DOCS phase or explicit documentation tasks |
+| `writing-plans` | universal | Any repo | Produces architecture-aware implementation plans grounded in current code and Memory Bank context | PLAN phase |
+| `backend-architect-supabase-hono` | backend | Hono + Supabase backends | Keeps the agent aligned to the Hono plus Supabase design ethos and routes it to the right stack references | Planning or building Hono-in-Supabase-Edge backend work |
+| `supabase-postgres-best-practices` | backend | Supabase/Postgres backends | Supplies deep Postgres and Supabase guidance for performance, schema, RLS, locking, and tuning | Query, schema, RLS, indexing, or database-performance work |
+| `accessible-ui` | frontend shared | Web and mobile UIs | Enforces accessibility and interaction-quality guardrails for user-facing interfaces | Forms, flows, semantics, keyboard/screen-reader behavior, responsive UI |
+| `api-feature-request` | frontend shared | Frontends depending on APIs | Helps keep the frontend thin by identifying when API surface should be added or changed instead of pushing logic into the client | Planning features that depend on backend contracts |
+| `composition-patterns` | frontend shared | Component-based frontends | Guides component API design, compound components, and composition-heavy refactors | Reusable component APIs, component architecture changes |
+| `next-best-practices` | frontend web | Next.js repos | Provides Next.js-specific guidance for routing, RSC boundaries, metadata, scripts, and runtime choices | Writing, reviewing, or refactoring Next.js code |
+| `next-cache-components` | frontend web | Next.js repos using Cache Components | Guides `use cache`, cache invalidation, and Cache Components boundaries | Tasks involving cache tags, cache life, or Partial Prerendering |
+| `next-upgrade` | frontend web | Next.js repos | Focuses on framework upgrade work and upgrade-specific pitfalls | Explicit Next.js upgrade tasks |
+| `react-best-practices` | frontend web | React and Next.js repos | Provides React and Next.js performance and structure guidance from Vercel’s patterns | Writing, reviewing, or refactoring React/Next.js code |
+| `expo-native-data-fetching` | frontend mobile | Expo / React Native repos | Covers API calls, caching, token flow, retries, offline handling, and mobile request boundaries | Networking, auth refresh, or client data-fetching work in mobile apps |
+| `react-native-skills` | frontend mobile | Expo / React Native repos | Provides mobile-focused guidance for performance, UI, lists, animation, navigation, and native constraints | Writing, reviewing, or refactoring React Native or Expo code |
+| `best-practices-audit` | optional | Existing repos needing review | Produces a structured audit document against the installed playbook and skill packs | Manual baseline audit or drift audit |
+| `brainstorming-features` | optional | Early-stage feature work | Helps turn vague ideas into clearer feature direction before formal planning | The request is still fuzzy and not ready for PLAN |
+| `legal-compliance-checker` | optional | Regulated or compliance-sensitive work | Adds legal and regulatory review framing for privacy, consent, payments, health data, contracts, and similar areas | Tasks touching regulated data, privacy, payments, or jurisdictional compliance |
+| `sync-api` | optional | TypeScript frontend repos using OpenAPI | Installs and runs a strict OpenAPI-to-client sync workflow with Orval support files | Frontend repos that generate clients from an OpenAPI contract |
+
+---
+
 ## Install Into A Real Repo
 
 This repository is a template source, not the final installed layout.
