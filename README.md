@@ -192,6 +192,10 @@ They cover:
 
 Reusable backend-oriented skill packs for APIs, databases, security posture, and backend architecture.
 
+Current source packs include a general backend architecture skill, a
+Supabase/Postgres best-practices pack, and a stack-specific Hono + Supabase
+backend architecture pack.
+
 ### `frontend-skills/`
 
 Reusable frontend skill source packs organized to reduce drift across

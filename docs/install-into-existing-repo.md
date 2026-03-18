@@ -71,6 +71,7 @@ target-repo/
         ├── writing-plans/
         ├── writing-skills/
         ├── backend-architect/                 # optional
+        ├── backend-architect-supabase-hono/   # optional
         ├── supabase-postgres-best-practices/  # optional
         ├── accessible-ui/                     # optional
         ├── api-feature-request/               # optional
