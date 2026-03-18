@@ -1,7 +1,8 @@
+<!-- Generated file. Edit agent/AGENTS.core.md, agent/profiles/*.md, or agent/scripts/render-agents.js instead. -->
 # AGENTS.md
 
-**Version**: 2.2 (2025-03-04) | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
-**Status**: Canonical single-file guide for AI-assisted development
+**Version**: 2.2 (2025-03-04) | **Compatibility**: Antigravity, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
+**Status**: Rendered deployable guide for AI-assisted development
 
 ---
 
@@ -12,6 +13,7 @@
    - [Compaction Protocol](#compaction-protocol-mid-session-context-preservation)
 3. [Memory Bank](#3-memory-bank)
 4. [State Machine](#4-state-machine)
+   - [Production Profile](#production-profile)
 5. [Task Contract & Budgets](#5-task-contract--budgets)
 6. [Quality & Documentation](#6-quality--documentation)
 7. [Example Workflow](#7-example-workflow)
@@ -72,7 +74,8 @@ COMPLIANCE CONFIRMED: Reuse over creation
 1. Output compliance statement (Section 1)
 2. Attach MCP servers: Read `.brain/mcp.config.json` or `.mcp.json` if present
 3. Load Memory Bank per mode below
-4. Log session: `{"ts":"2025-10-25T10:30Z","mode":"fast|standard|deep","mb_v":"2024-10"}`
+4. Identify the active **Production Profile** in Section 4 and load its domain skill packs
+5. Log session: `{"ts":"2025-10-25T10:30Z","mode":"fast|standard|deep","mb_v":"2024-10"}`
 
 **Fast Track** (bug fixes, small changes):
 ```
@@ -210,6 +213,58 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
   └───────────────────────────────────[major changes needed]─────┘
 ```
 
+### Production Profile
+
+This deployable guide is rendered from `agent/AGENTS.core.md` plus one
+production-domain profile. The selected profile narrows the default bias for
+planning, implementation, review, and domain-skill loading without changing the
+core workflow contract.
+
+<!-- ACTIVE_PROFILE: backend-generic -->
+**Profile Label**: Backend Generic
+
+**Active Profile**: `backend-generic`
+
+Use this profile for general backend repositories where the production surface
+is an API, service layer, worker, or data system, but the stack is not tightly
+opinionated around Hono + Supabase Edge Functions.
+
+**Default Domain Skill Packs**:
+- `.agent/skills/backend-architect/SKILL.md`
+- `.agent/skills/supabase-postgres-best-practices/SKILL.md` when the repo uses Postgres or Supabase
+
+**Primary Bias**:
+- Optimize for durable service boundaries, security-first APIs, migration discipline, observability, and reliability under real production load.
+
+**PLAN Bias**:
+- Treat auth/authz, data contracts, service boundaries, and migration strategy as expensive-to-reverse decisions.
+- Require explicit integration points, rollback thinking, and test strategy for backend changes.
+
+**BUILD Bias**:
+- Prefer incremental extension of existing services over parallel architecture.
+- Keep API contracts explicit, validation strong, and operational behavior visible.
+- Treat migrations, background jobs, and failure handling as part of the feature, not follow-up work.
+
+**QA Bias**:
+- Check contract correctness, security boundaries, migrations, error handling, observability hooks, and scalability/reliability regressions.
+
+**Red Flags**:
+- Public interfaces without validation or auth.
+- Database or infra changes without migration/rollback thinking.
+- “We will add security, monitoring, or operational hardening later.”
+
+### Available Workflow Skills
+
+Before beginning or transitioning states, you should load the relevant skill file:
+- Also load the domain skills named in the active **Production Profile** above.
+- **Idea Generation**: `.agent/skills/brainstorming-features/SKILL.md`
+- **PLAN State**: `.agent/skills/writing-plans/SKILL.md`
+- **Frontend API Planning**: `.agent/skills/api-feature-request/SKILL.md` (Mandatory gate during PLAN state for any frontend API integration)
+- **BUILD State**: `.agent/skills/executing-plans/SKILL.md`
+- **BUILD (Coding)**: `.agent/skills/test-driven-development/SKILL.md`
+- **QA (Debugging)**: `.agent/skills/systematic-debugging/SKILL.md`
+- **QA to APPROVAL Gate**: `.agent/skills/verification-before-completion/SKILL.md`
+
 ---
 
 ### PLAN
@@ -231,9 +286,10 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 - Cannot reuse [component] because: [specific technical reason]
 
 **Steps**:
-1. [Action] - extends pattern at `file:line`
-2. [Action] - integrates with [component]
-3. [Action] - adds tests mirroring `test.ext`
+1. **[Frontend Only] API Surface Check** - Evaluated via `api-feature-request` skill
+2. [Action] - extends pattern at `file:line`
+3. [Action] - integrates with [component]
+4. [Action] - adds tests mirroring `test.ext`
 
 **Integration**: [Component A] calls via [method] | [Service B] update at `file:line`
 **Risks**: [Risk] → mitigation: [approach]
@@ -1019,3 +1075,4 @@ Major changes: Return to `PLAN`
 **Mission**: Build software respecting existing architecture, following established patterns, improving incrementally. Reuse over creation. Quality over speed. Approval over assumption.
 
 **Let's build smarter — together.**
+
