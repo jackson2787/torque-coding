@@ -23,7 +23,7 @@ This runs an interactive installer that:
 Then open an AI session and run:
 
 ```
-"Read .agent/bootstrap-memory-bank-contract.md and execute it."
+"Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it."
 ```
 
 This scans your actual code to populate the memory bank. Commit `.agent/` and `memory-bank/` when done.
@@ -39,10 +39,9 @@ npx github:jackson2787/agent-engineering-playbook
 ## What Gets Installed
 
 ```
+AGENTS.md                                    ← The operating model (state machine)
+
 .agent/
-├── AGENTS.md                              ← The operating model (state machine)
-├── bootstrap-memory-bank-contract.md      ← One-time memory bank setup
-├── templates/                             ← Document templates
 └── skills/
     ├── state-machine/                     ← Core workflow skills
     │   ├── writing-plans/                 ← PLAN state
@@ -58,6 +57,10 @@ npx github:jackson2787/agent-engineering-playbook
         ├── update-product-context/
         ├── update-toc/
         └── mb-rebase/                     ← Human-in-the-loop doc calibration
+
+docs/memory-bank/
+├── bootstrap-memory-bank-contract.md      ← One-time memory bank setup
+└── templates/                             ← Document templates
 
 memory-bank/
 ├── architecture.md                        ← Tech stack, patterns, rules

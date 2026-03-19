@@ -71,7 +71,7 @@ It's also token-aware — you can set a `--max-tokens` budget and it deduplicate
 Probe supports JavaScript, TypeScript, Python, Go, Rust, C/C++, Java, Ruby, PHP, Swift, C#, and more — covering any stack you work in.
 
 Probe is also the best fit for the Day 1 bootstrap contract in
-`.agent/bootstrap-memory-bank-contract.md`. That contract intentionally
+`docs/memory-bank/bootstrap-memory-bank-contract.md`. That contract intentionally
 quarantines markdown and other prose during the primary evidence sweep, so the
 agent has to learn the repo from code, config, tests, schemas, and runtime
 files alone. If Probe is connected, the agent can do that sweep with structural

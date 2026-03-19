@@ -111,7 +111,7 @@ memory-bank/
 
 | Situation | Action |
 |-----------|--------|
-| After first install | Run bootstrap: `Read .agent/bootstrap-memory-bank-contract.md and execute it.` |
+| After first install | Run bootstrap: `Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it.` |
 | Calibrate with human knowledge | `mb-rebase projectBrief.md` (one file at a time) |
 | Docs feel stale | `mb-rebase architecture.md` — agent checks for drift, shows you, you confirm |
 | Major pivot or refactor | Rebase all foundation docs one by one |
@@ -165,7 +165,7 @@ If the agent breaks these, call it out. They're non-negotiable.
 
 | What | Prompt |
 |------|--------|
-| Bootstrap memory bank | `Read .agent/bootstrap-memory-bank-contract.md and execute it.` |
+| Bootstrap memory bank | `Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it.` |
 | Rebase a document | `mb-rebase architecture.md` |
 | Start from an idea | Use `idea-to-task` skill, then paste the contract |
 | Force state awareness | `"What state are you in? Show your state machine position."` |

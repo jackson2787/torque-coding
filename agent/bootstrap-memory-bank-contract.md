@@ -12,7 +12,7 @@ codebase.
 ## Source And Install Path
 
 - Template source path: `agent/bootstrap-memory-bank-contract.md`
-- Installed target-repo path: `.agent/bootstrap-memory-bank-contract.md`
+- Installed target-repo path: `docs/memory-bank/bootstrap-memory-bank-contract.md`
 
 ## Rules
 
@@ -98,7 +98,7 @@ BOOTSTRAP COMPLETE
 ## Suggested Prompt
 
 ```text
-Read .agent/bootstrap-memory-bank-contract.md and execute it.
+Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it.
 Examine the codebase — code, config, tests, manifests, CI, schemas, runtime
 files. Do not read markdown or documentation as evidence. Use the memory bank
 skills for all writes. If something is not provable from the repo, flag it and
