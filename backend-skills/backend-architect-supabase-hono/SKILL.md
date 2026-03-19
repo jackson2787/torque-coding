@@ -1,6 +1,6 @@
 ---
 name: backend-architect-supabase-hono
-description: Use when designing, planning, or implementing backend work in repositories that use Hono inside Supabase Edge Functions with Supabase/Postgres. Keeps the agent aligned to the stack ethos, helps choose architect versus builder posture, and routes to the correct reference docs for philosophy, route delivery, database boundaries, and Memory Bank bootstrap. Pair with supabase-postgres-best-practices for deep Postgres tuning, indexing, query optimization, or RLS performance work.
+description: Use when designing, planning, or implementing backend work in repositories that use Hono inside Supabase Edge Functions with Supabase/Postgres. Keeps the agent aligned to the stack ethos, helps choose architect versus builder posture, and routes to the correct reference docs for philosophy, route delivery, database boundaries, and Memory Bank bootstrap references. Pair with supabase-postgres-best-practices for deep Postgres tuning, indexing, query optimization, or RLS performance work.
 metadata:
   author: uber-ai-workflow
   version: "0.1.0"
@@ -89,7 +89,7 @@ Load references based on the current need:
 - [references/database-boundary-and-triple-lock.md](references/database-boundary-and-triple-lock.md)
   Use for SQL boundaries, authority modeling, public versus internal contracts, migrations, and the triple-lock model.
 - [references/memory-bank-bootstrap-map.md](references/memory-bank-bootstrap-map.md)
-  Use when `bootstrap-memory-bank` is creating or refreshing Memory Bank files for a repo using this stack.
+  Use when the bootstrap contract is creating or refreshing Memory Bank files for a repo using this stack.
 
 Load `supabase-postgres-best-practices` separately when the problem becomes about:
 

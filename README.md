@@ -16,6 +16,10 @@ This repo bootstraps **two interconnected systems** into a real project reposito
 1. **The operating model source**: `agent/AGENTS.md`
    This is the deployable operating-model asset. When installed into a real project repo, it becomes that repo's root `AGENTS.md` and defines the state machine, approval gates, Memory Bank behavior, task contracts, compaction protocol, and documentation discipline.
 
+   The operating-model layer also includes
+   `agent/bootstrap-memory-bank-contract.md`, a one-time bootstrap procedure
+   for creating the initial Memory Bank from repository evidence.
+
 2. **The capability layer**: the skill packs
    These complement `AGENTS.md` with reusable, domain-specific guidance for planning, debugging, frontend work, mobile work, backend work, verification, and documentation.
 
@@ -51,8 +55,9 @@ In this repository:
 If you need an authority order, use this:
 
 1. `AGENTS.md` in the target repo, sourced from `agent/AGENTS.md`
-2. Universal skill packs in `.agent/skills/`
-3. Optional skills in `.agent/skills/<skill-root>/` when explicitly installed
+2. `.agent/bootstrap-memory-bank-contract.md` during Day 1 Memory Bank bootstrap
+3. Universal skill packs in `.agent/skills/`
+4. Optional skills in `.agent/skills/<skill-root>/` when explicitly installed
 
 Optional skills should **complement** the universal skills. They should not
 replace the higher-order workflow, approval model, or architectural discipline
@@ -110,7 +115,6 @@ Do not nest them by source area such as `frontend-skills/` or
 
 | Skill Root | Layer | Designed For | What It Does | Use When |
 |---|---|---|---|---|
-| `bootstrap-memory-bank` | universal | Any repo using the Memory Bank | Creates or refreshes `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, and `projectRules.md` with explicit human confirmation | Day 1 bootstrap or deliberate Memory Bank recalibration |
 | `build-execution` | universal | Any repo in BUILD | Keeps implementation disciplined inside BUILD, including TDD, tight scope, and stop-before-apply behavior | Entering BUILD after plan approval |
 | `systematic-debugging` | universal | Any repo | Drives root-cause-first debugging instead of random patching | QA failures, unclear bugs, repeated failed fixes |
 | `verification-before-completion` | universal | Any repo | Forces evidence-based verification before claiming work is done | QA and final verification before “fixed” or “complete” claims |
@@ -145,10 +149,11 @@ The short version:
 
 1. Ask which domain to install: `universal`, `web`, `mobile`, or `supabase backend`.
 2. Copy the matching file from `agent/` into the target repo root as `AGENTS.md`.
-3. Copy the universal skills into `.agent/skills/`.
-4. Copy the selected domain skill roots into `.agent/skills/`.
-5. Ask which optional skills to install.
-6. Install any selected optional skills under `.agent/skills/<skill-root>/`.
+3. Copy `agent/bootstrap-memory-bank-contract.md` into the target repo as `.agent/bootstrap-memory-bank-contract.md`.
+4. Copy the universal skills into `.agent/skills/`.
+5. Copy the selected domain skill roots into `.agent/skills/`.
+6. Ask which optional skills to install.
+7. Install any selected optional skills under `.agent/skills/<skill-root>/`.
 
 Use the full step-by-step guide at
 [docs/install-ai-guide.md](./docs/install-ai-guide.md).
@@ -177,6 +182,19 @@ If someone asks "how should the agent operate in the installed repo?", the
 answer should begin with `AGENTS.md` in that target repo, copied from the
 appropriate file in `agent/`.
 
+### `agent/bootstrap-memory-bank-contract.md`
+
+This is the Day 1 bootstrap contract for creating the initial Memory Bank in a
+target repository.
+
+It tells the AI to:
+
+- inspect code and executable project files first
+- ignore README-style prose as grounding truth during the initial sweep
+- draft the foundation Memory Bank files
+- keep unresolved human-driven claims in explicit pending-confirmation sections
+- create the minimum operational scaffolding needed for AGENTS 2.2 startup
+
 ### `AGENTS.md`
 
 This root file is intentionally lightweight. Its only job is to stop
@@ -196,7 +214,6 @@ They cover:
 - debugging
 - verification
 - documentation
-- Memory Bank bootstrap
 
 ### `backend-skills/`
 
@@ -286,14 +303,15 @@ That means:
 In a target repository, the sequence should be:
 
 1. Install the correct `agent/AGENTS*.md` file into the target repo as `AGENTS.md`.
-2. Install the universal skills into `.agent/skills/`.
-3. Install the matching domain skill pack roots into `.agent/skills/`.
-4. Optionally install any optional skills the repo actually needs.
-5. Use `bootstrap-memory-bank` to create the Memory Bank with human confirmation.
-6. On subsequent boots, use `startup`.
-7. Start work in `PLAN`, not direct implementation.
-8. Use `BUILD`, `QA`, and `Document it. Update the memory bank.` as explicit workflow transitions.
-9. Use `/compact` between tasks to keep context clean.
+2. Copy `agent/bootstrap-memory-bank-contract.md` into the target repo as `.agent/bootstrap-memory-bank-contract.md`.
+3. Install the universal skills into `.agent/skills/`.
+4. Install the matching domain skill pack roots into `.agent/skills/`.
+5. Optionally install any optional skills the repo actually needs.
+6. Point the AI to `.agent/bootstrap-memory-bank-contract.md` to create the initial Memory Bank.
+7. On subsequent boots, use `startup`.
+8. Start work in `PLAN`, not direct implementation.
+9. Use `BUILD`, `QA`, and `Document it. Update the memory bank.` as explicit workflow transitions.
+10. Use `/compact` between tasks to keep context clean.
 
 If the AI is confused about "what matters most," it should prefer:
 

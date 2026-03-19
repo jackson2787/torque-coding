@@ -16,6 +16,7 @@ The full deployable operating model for real project repositories lives at:
 When installing this playbook into a target repo, copy:
 
 - `agent/AGENTS.md` -> `AGENTS.md` in the target repo root
+- `agent/bootstrap-memory-bank-contract.md` -> `.agent/bootstrap-memory-bank-contract.md`
 - `skills/` -> `.agent/skills/`
 - selected domain packs -> `.agent/skills/`
 - generated project-specific skills -> `.agent/skills/project-*/`
@@ -39,7 +40,8 @@ When installing this playbook into a target repo, copy:
 ## Canonical Paths
 
 - Full operating model source in this repo: `agent/AGENTS.md`
-- Install guide: `docs/install-into-existing-repo.md`
+- Bootstrap contract source in this repo: `agent/bootstrap-memory-bank-contract.md`
+- Install guide: `docs/install-ai-guide.md`
 - Optional skill install guide: `docs/install-optional-skills.md`
 
 If asked where the real agent instructions live, answer with

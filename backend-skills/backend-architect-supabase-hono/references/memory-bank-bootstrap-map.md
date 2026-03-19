@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use this reference when `bootstrap-memory-bank` is creating or refreshing Memory
+Use this reference when the bootstrap contract is creating or refreshing Memory
 Bank documents for a repo that uses Hono inside Supabase Edge Functions with
 Supabase/Postgres.
 

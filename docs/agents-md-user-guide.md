@@ -75,6 +75,22 @@ memory-bank/
 
 **When files get updated**: The agent updates the Memory Bank at specific moments — after major features are completed, when new patterns are discovered, when architectural decisions are made, or when you explicitly ask it to. Routine bug fixes and small changes don't trigger full MB updates.
 
+### Creating The Initial Memory Bank
+
+On Day 1, create the initial Memory Bank by pointing the AI to
+`.agent/bootstrap-memory-bank-contract.md`.
+
+That contract tells the AI to:
+
+- inspect code, config, tests, manifests, CI, schemas, and runtime files first
+- avoid using README files or other prose as grounding truth during the primary sweep
+- draft the five foundation files of the Memory Bank
+- keep anything human-dependent in clearly labeled pending-confirmation sections
+- add the minimum operational scaffolding needed for normal AGENTS.md startup
+
+This keeps the initial Memory Bank grounded in repo evidence without forcing the
+agent to invent product goals or local rules that the codebase cannot prove.
+
 ---
 
 ## How a Session Works

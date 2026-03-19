@@ -9,10 +9,12 @@ The AI should:
 
 1. Ask which domain the target repo should use.
 2. Copy the correct `AGENTS` file into the target repo root as `AGENTS.md`.
-3. Copy the universal skills into the target repo under `.agent/skills/`.
-4. Copy the selected domain skill pack roots into `.agent/skills/`.
-5. Ask which optional skills to install.
-6. Copy the selected optional skill roots into `.agent/skills/`.
+3. Copy the bootstrap contract into the target repo at
+   `.agent/bootstrap-memory-bank-contract.md`.
+4. Copy the universal skills into the target repo under `.agent/skills/`.
+5. Copy the selected domain skill pack roots into `.agent/skills/`.
+6. Ask which optional skills to install.
+7. Copy the selected optional skill roots into `.agent/skills/`.
 
 All installed skills must end up at:
 
@@ -40,18 +42,24 @@ Use this mapping:
 - `mobile` -> copy `agent/AGENTS.mobile.md` to `AGENTS.md` in the target repo root
 - `supabase backend` -> copy `agent/AGENTS.backend.supabase.md` to `AGENTS.md` in the target repo root
 
-## Step 3: Always Copy The Universal Skills
+## Step 3: Copy The Bootstrap Contract
+
+Always copy:
+
+- `agent/bootstrap-memory-bank-contract.md` ->
+  `.agent/bootstrap-memory-bank-contract.md`
+
+## Step 4: Always Copy The Universal Skills
 
 Always install these skill roots into `.agent/skills/`:
 
-- `skills/bootstrap-memory-bank/` -> `.agent/skills/bootstrap-memory-bank/`
 - `skills/build-execution/` -> `.agent/skills/build-execution/`
 - `skills/systematic-debugging/` -> `.agent/skills/systematic-debugging/`
 - `skills/verification-before-completion/` -> `.agent/skills/verification-before-completion/`
 - `skills/writing-docs/` -> `.agent/skills/writing-docs/`
 - `skills/writing-plans/` -> `.agent/skills/writing-plans/`
 
-## Step 4: Copy The Domain Skill Roots
+## Step 5: Copy The Domain Skill Roots
 
 ### `universal`
 
@@ -86,7 +94,7 @@ Copy these roots into `.agent/skills/`:
 - `backend-skills/backend-architect-supabase-hono/`
 - `backend-skills/supabase-postgres-best-practices/`
 
-## Step 5: Ask Which Optional Skills To Install
+## Step 6: Ask Which Optional Skills To Install
 
 After the universal skills and chosen domain pack are copied, the AI should ask:
 
@@ -94,7 +102,7 @@ After the universal skills and chosen domain pack are copied, the AI should ask:
 Which optional skills do you want to install: brainstorming-features, legal-compliance-checker, best-practices-audit, sync-api, or none?
 ```
 
-## Step 6: Optional Skill Mapping
+## Step 7: Optional Skill Mapping
 
 If the user selects one or more optional skills, copy them into
 `.agent/skills/` like this:
@@ -121,11 +129,13 @@ We are installing AGENT-ZERO from this template repo into a target repository.
 
 1. Ask me which domain to install: universal, web, mobile, or supabase backend.
 2. Copy the matching file from agent/ into the target repo root as AGENTS.md.
-3. Copy the universal skills into .agent/skills/ using the root skill directory names only.
-4. Copy the selected domain skill roots into .agent/skills/.
-5. Ask me which optional skills to install: brainstorming-features, legal-compliance-checker, best-practices-audit, sync-api, or none.
-6. Install the selected optional skills into .agent/skills/<root-directory-of-skill>/.
-7. If sync-api is selected, also follow optional-skills/sync-api/installation.md for any extra support files.
+3. Copy agent/bootstrap-memory-bank-contract.md into the target repo at .agent/bootstrap-memory-bank-contract.md.
+4. Copy the universal skills into .agent/skills/ using the root skill directory names only.
+5. Copy the selected domain skill roots into .agent/skills/.
+6. Ask me which optional skills to install: brainstorming-features, legal-compliance-checker, best-practices-audit, sync-api, or none.
+7. Install the selected optional skills into .agent/skills/<root-directory-of-skill>/.
+8. If sync-api is selected, also follow optional-skills/sync-api/installation.md for any extra support files.
+9. When installation is complete, tell me to point the AI at .agent/bootstrap-memory-bank-contract.md before normal work begins.
 
 All skills must end up directly under .agent/skills/<skill-root>/ in the target repo.
 Do not use the old dynamic-skills flow.

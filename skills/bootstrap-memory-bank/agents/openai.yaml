@@ -1,4 +1,0 @@
-interface:
-  display_name: "Bootstrap Memory Bank"
-  short_description: "Create Memory Bank foundation docs with human confirmation"
-  default_prompt: "Use this skill to create or refresh the foundational Memory Bank documents one at a time, presenting findings and assumptions to the human for confirmation before writing."
