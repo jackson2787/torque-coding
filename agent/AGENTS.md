@@ -1,35 +1,28 @@
 # AGENTS.md
 
-**Version**: 2.3 (2026-03-19) | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
-**Status**: Canonical single-file guide for AI-assisted development
+**Version**: 2.4 (2026-03-19) | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
 
 ---
 
 ## Table of Contents
 
-1. [Compliance & Core Rules](#1-compliance--core-rules)
+1. [Core Rules](#1-core-rules)
 2. [Session Startup](#2-session-startup)
-   - [Compaction Protocol](#compaction-protocol-mid-session-context-preservation)
 3. [Memory Bank](#3-memory-bank)
 4. [State Machine](#4-state-machine)
-5. [Task Contract & Budgets](#5-task-contract--budgets)
+5. [Task Contract & Stall Detection](#5-task-contract--stall-detection)
 6. [Quality & Documentation](#6-quality--documentation)
 7. [Example Workflow](#7-example-workflow)
 8. [Troubleshooting](#8-troubleshooting)
 
 ---
 
-## 1. Compliance & Core Rules
+## 1. Core Rules
 
 ### Startup Compliance (Output Every Session)
 
 ```
 COMPLIANCE CONFIRMED: Reuse over creation
-
-⚠️  GIGO PREVENTION - User Responsibilities:
-📋 Clear task objectives | 🔗 Historical context | 🎯 Success criteria
-⚙️  Architectural constraints | 🎖️ You lead - clear input = excellent output
-
 [Continue with Memory Bank loading...]
 ```
 
@@ -39,10 +32,10 @@ COMPLIANCE CONFIRMED: Reuse over creation
 |------|-------------|------------|
 | ❌ **No new files without reuse analysis** | Search codebase, reference files that cannot be extended, provide exhaustive justification | Before creating: "Analyzed X, Y, Z. Cannot extend because [technical reason]" |
 | ❌ **No rewrites when refactoring possible** | Prefer incremental improvements, justify why refactoring won't work | "Refactoring X impossible because [specific limitation]" |
-| ❌ **No generic advice** | Cite `file:line`, show concrete integration points, include migration strategies | Every suggestion includes `file:line` citation |
+| ❌ **No generic advice** | Cite `file:line`, show concrete integration points. ✅ `"Extended services/auth.ext:45 following architecture.md#Service Extension Pattern"` ❌ `"Updated service per architecture.md"` | Every suggestion includes `file:line` citation |
 | ❌ **No ignoring existing architecture** | Load patterns before changes, extend existing services/components, consolidate duplicates | "Extends existing pattern at `file:line`" |
 
-### Reuse Validation Checklist (Before Creating Files)
+**Reuse Proof** (required before creating any new file):
 
 ```markdown
 - [ ] Searched: [search terms] → found: [list files]
@@ -52,15 +45,6 @@ COMPLIANCE CONFIRMED: Reuse over creation
 - [ ] Checked patterns: `architecture.md#[section]`
 - [ ] Justification: New file needed because [exhaustive reasoning]
 ```
-
-### Non-Negotiables
-
-- **Approval Gates**: No file changes without explicit user approval
-- **Citations**: Always `file:line` for code, `file.md#Section` for Memory Bank
-- **Sandbox First**: All edits in branch/temp clone, never main
-- **MCP Preferred**: Use MCP servers for memory, repo ops, QA over brute-force context
-- **No Mock Data**: Never fake/simulated data in production; never stub functions
-- **Context Engineering**: Keep working context focused on current task
 
 ---
 
@@ -129,8 +113,8 @@ memory-bank/
 ├── toc.md                    # Index (update after new files/tasks)
 ├── projectBrief.md           # Vision, goals (rarely change)
 ├── productContext.md         # User goals, market (quarterly)
-├── architecture.md           # Patterns, rules, tech stack (consolidates systemPatterns + projectRules + techContext)
-├── activeContext.md          # Working state: current focus, progress, blockers, session data (consolidates progress + quick-start)
+├── architecture.md           # Patterns, rules, tech stack
+├── activeContext.md          # Working state: current focus, progress, session data
 ├── decisions.md              # ADRs - append-only (architectural decisions)
 ├── database-schema.md        # Data models (if applicable)
 ├── build-deployment.md       # Build/deploy procedures
@@ -142,20 +126,7 @@ memory-bank/
     └── YYYY-MM/README.md
 ```
 
-### File Reference Table
-
-| File | Purpose | Load When | Update When |
-|------|---------|-----------|-------------|
-| `toc.md` | Index/navigation | After adding files | After new files/tasks |
-| `projectBrief.md` | Core requirements | Complex tasks | Major pivots |
-| `productContext.md` | User goals, market | Complex tasks | Quarterly/strategy shifts |
-| `architecture.md` | Patterns, rules, tech stack | Before arch changes, when uncertain, session start | Pattern discovery, new tech, new rules |
-| `activeContext.md` | Working state: focus, progress, blockers, session data | Every session | State transitions, milestones, major features |
-| `decisions.md` | Why X over Y (append-only) | Arch decisions | Arch decisions made |
-| `tasks/*/README.md` | Monthly summary | Month-specific work | Month end/milestone |
-| `tasks/*/*.md` | Task documentation | Investigating issues | After approval only |
-
-### Document Structure & Skills
+### Document Skills
 
 Each memory-bank document has a dedicated update skill that enforces its internal
 structure and write rules. See `skills/memory-bank/` for the full set:
@@ -176,11 +147,6 @@ and validation rules.
 
 **Templates**: Bootstrap uses `agent/templates/architecture.md` and
 `agent/templates/activeContext.md` as structural templates for initial file creation.
-
-### Read vs Write Paths
-
-**Read** (frequent): Session startup, before arch decisions, when uncertain, investigating issues
-**Write** (infrequent, requires approval): After major features, pattern discovery, arch decisions, milestone completion, user requests
 
 ---
 
@@ -294,19 +260,6 @@ and research anything — but it cannot change anything.
 6. Generate unified diff
 7. **DO NOT APPLY**
 
-**Context Management**:
-- Keep only task-relevant files in working context
-- Reference MB as needed, don't load entire codebase
-- Focused search/grep for patterns
-- Parallelize independent file operations
-
-**Agentic Primitives** (reusable building blocks):
-- Extend class/module following established patterns
-- Integrate component at defined integration points
-- Add test coverage mirroring existing test structure
-- Update config following existing patterns
-- Add error handling using project's patterns
-
 **Exit**: All planned changes done, tests written, no syntax errors, diff generated, **NOT APPLIED**
 **Failures**: Compilation errors → fix, stay in BUILD | Pattern violations or integration conflicts → review `architecture.md` | Two identical diffs → STALL DETECTED
 
@@ -316,32 +269,13 @@ and research anything — but it cannot change anything.
 
 **In**: BUILD complete | **Out**: Rationale + diff | **Exit**: Ready for QA
 
-**Present**:
-```markdown
-## Proposed Changes
-
-**Files**:
-```
-path/file1.ext    | 50 +++++++++---------
-path/file2.ext    | 120 +++++++++++++++++++
-tests/test.ext    | 200 +++++++++++++++++++++++++++
-3 files, 370 insertions(+), 10 deletions(-)
-```
-
-**Diff**: [unified diff output]
-
-**Rationale**:
-- Modified `file1.ext` to extend per `architecture.md#Pattern`
-- Created `file2.ext` because [specific technical reason]
-- Tests follow pattern from `existing_test.ext`
-
-**Integration**: `component.ext:45` calls new method | `service.ext:120` updated | No breaking API changes
-
-**MB References**: `architecture.md#Architecture` | `decisions.md#2025-09-15-strategy`
-```
+Present the diff with:
+- **Rationale**: Why each file was modified or created, citing `architecture.md` patterns
+- **MB References**: Which memory bank entries informed the changes
+- **New file justification**: If any new files were created, the reuse proof from Section 1
 
 **Exit**: Changes presented with rationale, MB references, new file justification (if any)
-**Failures**: Cannot justify new file → return to BUILD, refactor | Missing MB refs → add explicit refs | Unclear integration → clarify
+**Failures**: Cannot justify new file → return to BUILD, refactor | Missing MB refs → add explicit refs
 
 ---
 
@@ -390,45 +324,19 @@ tests/test.ext    | 200 +++++++++++++++++++++++++++
 
 **In**: QA passed | **Out**: User decision | **Exit**: User approves explicitly
 
-**Present**:
-```markdown
-## Ready for Approval
+**Security Checklist** (verify before presenting for approval):
+- [ ] **Auth/Authz**: No hardcoded creds | Auth checked before sensitive ops | Authz at boundaries
+- [ ] **Data Handling**: Input validation on external data | Output encoding prevents injection
+- [ ] **Error Handling**: No sensitive data in errors | Errors logged appropriately
+- [ ] **Dependencies**: No known vulnerabilities | Versions pinned
 
-Code changes complete. Ready for review.
+**Present**: Files modified, test results, review gates (tests, security, linter), approval keywords.
 
-**Files modified**:
-- `path/file1.ext` (+50, -10 lines)
-- `path/file2.ext` (+120, -5 lines)
-- `tests/test.ext` (+200, -0 lines)
+**Approval keywords**: "approved" | "looks good" | "document it" | "apply it" | "ship it" → APPLY
+**Change keywords**: "change X" | "fix Y" → BUILD
+**Reject keywords**: "revert" → discard all, return to EXPLORE
 
-**Git diff**: [git diff --stat if in repo]
-
-**Test Results**:
-✅ 145 tests passing | ✅ Linter clean | ✅ Coverage: 87.3% (+2.1%) | ✅ Build successful
-
-**Review Gates**:
-- ✅ Tests pass
-- ✅ Security reviewed (no sensitive data, validated inputs, safe errors, follows auth patterns)
-- ✅ Linter clean
-- ✅ Documentation plan: Will create `tasks/2025-10/251025_task-name.md` + update monthly README
-
-**Next Steps After Approval**:
-1. Apply changes to sandbox branch
-2. Create task documentation
-3. Update monthly README
-4. Update relevant MB files (if applicable)
-
----
-
-**Please review. Reply with**:
-- "approved" | "looks good" | "document it" → Proceed to APPLY
-- "change X" | "fix Y" → Return to BUILD with changes
-- "revert" → Discard all changes
-```
-
-**Exit**: User responds with approval keywords: "approved", "looks good", "document it", "apply it", "ship it"
-**Alternative Paths**: User requests changes → BUILD | User requests revert → discard, return to START | User requests info → provide details, stay in APPROVAL
-**Failures**: Ambiguous response → ask for explicit approval | Approval without gates passing → warn, request waiver | Long wait → stay IDLE, do not proceed
+**Failures**: Ambiguous response → ask for explicit approval | Approval without gates passing → warn, request waiver
 
 ---
 
@@ -441,31 +349,6 @@ Code changes complete. Ready for review.
 2. Verify application successful
 3. Optional: Quick smoke test
 4. Report success or initiate rollback
-
-**Success**:
-```markdown
-## Changes Applied
-
-✅ All changes applied to sandbox branch
-✅ 3 files modified
-✅ Quick verification passed
-
-Ready for DOCS.
-```
-
-**Failure**:
-```markdown
-## Apply Failed - Rolling Back
-
-❌ Failed: [error]
-🔄 Rolling back to previous state
-📝 Sandbox restored
-
-Diagnosis: [technical reason]
-Recommendation: [fix or alternative]
-
-Returning to BUILD.
-```
 
 **Exit (Success)**: All changes applied, sandbox updated, optional smoke test passed
 **Exit (Failure)**: Rollback complete, sandbox restored, error diagnosed
@@ -492,85 +375,38 @@ document structure, validation, and write rules.
 6. Open documentation PR (or commit if user prefers)
 
 **Rule**: Do not write to any memory-bank file without loading its skill first.
-Each skill contains the canonical template, validation checklist, and rejection
-criteria for its document.
 
 **Exit**: Task doc created, monthly README updated, relevant MB files updated via their skills, docs PR opened → return to EXPLORE
 **Failures**: Template violations → skill validation catches them | Missing references → skill requires them | Wrong section → skill placement test prevents it
 
 ---
 
-## 5. Task Contract & Budgets
+## 5. Task Contract & Stall Detection
 
-### Task Contract Format
+### Task Contract
 
-```markdown
-## Task: [Clear, specific objective]
+A task contract must include:
 
-### Context
-- **Repository**: [path or monorepo location]
-- **Related Work**: [prior tasks, MB entries]
-- **Constraints**: [arch rules, security, performance]
-- **Affected Systems**: [components, services, modules]
+- **Task name**: clear, specific objective
+- **Context**: what exists, what's affected, related prior work
+- **Acceptance criteria**: numbered, testable conditions
+- **Constraints**: must-follow patterns, must-extend files, must-not anti-patterns
+- **Instructions**: "Create a plan for approval. Do not code until approved."
 
-### Expected Outcomes
-- **Acceptance Criteria**:
-  1. [Specific, testable criterion]
-  2. [Specific, testable criterion]
-- **Success Metrics**: [how to measure completion]
-- **Definition of Done**: [when truly complete]
-
-### Historical Reference
-- **Prior Tasks**: [links to `tasks/YYYY-MM/DDMMDD_*.md`]
-- **Arch Decisions**: [links to `decisions.md` entries]
-- **Related Patterns**: [refs to `architecture.md`]
-
-### Architectural Constraints
-- **Must Follow**: [specific patterns from MB]
-- **Must Extend**: [specific existing files]
-- **Must Not**: [anti-patterns, approaches to avoid]
-- **Security**: [specific security considerations]
-
-### Instructions
-Create outline for approval. After approval, do work. Do not document until I approve completion.
-```
-
-### Budget System
-
-**Budget Types**:
-- **Cycles**: Max BUILD → QA iterations (default: 3)
-- **Tokens**: Max context tokens (default: agent-specific limits)
-- **Minutes**: Max wall-clock time (default: 30 min for standard tasks)
-
-**Tracking**:
-```json
-{
-  "task_id": "251025_task",
-  "budgets": {
-    "cycles": {"allocated": 3, "consumed": 1, "remaining": 2},
-    "tokens": {"allocated": 100000, "consumed": 45000, "remaining": 55000},
-    "minutes": {"allocated": 30, "consumed": 12, "remaining": 18}
-  },
-  "status": "within_budget"
-}
-```
-
-**Budget Exceeded Actions**:
-- Cycles exceeded → STALL DETECTED → user intervention
-- Tokens exceeded → minimal context mode or agent swap
-- Minutes exceeded → present progress, request extension
-
-**Extension**: User approval only. Request with: current progress, reason for overrun, estimated additional resources, alternatives
+For the full template format, use the `idea-to-task` optional skill or see
+`.agent/skills/memory-bank/update-task-docs/SKILL.md`.
 
 ### Stall Detection
 
-**Condition**: Two consecutive identical diffs (same files, same changes)
+**Cycle Budget**: Max 3 BUILD → QA iterations per task. Tracked in `activeContext.md` Current State section.
+
+**Condition**: Two consecutive identical diffs (same files, same changes) OR cycle count reaches 3.
 
 **Response**:
 ```markdown
 ## STALL DETECTED
 
-⚠️  Two identical diffs - unable to progress
+⚠️  Unable to progress
 
 **Diagnosis**:
 - Cause: [specific technical reason]
@@ -582,28 +418,7 @@ Create outline for approval. After approval, do work. Do not document until I ap
 2. Alternative: [different technical strategy]
 3. Agent Swap: Switch to [specialized agent] for subtask
 
-**Request**: Provide direction or choose recommendation
-
-**Budgets**: Cycles: 3/3 ⚠️ | Tokens: 85K/100K | Minutes: 28/30 ⚠️
-```
-
-### Context Management
-
-**Context Zones**:
-1. **Core** (always): Task contract, relevant MB files, current state
-2. **Task** (current task): Files being modified, direct dependencies, related tests
-3. **Reference** (on-demand): Arch patterns, similar implementations, historical decisions
-
-**Context Rotation**: After each state transition, drop Task Context, reload only what's needed for next state. Keep Core Context persistent. State is persisted to Memory Bank at every transition per **Compaction Protocol** (Section 2), so compaction recovery is automatic.
-
-**Parallel Execution**:
-```
-Task decomposition:
-1. [Independent A] - parallel
-2. [Independent B] - parallel
-3. [Dependent C] - requires A+B
-
-Execution: Spawn parallel agents for A+B with focused context → Wait → Execute C with results
+**Cycle**: [n]/3
 ```
 
 ---
@@ -622,38 +437,6 @@ Execution: Spawn parallel agents for A+B with focused context → Wait → Execu
 
 Test fixtures and test mocks are acceptable. Production fake data is never acceptable.
 
-### Code Reuse Enforcement
-
-**Before creating any new file**:
-1. Search codebase for similar functionality
-2. Check `architecture.md` for patterns
-3. Review existing architecture for extension points
-4. Document why extension impossible (if claiming so)
-
-**Validation** (see Section 1 checklist)
-
-### Security Review (Part of APPROVAL State)
-
-**Checklist**:
-- [ ] **Auth/Authz**: No hardcoded creds | Auth checked before sensitive ops | Authz at boundaries | Session mgmt follows patterns
-- [ ] **Data Handling**: Input validation on external data | Output encoding prevents injection | Sensitive data encrypted (rest/transit if applicable)
-- [ ] **Error Handling**: No sensitive data in errors | Errors logged appropriately | Graceful degradation
-- [ ] **Dependencies**: No known vulnerabilities | Versions pinned | Licenses compatible
-
-If any item fails, address before APPROVAL state.
-
-### Linting & Code Quality
-
-**Requirements**: Zero errors before APPROVAL | Warnings OK with justification | Follow project's linting rules
-
-**Standards**: Language idioms | Consistent naming (from `architecture.md`) | Single-purpose functions | Max 3-4 nesting levels | Comment complex logic only
-
-### Testing Requirements
-
-**Coverage**: Unit tests for all new functions | Integration tests for workflows | Edge case coverage for critical paths | Clear test names
-
-**Quality**: Deterministic (no flaky tests) | Independent (no shared state) | Fast (optimize slow tests) | Maintainable (clear, readable)
-
 ### Documentation Standards
 
 **Files Requiring Approval Before Creation**:
@@ -664,19 +447,6 @@ If any item fails, address before APPROVAL state.
 - Any commits to version control
 
 **Files NOT Requiring Approval**: App code, tests, config updates
-
-**Approval Gate Workflow**:
-1. Complete code changes (BUILD → DIFF → QA)
-2. Present in APPROVAL state
-3. **WAIT** for user response
-4. If approved: APPLY → DOCS
-5. If changes requested: BUILD
-6. If reverted: discard all
-
-**Citation Formats**:
-- Code: `path/file.ext:42` (single line) | `path/file.ext:42-58` (range) | `path/file.ext:functionName()` (function)
-- MB: `memory-bank/architecture.md#Section` | `memory-bank/decisions.md#2025-10-15-decision` | `memory-bank/tasks/2025-10/251025_task.md`
-- Always include context: ✅ "Extended `services/auth.ext:45` following `architecture.md#Service Extension Pattern`" | ❌ "Updated service per architecture.md"
 
 **When to Update MB** (always use the per-document skill):
 - ✅ Completing major features → `update-active-context` (Progress section)
@@ -708,20 +478,19 @@ If any item fails, address before APPROVAL state.
 
 ### Task: Add Email Notification on Onboarding Complete
 
-#### EXPLORE State
+#### EXPLORE → PLAN
 
 ```
-Session started. Memory Bank loaded (Standard Discovery).
-Entering EXPLORE.
+[STATE: EXPLORE/IDLE] Task: none
 
-Ready for a task contract or questions about the codebase.
+Session started. Memory Bank loaded. Ready for a task contract.
 ```
 
 **User**: Provides task contract for onboarding email notification.
 
----
-
-#### PLAN State
+```
+[STATE: PLAN/IDLE] Task: onboarding-email
+```
 
 ```markdown
 ## Plan: Onboarding Email
@@ -730,14 +499,11 @@ Ready for a task contract or questions about the codebase.
 - `services/onboarding.ext:120-150` - Current completion logic
 - `services/notification.ext` - Existing notification service
 - `architecture.md#Patterns/Event-Driven` - Event pattern
-- `architecture.md#Rules/Email Templates` - Email standards
 
 **Reuse**:
 - Extend `onboarding.ext:145` - emit "onboarding_completed" event
 - Extend `notification.ext:67` - add event listener
 - Add `templates/emails/onboarding_complete.template` - follow `welcome.template` pattern
-
-Cannot create new notification service - existing service handles all notifications.
 
 **Steps**:
 1. `onboarding.ext:145` - emit event on completion
@@ -745,162 +511,33 @@ Cannot create new notification service - existing service handles all notificati
 3. Create template following `welcome.template`
 4. Add tests mirroring `tests/notification_test.ext`
 
-**Integration**: Onboarding emits → Notification listens → Email service delivers (existing)
-**Risks**: Email delivery fail → existing retry logic handles
-**Tests**: Unit (event emission, listener) | Integration (e2e onboarding → email) | Manual (complete flow, verify email)
+**Tests**: Unit (event emission, listener) | Integration (e2e onboarding → email)
 
 Ready for approval.
 ```
 
 **User**: "approved"
 
----
-
-#### BUILD State
+#### BUILD → QA → APPROVAL
 
 ```
-Entering BUILD (substate: CODING)
-
-Changes:
-1. Modified `services/onboarding.ext:145` - added event emission
-2. Extended `services/notification.ext:67` - added listener
-3. Created `templates/emails/onboarding_complete.template`
-4. Added `tests/notification_onboarding_test.ext`
-
-Diff shows:
-- services/onboarding.ext (+5, -1)
-- services/notification.ext (+23, -0)
-- templates/emails/onboarding_complete.template (+45, -0)
-- tests/notification_onboarding_test.ext (+120, -0)
-
-Ready for DIFF.
+[STATE: BUILD/CODING] Task: onboarding-email
 ```
 
----
-
-#### DIFF State
-
-```markdown
-## Proposed Changes
-
-**Files**:
-```
-services/onboarding.ext                        |   5 +-
-services/notification.ext                       |  23 +++
-templates/emails/onboarding_complete.template  |  45 ++++
-tests/notification_onboarding_test.ext         | 120 +++++++++++
-4 files, 193 insertions(+), 1 deletion(-)
-```
-
-**Key Changes**:
-
-`services/onboarding.ext`:
-```diff
-- // User completed onboarding
-+ // User completed onboarding
-+ emit_event('onboarding_completed', user_id, completion_data)
-```
-
-`services/notification.ext`:
-```diff
-+ function handle_onboarding_completed(user_id, data) {
-+   template = load_template('onboarding_complete')
-+   user = fetch_user(user_id)
-+   send_email(user.email, template, data)
-+ }
-+ register_event_listener('onboarding_completed', handle_onboarding_completed)
-```
-
-**Rationale**: Follows `architecture.md#Patterns/Event-Driven Notifications` | Template matches existing structure | Tests mirror `tests/notification_welcome_test.ext`
-
-**Integration**: No breaking changes | Event system handles async | Existing retry logic for failures
-
-Ready for QA.
-```
-
----
-
-#### QA State
-
-```markdown
-Entering QA (substate: RUNNING)
-
-## QA Results
-
-**Tests**: ✅ PASS | Total: 156 (+11) | Passed: 156 | Failed: 0 | Duration: 18.2s
-**Linter**: ✅ PASS | Errors: 0 | Warnings: 0
-**Coverage**: Overall: 88.1% (+0.8%) | New code: 100% | Below threshold: None
-**Build**: ✅ SUCCESS | Duration: 9.7s
-
-**Verdict**: ✅ Ready for APPROVAL
-```
-
----
-
-#### APPROVAL State
-
-```markdown
-## Ready for Approval
-
-Code changes complete. Ready for review.
-
-**Files modified**:
-- `services/onboarding.ext` (+5, -1)
-- `services/notification.ext` (+23, -0)
-- `templates/emails/onboarding_complete.template` (+45, -0)
-- `tests/notification_onboarding_test.ext` (+120, -0)
-
-**Git diff**: 4 files, 193 insertions(+), 1 deletion(-)
-
-**Test Results**:
-✅ 156 tests passing (+11) | ✅ Linter clean | ✅ Coverage: 88.1% (+0.8%) | ✅ Build successful
-
-**Review Gates**:
-- ✅ Tests pass
-- ✅ Security reviewed (no sensitive data in emails, template escaped)
-- ✅ Linter clean
-- ✅ Documentation plan: Create `tasks/2025-10/251025_onboarding-email.md` + update monthly README
-
-**Please review. Reply with**:
-- "approved" | "looks good" | "document it" → APPLY
-- "change X" | "fix Y" → BUILD with changes
-- "revert" → Discard changes
-```
+Agent implements plan, generates diff, runs QA (all tests pass), presents for approval with security checklist verified.
 
 **User**: "looks good"
 
----
+#### APPLY → DOCS → EXPLORE
 
-#### APPLY State
-
-```markdown
-Entering APPLY
-
-## Changes Applied
-
-✅ All changes applied to sandbox branch
-✅ 4 files modified
-✅ Quick verification passed
-
-Ready for DOCS.
+```
+[STATE: APPLY/IDLE] Task: onboarding-email
 ```
 
----
+Changes applied. Per-document skills update task docs and activeContext.md.
 
-#### DOCS State
-
-```markdown
-Entering DOCS
-
-Loading per-document skills:
-1. update-task-docs → Created `memory-bank/tasks/2025-10/251025_onboarding-email.md`
-                    → Updated `memory-bank/tasks/2025-10/README.md`
-2. update-architecture → No new patterns, rules, or tech changes. Skipped.
-3. update-decisions → No architectural decisions made. Skipped.
-4. update-active-context → Updated Progress section (milestone: onboarding email complete)
-5. update-toc → No new MB files created. Skipped.
-
-✅ All documentation complete.
+```
+[STATE: EXPLORE/IDLE] Task: none
 
 Task complete. Returning to EXPLORE.
 ```
@@ -929,30 +566,19 @@ Stuck? → Cycles ≥3?
 
 | Issue | Symptoms | Resolution |
 |-------|----------|------------|
-| **Loop** | Same diff multiple times, QA fails repeatedly, no progress after 3+ cycles | Check budgets → Load more MB → Clarify requirements → Check environment → Agent swap |
-| **Context Exceeded** | Token limit approaching, slow/truncated responses, forgetting earlier info | State already persisted via **Compaction Protocol** (Section 2) → Rotate context (drop Task, reload essentials) → Focused mode (MB summaries only) → Break into subtasks → Agent swap |
-| **CI ≠ Local** | QA passes, CI fails | Compare environments → Verify dependency versions → Check timing/concurrency → Check state cleanup → Document waiver if CI issue |
-| **Security Fail** | Security checklist incomplete, sensitive data exposed, auth/authz bypassed | Never bypass → Return to BUILD → Fix all issues → Re-test → Document pattern if new |
-
-### Stall Detection Protocol
-
-**Condition**: Two consecutive identical diffs
-
-**Response**:
-1. Detect: Compare current diff with previous
-2. Halt: Stop all BUILD attempts
-3. Report: Present diagnosis to user
-4. Request: More context, alternative approach, or agent swap
+| **Loop** | Same diff multiple times, QA fails repeatedly, no progress after 3+ cycles | Load more MB → Clarify requirements → Check environment → Agent swap |
+| **Context Exceeded** | Token limit approaching, slow/truncated responses, forgetting earlier info | State already persisted via **Compaction Protocol** (Section 2) → Break into subtasks → Agent swap |
+| **CI ≠ Local** | QA passes, CI fails | Compare environments → Verify dependency versions → Check timing/concurrency → Document waiver if CI issue |
+| **Security Fail** | Security checklist incomplete, sensitive data exposed | Never bypass → Return to BUILD → Fix all issues → Re-test |
 
 ### Recovery Procedures
 
 **Full Reset** (complete breakdown):
-1. Log current state
+1. Update `activeContext.md` with current state
 2. Discard uncommitted changes
 3. Reset to last known good state
 4. Start new session with fresh agent
-5. Load MB in full (Standard Discovery)
-6. Re-analyze with fresh perspective
+5. Agent loads MB at startup and resumes from `activeContext.md`
 
 **Partial Rollback** (recent regression):
 1. Identify last working state
@@ -1011,5 +637,3 @@ Task complete: Return to `EXPLORE`
 **Each session starts in EXPLORE. Memory Bank is your only persistent memory. Maintain it with precision.**
 
 **Mission**: Build software respecting existing architecture, following established patterns, improving incrementally. Reuse over creation. Quality over speed. Approval over assumption.
-
-**Let's build smarter — together.**
