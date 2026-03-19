@@ -114,14 +114,14 @@ Compaction (context compression) can happen at any time — triggered by the sys
 
 At each state transition (`PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS`), persist the following to the Memory Bank:
 
-1. **State machine position**: Update `activeContext.md` with current state, substate, and working context
+1. **State machine position**: Load `.agent/skills/memory-bank/update-active-context/SKILL.md` → update Current State section only
 2. **Task progress**: Append current status to `tasks/YYYY-MM/README.md` with `[IN-PROGRESS]` tag
-3. **Decisions**: Append any new architectural decisions to `decisions.md`
+3. **Decisions**: If new architectural decisions, load `.agent/skills/memory-bank/update-decisions/SKILL.md` → append entry
 4. **Log transition** to operational log:
    ```json
    {"timestamp":"...","session_id":"uuid","event":"state_transition","from":"PLAN","to":"BUILD"}
    ```
-5. **Loose context**: Capture any information that exists only in conversation (user preferences, verbal requirements, pending questions) into `activeContext.md`
+5. **Loose context**: Captured in `activeContext.md` Current State section via the `update-active-context` skill (step 1)
 
 This ensures that when compaction occurs — without warning — the Memory Bank already reflects the latest state.
 
@@ -182,77 +182,27 @@ memory-bank/
 | `tasks/*/README.md` | Monthly summary | Month-specific work | Month end/milestone |
 | `tasks/*/*.md` | Task documentation | Investigating issues | After approval only |
 
-### Required Internal Structure
+### Document Structure & Skills
 
-Consolidated files **must** use these section headings. Agents write only to the matching section.
+Each memory-bank document has a dedicated update skill that enforces its internal
+structure and write rules. See `skills/memory-bank/` for the full set:
 
-**`architecture.md`** (three sections — one file, clear boundaries):
+| Document | Update Skill | Structure Enforced |
+|----------|-------------|-------------------|
+| `architecture.md` | `update-architecture` | Three sections: Tech Stack, Patterns, Rules |
+| `activeContext.md` | `update-active-context` | Three sections: Current State, Progress, Session Data |
+| `decisions.md` | `update-decisions` | Append-only ADR entries |
+| `tasks/YYYY-MM/*.md` | `update-task-docs` | Task doc + monthly README pair |
+| `toc.md` | `update-toc` | Mechanical file index |
+| `projectBrief.md` | `update-project-brief` | Identity and mission (requires human approval) |
+| `productContext.md` | `update-product-context` | User/product context (requires human confirmation) |
 
-```markdown
-# Architecture
+**Rule**: Always use the corresponding skill when writing to a memory-bank file.
+Do not write directly. The skill enforces the document's constitutional structure
+and validation rules.
 
-## Tech Stack
-<!-- Was techContext.md. Factual technical context only. -->
-- Languages, frameworks, and versions
-- Repository structure and entry points
-- Tooling and required commands (build, test, lint, deploy)
-- Runtime and hosting
-- External services visible in code or config
-
-## Patterns
-<!-- Was systemPatterns.md. Repeated, intentional architectural patterns only. -->
-- Major layers and boundaries
-- Data-flow patterns
-- Integration patterns
-- Reuse patterns that appear multiple times
-- Legacy or transitional patterns (labeled explicitly)
-
-## Rules
-<!-- Was projectRules.md. Enforceable local laws only. -->
-- Mandatory local conventions
-- Approved patterns already enforced in the repo
-- Forbidden moves
-- Tooling or workflow constraints
-```
-
-**Boundary rules for `architecture.md`**:
-- Tech Stack is factual — what the repo *uses*. No opinions.
-- Patterns are observed — what the repo *does repeatedly*. Not aspirational.
-- Rules are enforced — what the repo *requires*. Must be confirmed or provable.
-- Do not duplicate across sections. A tech choice goes in Tech Stack, the pattern it enables goes in Patterns, the rule enforcing it goes in Rules.
-
-**`activeContext.md`** (three sections — single source of working state):
-
-```markdown
-# Active Context
-
-## Current State
-<!-- State machine position and task focus. Updated at every state transition. -->
-- Current state and substate (e.g., BUILD/CODING)
-- Active task name and objective
-- Working context (key files, decisions in progress, pending questions)
-- Loose context from conversation (user preferences, verbal requirements)
-
-## Progress
-<!-- Status and trajectory. Updated at milestones and major features. -->
-- Recent completions (with dates)
-- Current blockers
-- Near-term focus / next priorities
-- Known gaps
-
-## Session Data
-<!-- Operational shortcuts. Updated when new useful patterns are discovered. -->
-- Common commands (build, test, deploy, lint)
-- Key entry points and navigation hints
-- Environment setup notes
-- Frequently referenced files or paths
-```
-
-**Boundary rules for `activeContext.md`**:
-- Current State is ephemeral — changes at every state transition. This is the compaction recovery anchor.
-- Progress is directional — changes at milestones. Tracks trajectory, not moment-to-moment state.
-- Session Data is stable — changes rarely. Captures what an agent needs to start working fast.
-- At compaction recovery, read all three sections. For state transitions, update only Current State.
+**Templates**: Bootstrap uses `agent/templates/architecture.md` and
+`agent/templates/activeContext.md` as structural templates for initial file creation.
 
 ### Read vs Write Paths
 
@@ -519,88 +469,24 @@ Returning to BUILD.
 
 **CRITICAL**: Only enter after user approved code changes (from APPROVAL state)
 
-**Core Skill Nudge**:
-- Load `.agent/skills/writing-docs/SKILL.md` when entering DOCS after APPLY succeeds.
+**Per-Document Skills**: Each memory-bank file has a dedicated update skill.
+Load the relevant skill for each file you need to update. Skills enforce
+document structure, validation, and write rules.
 
-**Create**:
-1. Task doc: `memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md`
-2. Update monthly README: `memory-bank/tasks/YYYY-MM/README.md`
-3. Update `architecture.md` if new patterns, rules, or tech stack changes
-4. Update `decisions.md` if arch decisions
-5. Update `toc.md` if new MB files
+**DOCS Execution Order**:
+1. Load `.agent/skills/memory-bank/update-task-docs/SKILL.md` → Create task doc + update monthly README
+2. Load `.agent/skills/memory-bank/update-architecture/SKILL.md` → If new patterns, rules, or tech stack changes
+3. Load `.agent/skills/memory-bank/update-decisions/SKILL.md` → If architectural decisions were made
+4. Load `.agent/skills/memory-bank/update-active-context/SKILL.md` → Update Progress section (milestone completion)
+5. Load `.agent/skills/memory-bank/update-toc/SKILL.md` → If any new MB files were created
 6. Open documentation PR (or commit if user prefers)
 
-**Task Doc Template**:
-```markdown
-# YYMMDD_task-name
+**Rule**: Do not write to any memory-bank file without loading its skill first.
+Each skill contains the canonical template, validation checklist, and rejection
+criteria for its document.
 
-## Objective
-[What was accomplished]
-
-## Outcome
-- ✅ Tests: 145 passing (+10 new)
-- ✅ Coverage: 87.3% (+2.1%)
-- ✅ Build: Successful
-- ✅ Review: Approved
-
-## Files Modified
-- `file1.ext` - Added [functionality]
-- `file2.ext` - Extended [service] for [scenario]
-- `tests/test.ext` - Tests for [functionality]
-
-## Patterns Applied
-- `architecture.md#Patterns/Pattern`
-- Updated `architecture.md#Rules/ErrorHandling` (added: log at integration boundaries)
-
-## Integration Points
-- `component.ext:45` via new method
-- `service.ext:120` updated for new data flow
-
-## Architectural Decisions
-- Decision: Event-driven for async updates
-- Rationale: Loose coupling per `decisions.md#2025-09-01-event-driven`
-- Trade-offs: Higher complexity, better scalability
-
-## Artifacts
-- PR: [link]
-- Diff: [link]
-```
-
-**Monthly README Update**:
-```markdown
-## Tasks Completed
-
-### 2025-10-25: [Task Name]
-- Implemented [brief description]
-- Files: `file1.ext`, `file2.ext`
-- Pattern: Extended [existing pattern]
-- See: [251025_task-name.md](./251025_task-name.md)
-```
-
-**MB Updates**:
-
-`architecture.md` (add to relevant section — Patterns, Rules, or Tech Stack):
-```markdown
-### [New Pattern/Rule/Tech]
-**Context**: Discovered during [task]
-**Pattern**: [description]
-**Implementation**: [how to apply]
-**Example**: `file.ext:line-range`
-```
-
-`decisions.md`:
-```markdown
-### YYYY-MM-DD: [Decision]
-**Status**: Approved
-**Context**: [why needed]
-**Decision**: [what decided]
-**Alternatives**: [other options, why not]
-**Consequences**: [positive/negative outcomes]
-**References**: `tasks/YYYY-MM/DDMMDD_task-name.md`
-```
-
-**Exit**: Task doc created, monthly README updated, relevant MB files updated, docs PR opened
-**Failures**: Template violations → correct format | Missing references → add explicit refs | Incomplete updates → ensure all MB files updated
+**Exit**: Task doc created, monthly README updated, relevant MB files updated via their skills, docs PR opened
+**Failures**: Template violations → skill validation catches them | Missing references → skill requires them | Wrong section → skill placement test prevents it
 
 ---
 
@@ -782,12 +668,12 @@ If any item fails, address before APPROVAL state.
 - MB: `memory-bank/architecture.md#Section` | `memory-bank/decisions.md#2025-10-15-decision` | `memory-bank/tasks/2025-10/251025_task.md`
 - Always include context: ✅ "Extended `services/auth.ext:45` following `architecture.md#Service Extension Pattern`" | ❌ "Updated service per architecture.md"
 
-**When to Update MB**:
-- ✅ Completing major features (update `activeContext.md` progress section)
-- ✅ Discovering new patterns (update `architecture.md`)
-- ✅ Making arch decisions (update `decisions.md`)
-- ✅ User explicitly requests: "update memory bank"
-- ✅ Milestone completion (update monthly README)
+**When to Update MB** (always use the per-document skill):
+- ✅ Completing major features → `update-active-context` (Progress section)
+- ✅ Discovering new patterns → `update-architecture` (Patterns section)
+- ✅ Making arch decisions → `update-decisions`
+- ✅ User explicitly requests: "update memory bank" → relevant skill(s)
+- ✅ Milestone completion → `update-task-docs` + `update-active-context`
 - ❌ Minor bug fixes (task doc only)
 - ❌ Code formatting (no doc needed)
 - ❌ Dependency updates (task doc only)
@@ -983,11 +869,15 @@ Ready for DOCS.
 ```markdown
 Entering DOCS
 
-## Documentation Created
+Loading per-document skills:
+1. update-task-docs → Created `memory-bank/tasks/2025-10/251025_onboarding-email.md`
+                    → Updated `memory-bank/tasks/2025-10/README.md`
+2. update-architecture → No new patterns, rules, or tech changes. Skipped.
+3. update-decisions → No architectural decisions made. Skipped.
+4. update-active-context → Updated Progress section (milestone: onboarding email complete)
+5. update-toc → No new MB files created. Skipped.
 
-✅ Created `memory-bank/tasks/2025-10/251025_onboarding-email.md`
-✅ Updated `memory-bank/tasks/2025-10/README.md`
-✅ No MB pattern updates needed (used existing pattern)
+✅ All documentation complete.
 
 Task complete.
 ```

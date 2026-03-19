@@ -16,24 +16,20 @@ This contract is for bootstrap only. It does not replace the installed
 
 ## Required Outcome
 
-Create or refresh a trustworthy AGENTS 2.2 Memory Bank for the target repo.
+Create or refresh a trustworthy AGENTS 2.3 Memory Bank for the target repo.
 
 At minimum, create or update these foundation files:
 
 - `memory-bank/projectbrief.md`
 - `memory-bank/productContext.md`
-- `memory-bank/techContext.md`
-- `memory-bank/systemPatterns.md`
-- `memory-bank/projectRules.md`
+- `memory-bank/architecture.md` (uses template from `agent/templates/architecture.md`)
 
 If they do not already exist, also scaffold these operational files so the repo
 can start using the Memory Bank immediately:
 
 - `memory-bank/toc.md`
-- `memory-bank/activeContext.md`
-- `memory-bank/progress.md`
+- `memory-bank/activeContext.md` (uses template from `agent/templates/activeContext.md`)
 - `memory-bank/decisions.md`
-- `memory-bank/quick-start.md`
 - `memory-bank/tasks/YYYY-MM/README.md`
 
 Only create additional files such as `build-deployment.md`,
@@ -100,13 +96,17 @@ Build an evidence notebook with three buckets:
 
 For a code-first bootstrap, draft the foundation documents in this order:
 
-1. `techContext.md`
-2. `systemPatterns.md`
-3. `projectbrief.md`
-4. `productContext.md`
-5. `projectRules.md`
+1. `architecture.md` (Tech Stack section first, then Patterns, then Rules)
+2. `projectbrief.md`
+3. `productContext.md`
 
-### `techContext.md`
+### `architecture.md`
+
+Copy the structural template from `agent/templates/architecture.md`. This file
+has three mandatory sections with clear boundaries. Draft them in order because
+each builds on the previous.
+
+#### Section: `## Tech Stack`
 
 Capture factual technical context:
 
@@ -120,7 +120,9 @@ Ask the human only for what the repo cannot prove, such as the real production
 hosting target, the standard package manager when multiple lockfiles exist, or
 hidden external services not yet represented in code.
 
-### `systemPatterns.md`
+**Boundary**: what the repo *uses*. No opinions, no patterns, no rules.
+
+#### Section: `## Patterns`
 
 Capture repeated, intentional architectural patterns:
 
@@ -132,6 +134,28 @@ Capture repeated, intentional architectural patterns:
 
 Do not promote one-off implementation details, dead folders, or aspirational
 architecture to documented standards.
+
+**Boundary**: what the repo *does repeatedly*. Not aspirational. Not one-offs.
+
+#### Section: `## Rules`
+
+Capture stable local laws for future agents:
+
+- mandatory local conventions
+- approved patterns already enforced in the repo
+- forbidden moves
+- tooling or workflow constraints
+
+Only record rules that are clearly enforced, repeated, or explicitly confirmed.
+Do not copy generic framework advice or rules already covered by `AGENTS.md`.
+
+**Boundary**: what the repo *requires*. Must be confirmed or provable from code.
+
+#### Cross-section discipline
+
+- A tech choice goes in Tech Stack. The pattern it enables goes in Patterns.
+  The rule enforcing it goes in Rules. Do not duplicate.
+- If unsure which section, ask: "Is this a fact, a repeated practice, or a law?"
 
 ### `projectbrief.md`
 
@@ -159,34 +183,27 @@ This file is the least repo-provable. Visible flows may support careful
 inference, but user segments, pain points, and value claims should remain in a
 `Pending Human Confirmation` section unless the human confirms them.
 
-### `projectRules.md`
-
-Capture stable local laws for future agents:
-
-- mandatory local conventions
-- approved patterns already enforced in the repo
-- forbidden moves
-- tooling or workflow constraints
-
-Only record rules that are clearly enforced, repeated, or explicitly confirmed.
-Do not copy generic framework advice or rules already covered by `AGENTS.md`.
-
 ## Phase 3: Present One Consolidated Bootstrap Review
 
 Before finalizing the Memory Bank, present one consolidated review that covers
-all five foundation documents.
+all foundation documents.
 
 Use this shape:
 
 ```markdown
 ## Proposed Memory Bank Bootstrap
 
-### `techContext.md`
+### `architecture.md` — Tech Stack
 - Observed: ...
 - Inferred: ...
 - Needs confirmation: ...
 
-### `systemPatterns.md`
+### `architecture.md` — Patterns
+- Observed: ...
+- Inferred: ...
+- Needs confirmation: ...
+
+### `architecture.md` — Rules
 - Observed: ...
 - Inferred: ...
 - Needs confirmation: ...
@@ -197,11 +214,6 @@ Use this shape:
 - Needs confirmation: ...
 
 ### `productContext.md`
-- Observed: ...
-- Inferred: ...
-- Needs confirmation: ...
-
-### `projectRules.md`
 - Observed: ...
 - Inferred: ...
 - Needs confirmation: ...
@@ -225,6 +237,8 @@ going with these rules:
 
 When writing the files:
 
+- use the structural template from `agent/templates/architecture.md` for
+  `architecture.md` — preserve all HTML boundary comments
 - keep each file scoped to its own purpose
 - avoid duplicating the same content across multiple documents
 - keep confirmed facts in the main body
@@ -235,13 +249,15 @@ When writing the files:
 After the foundation files are written, create any missing operational files:
 
 - `toc.md`: list the current Memory Bank files and their purpose
-- `activeContext.md`: note that bootstrap is complete, record the current state
-  as "no active delivery task," and capture any pending confirmation items
-- `progress.md`: summarize current repo status, known gaps, and near-term focus
+- `activeContext.md`: copy the structural template from
+  `agent/templates/activeContext.md`, then populate:
+  - **Current State**: note that bootstrap is complete, record "no active
+    delivery task," capture any pending confirmation items
+  - **Progress**: summarize current repo status, known gaps, and near-term focus
+  - **Session Data**: capture the most useful commands, entry points, and
+    navigation hints discovered during the evidence sweep
 - `decisions.md`: add a placeholder note if no real architectural decisions were
   confirmed during bootstrap
-- `quick-start.md`: capture the most useful commands, entry points, and
-  navigation hints discovered during the evidence sweep
 - `tasks/YYYY-MM/README.md`: add a bootstrap entry summarizing what was created
   and what still needs confirmation
 

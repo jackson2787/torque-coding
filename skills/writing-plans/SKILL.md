@@ -25,7 +25,7 @@ If the spec or Task Contract covers multiple independent subsystems, suggest bre
 
 Before defining the Steps, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
 - Design units with clear boundaries and well-defined interfaces.
-- Files that change together should live together. Follow established patterns in `memory-bank/systemPatterns.md`.
+- Files that change together should live together. Follow established patterns in `memory-bank/architecture.md#Patterns`.
 - You must include citations using `file:line` for code and `file.md#Section` for Memory Bank references.
 
 ## Document Header and Structure
@@ -37,7 +37,7 @@ Before defining the Steps, map out which files will be created or modified and w
 
 **Analyzed**:
 - `path/file.ext:50-100` - Current implementation of X
-- `memory-bank/systemPatterns.md#Pattern` - Established pattern for Y
+- `memory-bank/architecture.md#Patterns#Pattern` - Established pattern for Y
 - `path/service.ext` - Service handling Z
 
 **Reuse Strategy**:
@@ -62,7 +62,7 @@ Before defining the Steps, map out which files will be created or modified and w
 
 Before you write the plan document, you MUST:
 1. Search the codebase for similar functionality to satisfy the Reuse rule.
-2. Check `memory-bank/systemPatterns.md` for existing architecture patterns.
+2. Check `memory-bank/architecture.md#Patterns` for existing architecture patterns.
 3. Review existing codebase structure for clear extension points.
 4. Perform an explicit **Architectural Self-Audit**: validate your proposed plan structurally complies with established architectural patterns, best practices, and any compliance requirements specific to your deployment before asking for approval.
 

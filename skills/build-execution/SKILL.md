@@ -43,7 +43,7 @@ Use other skills or states for those concerns:
 - PLAN: `writing-plans`
 - QA evidence gate: `verification-before-completion`
 - QA failure path: `systematic-debugging`
-- DOCS: `writing-docs`
+- DOCS: per-document skills in `skills/memory-bank/`
 
 ## When To Use
 
@@ -328,7 +328,7 @@ While executing, you must continuously prefer:
 
 Concrete expectations:
 
-- follow `projectRules.md` where it exists
+- follow `architecture.md#Rules` where it exists
 - mirror existing test layout and naming
 - mirror nearby integration points
 - keep new files exceptional, not casual
