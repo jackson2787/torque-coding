@@ -1,6 +1,6 @@
 ---
 name: update-active-context
-description: Use when updating memory-bank/activeContext.md. Enforces the three-section structure (Current State, Progress, Session Data) with time-scale boundary rules. Triggered at every state transition (Current State only), at milestones (Progress), and when new operational shortcuts are discovered (Session Data).
+description: Use when updating .memory-bank/activeContext.md. Enforces the three-section structure (Current State, Progress, Session Data) with time-scale boundary rules. Triggered at every state transition (Current State only), at milestones (Progress), and when new operational shortcuts are discovered (Session Data).
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,7 +10,7 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/activeContext.md`. It enforces the
+This skill owns all writes to `.memory-bank/activeContext.md`. It enforces the
 constitutional structure of the document — three sections separated by how
 frequently they change. State transitions touch only Current State. Milestones
 touch Progress. Session Data changes rarely.
@@ -20,7 +20,7 @@ updated at every state machine transition.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/activeContext.md`
+- All writes to `.memory-bank/activeContext.md`
 - Enforcing section boundaries based on time-scale
 - Ensuring compaction recovery data is always current
 - Preventing state transitions from churning stable sections
@@ -134,7 +134,7 @@ gets overwritten most frequently and is the safest place for uncertain content).
 This is the fast path. It must be lightweight because it runs at every
 transition.
 
-1. Read `memory-bank/activeContext.md` — focus on the Current State section
+1. Read `.memory-bank/activeContext.md` — focus on the Current State section
 2. Rewrite the Current State section with:
    - New state machine position
    - Active task name and objective
@@ -145,7 +145,7 @@ transition.
 
 ### For Milestones
 
-1. Read `memory-bank/activeContext.md` — focus on the Progress section
+1. Read `.memory-bank/activeContext.md` — focus on the Progress section
 2. In the Progress section:
    - Append new completion to Recent Completions with date
    - Update or remove resolved blockers
@@ -156,7 +156,7 @@ transition.
 
 ### For Session Data Updates
 
-1. Read `memory-bank/activeContext.md` — focus on the Session Data section
+1. Read `.memory-bank/activeContext.md` — focus on the Session Data section
 2. Add the newly discovered command, path, or setup note to the appropriate
    subsection
 3. **Do not reorganize existing entries** — only add new ones

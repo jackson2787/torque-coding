@@ -42,14 +42,14 @@ mb-rebase activeContext.md
 mb-rebase decisions.md
 ```
 
-The target must be a file that exists in `memory-bank/`. If the file does not
+The target must be a file that exists in `.memory-bank/`. If the file does not
 exist, stop and tell the human.
 
 ## Procedure
 
 ### Step 1: Read The Current Document
 
-Read the target file from `memory-bank/` in full. Note:
+Read the target file from `.memory-bank/` in full. Note:
 
 - What is currently documented
 - What sections exist and their content

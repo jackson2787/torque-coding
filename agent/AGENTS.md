@@ -109,7 +109,7 @@ When context has been compressed (detected by loss of earlier conversation detai
 ### Structure
 
 ```
-memory-bank/
+.memory-bank/
 ├── toc.md                    # Index (update after new files/tasks)
 ├── projectBrief.md           # Vision, goals (rarely change)
 ├── productContext.md         # User goals, market (quarterly)
@@ -219,7 +219,7 @@ and research anything — but it cannot change anything.
 
 **Analyzed**:
 - `path/file.ext:50-100` - Current implementation of X
-- `memory-bank/architecture.md#Pattern` - Established pattern for Y
+- `.memory-bank/architecture.md#Pattern` - Established pattern for Y
 - `path/service.ext` - Service handling Z
 
 **Reuse Strategy**:
@@ -440,10 +440,10 @@ Test fixtures and test mocks are acceptable. Production fake data is never accep
 ### Documentation Standards
 
 **Files Requiring Approval Before Creation**:
-- Any `memory-bank/tasks/*/` files (task docs)
-- Updates to `memory-bank/tasks/*/README.md` (monthly summaries)
-- Updates to `memory-bank/decisions.md` (ADRs)
-- Updates to `memory-bank/architecture.md` (patterns/rules)
+- Any `.memory-bank/tasks/*/` files (task docs)
+- Updates to `.memory-bank/tasks/*/README.md` (monthly summaries)
+- Updates to `.memory-bank/decisions.md` (ADRs)
+- Updates to `.memory-bank/architecture.md` (patterns/rules)
 - Any commits to version control
 
 **Files NOT Requiring Approval**: App code, tests, config updates
@@ -628,8 +628,8 @@ Task complete: Return to `EXPLORE`
 
 ### Files Never Created Without Approval
 
-- `memory-bank/tasks/*/` (task docs)
-- `memory-bank/tasks/*/README.md` (monthly summaries)
+- `.memory-bank/tasks/*/` (task docs)
+- `.memory-bank/tasks/*/README.md` (monthly summaries)
 - Any commits to version control
 
 ---

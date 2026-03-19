@@ -93,7 +93,7 @@ Full format in AGENTS.md Section 5. Or use `idea-to-task` to generate one from c
 ## Memory Bank — What's In It
 
 ```
-memory-bank/
+.memory-bank/
 ├── architecture.md      ← Tech Stack + Patterns + Rules (the big one)
 ├── activeContext.md      ← Current state + Progress + Session shortcuts
 ├── projectBrief.md       ← What the project IS

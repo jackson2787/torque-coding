@@ -1,6 +1,6 @@
 ---
 name: update-task-docs
-description: Use when creating task documentation after APPLY succeeds. Creates the task doc at memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md and updates the monthly README. Always creates both files as a pair. Triggered from DOCS state only.
+description: Use when creating task documentation after APPLY succeeds. Creates the task doc at .memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md and updates the monthly README. Always creates both files as a pair. Triggered from DOCS state only.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -20,8 +20,8 @@ This skill owns task documentation that was previously handled by the
 
 ## What This Skill Owns
 
-- Creating `memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md`
-- Updating `memory-bank/tasks/YYYY-MM/README.md`
+- Creating `.memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md`
+- Updating `.memory-bank/tasks/YYYY-MM/README.md`
 - Enforcing the task doc template
 - Ensuring high-fidelity, specific documentation (no generic summaries)
 
@@ -115,16 +115,16 @@ Do not write from memory. Re-read the diff and QA output if needed.
 
 ### Step 2: Create Task Doc
 
-1. Determine the file path: `memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md`
+1. Determine the file path: `.memory-bank/tasks/YYYY-MM/DDMMDD_task-name.md`
    - Use today's date for YYMMDD
    - Use a kebab-case task name derived from the task contract
-2. Create the directory `memory-bank/tasks/YYYY-MM/` if it does not exist
+2. Create the directory `.memory-bank/tasks/YYYY-MM/` if it does not exist
 3. Write the task doc using the canonical template above
 4. Fill in every field with specific, verifiable data
 
 ### Step 3: Update Monthly README
 
-1. Read `memory-bank/tasks/YYYY-MM/README.md`
+1. Read `.memory-bank/tasks/YYYY-MM/README.md`
    - If it does not exist, create it with a `# YYYY-MM Tasks` heading
 2. Append the monthly README entry template at the bottom
 3. Do not modify existing entries

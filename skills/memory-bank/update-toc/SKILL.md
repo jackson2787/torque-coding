@@ -1,6 +1,6 @@
 ---
 name: update-toc
-description: Use when updating memory-bank/toc.md after any memory-bank file has been added or removed. Mechanically reflects the current file list. Triggered from DOCS state after other memory-bank skills have run, or whenever a new memory-bank file is created.
+description: Use when updating .memory-bank/toc.md after any memory-bank file has been added or removed. Mechanically reflects the current file list. Triggered from DOCS state after other memory-bank skills have run, or whenever a new memory-bank file is created.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,13 +10,13 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/toc.md`. The table of contents is a
+This skill owns all writes to `.memory-bank/toc.md`. The table of contents is a
 mechanical reflection of what files exist in the memory-bank directory. It does
 not contain opinions, summaries, or editorial content.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/toc.md`
+- All writes to `.memory-bank/toc.md`
 - Ensuring every memory-bank file is listed
 - Ensuring no non-existent files are listed
 - Maintaining consistent format
@@ -78,11 +78,11 @@ Use this skill when:
 
 ### Step 1: List Actual Files
 
-List all files that currently exist in the `memory-bank/` directory.
+List all files that currently exist in the `.memory-bank/` directory.
 
 ### Step 2: Read Current TOC
 
-Read `memory-bank/toc.md`.
+Read `.memory-bank/toc.md`.
 
 ### Step 3: Reconcile
 
@@ -96,7 +96,7 @@ Read `memory-bank/toc.md`.
 
 Before saving, confirm:
 
-- [ ] Every file in `memory-bank/` has a toc entry
+- [ ] Every file in `.memory-bank/` has a toc entry
 - [ ] No toc entry references a non-existent file
 - [ ] The header comment is preserved
 - [ ] No editorial content was added (descriptions are factual, one-line purpose statements)

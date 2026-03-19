@@ -1,6 +1,6 @@
 ---
 name: update-architecture
-description: Use when updating memory-bank/architecture.md. Enforces the three-section structure (Tech Stack, Patterns, Rules) with strict boundary rules. Triggered from DOCS state for pattern/tech/rule changes, or when a new architectural pattern, technology, or rule is discovered during any state.
+description: Use when updating .memory-bank/architecture.md. Enforces the three-section structure (Tech Stack, Patterns, Rules) with strict boundary rules. Triggered from DOCS state for pattern/tech/rule changes, or when a new architectural pattern, technology, or rule is discovered during any state.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,14 +10,14 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/architecture.md`. It enforces the
+This skill owns all writes to `.memory-bank/architecture.md`. It enforces the
 constitutional structure of the document — three sections with clear, immutable
 boundaries. No agent may add, remove, or rename sections. Content must be placed
 in the correct section based on its nature.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/architecture.md`
+- All writes to `.memory-bank/architecture.md`
 - Enforcing section boundaries
 - Validating content placement
 - Preventing duplication across sections
@@ -114,7 +114,7 @@ Follow these steps exactly. Do not skip steps.
 
 ### Step 1: Read Current File
 
-Read `memory-bank/architecture.md` in full. Confirm the three-section structure
+Read `.memory-bank/architecture.md` in full. Confirm the three-section structure
 is intact. If the structure is damaged, repair it before making content changes.
 
 ### Step 2: Identify Target Section

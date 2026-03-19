@@ -1,6 +1,6 @@
 ---
 name: update-project-brief
-description: Use when updating memory-bank/projectbrief.md. Rarely triggered — only at major product pivots, identity changes, or scope redefinitions. Requires explicit human approval before any write. Do not use for implementation details, patterns, or tech stack changes.
+description: Use when updating .memory-bank/projectbrief.md. Rarely triggered — only at major product pivots, identity changes, or scope redefinitions. Requires explicit human approval before any write. Do not use for implementation details, patterns, or tech stack changes.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,14 +10,14 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/projectbrief.md`. This is the most
+This skill owns all writes to `.memory-bank/projectbrief.md`. This is the most
 stable document in the memory bank. It captures the project's identity, mission,
 and scope — not implementation details. Changes to this file are rare and always
 require explicit human approval.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/projectbrief.md`
+- All writes to `.memory-bank/projectbrief.md`
 - Enforcing the scope of what belongs in this file
 - Requiring human approval before any change
 
@@ -87,7 +87,7 @@ approval.
 
 ### Step 2: Read Current File
 
-Read `memory-bank/projectbrief.md` in full.
+Read `.memory-bank/projectbrief.md` in full.
 
 ### Step 3: Make Minimal Changes
 

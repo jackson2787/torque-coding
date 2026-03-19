@@ -18,7 +18,7 @@ This runs an interactive installer that:
 1. Asks what you're building (Web, Mobile, Backend, or none)
 2. Asks which optional skills to include
 3. Installs the operating model into `.agent/`
-4. Scaffolds an empty `memory-bank/`
+4. Scaffolds an empty `.memory-bank/`
 
 Then open an AI session and run:
 
@@ -26,7 +26,7 @@ Then open an AI session and run:
 "Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it."
 ```
 
-This scans your actual code to populate the memory bank. Commit `.agent/` and `memory-bank/` when done.
+This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, and `.memory-bank/` when done.
 
 ### Install from GitHub directly
 
@@ -62,7 +62,7 @@ docs/memory-bank/
 ├── bootstrap-memory-bank-contract.md      ← One-time memory bank setup
 └── templates/                             ← Document templates
 
-memory-bank/
+.memory-bank/
 ├── architecture.md                        ← Tech stack, patterns, rules
 ├── activeContext.md                        ← Current state, progress, session data
 ├── projectBrief.md                        ← Project identity and scope

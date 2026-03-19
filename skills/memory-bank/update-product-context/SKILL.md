@@ -1,6 +1,6 @@
 ---
 name: update-product-context
-description: Use when updating memory-bank/productContext.md. Rarely triggered — only when human-confirmed user or product context changes. Unconfirmed claims must stay in a pending section. Do not invent user segments or product value from code alone.
+description: Use when updating .memory-bank/productContext.md. Rarely triggered — only when human-confirmed user or product context changes. Unconfirmed claims must stay in a pending section. Do not invent user segments or product value from code alone.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,14 +10,14 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/productContext.md`. This file
+This skill owns all writes to `.memory-bank/productContext.md`. This file
 captures user and product context — who uses the product, what jobs they are
 trying to do, and what the product priorities are. This is the least
 code-provable file in the memory bank. Most content requires human confirmation.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/productContext.md`
+- All writes to `.memory-bank/productContext.md`
 - Enforcing the human-confirmation requirement
 - Keeping unconfirmed claims in the pending section
 - Preventing agent-invented user or market claims
@@ -94,7 +94,7 @@ For each piece of content:
 
 ### Step 2: Read Current File
 
-Read `memory-bank/productContext.md` in full.
+Read `.memory-bank/productContext.md` in full.
 
 ### Step 3: Make Changes
 

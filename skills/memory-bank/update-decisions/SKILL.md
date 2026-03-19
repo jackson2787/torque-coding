@@ -1,6 +1,6 @@
 ---
 name: update-decisions
-description: Use when recording an architectural decision in memory-bank/decisions.md. Enforces append-only ADR format. Triggered from DOCS state when an architectural decision was made, or immediately when a significant architectural choice occurs during PLAN or BUILD.
+description: Use when recording an architectural decision in .memory-bank/decisions.md. Enforces append-only ADR format. Triggered from DOCS state when an architectural decision was made, or immediately when a significant architectural choice occurs during PLAN or BUILD.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -10,14 +10,14 @@ metadata:
 
 ## Overview
 
-This skill owns all writes to `memory-bank/decisions.md`. The file is an
+This skill owns all writes to `.memory-bank/decisions.md`. The file is an
 append-only architectural decision record (ADR). Entries are never edited or
 deleted after creation. Each entry records what was decided, why, what
 alternatives were rejected, and what consequences follow.
 
 ## What This Skill Owns
 
-- All writes to `memory-bank/decisions.md`
+- All writes to `.memory-bank/decisions.md`
 - Enforcing append-only discipline
 - Enforcing the ADR entry format
 - Preventing edits to existing entries
@@ -92,7 +92,7 @@ If all three are yes, proceed. Otherwise, stop.
 
 ### Step 1: Read Current File
 
-Read `memory-bank/decisions.md` in full. Confirm the append-only header comment
+Read `.memory-bank/decisions.md` in full. Confirm the append-only header comment
 is intact. Note the last entry date to ensure chronological ordering.
 
 ### Step 2: Draft The Entry
