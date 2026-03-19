@@ -72,7 +72,8 @@ COMPLIANCE CONFIRMED: Reuse over creation
 1. Output compliance statement (Section 1)
 2. Attach MCP servers: Read `.brain/mcp.config.json` or `.mcp.json` if present
 3. Load Memory Bank per mode below
-4. Log session: `{"ts":"2025-10-25T10:30Z","mode":"fast|standard|deep","mb_v":"2024-10"}`
+4. Enter EXPLORE state (default — await task contract or user direction)
+5. Log session: `{"ts":"2025-10-25T10:30Z","mode":"fast|standard|deep","mb_v":"2024-10"}`
 
 **Fast Track** (bug fixes, small changes):
 ```
@@ -112,7 +113,7 @@ Compaction (context compression) can happen at any time — triggered by the sys
 
 #### Continuous State Persistence (At Every State Transition)
 
-At each state transition (`PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS`), persist the following to the Memory Bank:
+At each state transition (`EXPLORE → PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS`), persist the following to the Memory Bank:
 
 1. **State machine position**: Load `.agent/skills/memory-bank/update-active-context/SKILL.md` → update Current State section only
 2. **Task progress**: Append current status to `tasks/YYYY-MM/README.md` with `[IN-PROGRESS]` tag
@@ -215,18 +216,48 @@ and validation rules.
 
 ### Overview
 
-**States**: `PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS`
+**States**: `EXPLORE → PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS`
 **Substates**: `CODING` (building), `WAITING_TOOL` (permissions), `RUNNING` (QA), `IDLE`
 
 ```
-PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY → DOCS → END
-  ↑               ↑______↓______↓_____[fail/changes]______________↓
-  └───────────────────────────────────[major changes needed]─────┘
+EXPLORE [task contract] → PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY → DOCS
+  ↑                         ↑               ↑______↓______↓_____[fail/changes]______________↓       │
+  │                         └───────────────────────────────────[major changes needed]─────┘         │
+  └─────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Core Skill Usage Rule**:
 - The state machine is the source of truth for transitions and gates.
 - Universal skills nudge behavior *inside* a state; they do not redefine the state machine.
+
+---
+
+### EXPLORE (Default Entry State)
+
+**In**: Session startup complete | **Out**: Understanding, discussion, research | **Exit**: User provides task contract
+
+Every session begins in EXPLORE. This is the read-only state for investigation,
+discussion, and pre-planning. The agent can look at anything, discuss anything,
+and research anything — but it cannot change anything.
+
+**Allowed**:
+- Read any file in the codebase
+- Read any memory bank document
+- Query Context7 MCP for framework/library documentation
+- Discuss approaches, trade-offs, and options with the user
+- Answer questions about existing code, architecture, or patterns
+- Research dependencies, flows, and integration points
+- Help the user shape a vague idea (the user may choose to use the `idea-to-task` optional skill)
+
+**Forbidden**:
+- Writing or modifying any file
+- Creating any file
+- Making architectural decisions (that requires PLAN → decisions.md)
+- Updating the memory bank (that requires DOCS or explicit `mb-rebase`)
+- Generating diffs or applying changes
+
+**Exit**: User provides a task contract → transition to PLAN
+**No task**: User ends the session → END. Not every session needs to produce work.
 
 ---
 
@@ -485,7 +516,7 @@ document structure, validation, and write rules.
 Each skill contains the canonical template, validation checklist, and rejection
 criteria for its document.
 
-**Exit**: Task doc created, monthly README updated, relevant MB files updated via their skills, docs PR opened
+**Exit**: Task doc created, monthly README updated, relevant MB files updated via their skills, docs PR opened → return to EXPLORE
 **Failures**: Template violations → skill validation catches them | Missing references → skill requires them | Wrong section → skill placement test prevents it
 
 ---
@@ -698,6 +729,19 @@ If any item fails, address before APPROVAL state.
 
 ### Task: Add Email Notification on Onboarding Complete
 
+#### EXPLORE State
+
+```
+Session started. Memory Bank loaded (Standard Discovery).
+Entering EXPLORE.
+
+Ready for a task contract or questions about the codebase.
+```
+
+**User**: Provides task contract for onboarding email notification.
+
+---
+
 #### PLAN State
 
 ```markdown
@@ -879,7 +923,7 @@ Loading per-document skills:
 
 ✅ All documentation complete.
 
-Task complete.
+Task complete. Returning to EXPLORE.
 ```
 
 ---
@@ -953,10 +997,11 @@ Stuck? → Cycles ≥3?
 
 ### State Transitions
 
-`PLAN [user approves] → BUILD → DIFF → QA [pass] → APPROVAL [user approves] → APPLY → DOCS`
+`EXPLORE [task contract] → PLAN [user approves] → BUILD → DIFF → QA [pass] → APPROVAL [user approves] → APPLY → DOCS → EXPLORE`
 
 Iterations on failure: `BUILD ← DIFF ← QA ← APPROVAL`
 Major changes: Return to `PLAN`
+Task complete: Return to `EXPLORE`
 
 ### Critical Rules
 
@@ -985,7 +1030,7 @@ Major changes: Return to `PLAN`
 
 ---
 
-**Each session starts fresh. Memory Bank is your only persistent memory. Maintain it with precision.**
+**Each session starts in EXPLORE. Memory Bank is your only persistent memory. Maintain it with precision.**
 
 **Mission**: Build software respecting existing architecture, following established patterns, improving incrementally. Reuse over creation. Quality over speed. Approval over assumption.
 
