@@ -235,7 +235,7 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 **In**: Task contract + MB context | **Out**: Implementation plan | **Exit**: User approves
 
 **Core Skill Nudge**:
-- Load `.agent/skills/writing-plans/SKILL.md` while operating in PLAN.
+- Load `.agent/skills/state-machine/writing-plans/SKILL.md` while operating in PLAN.
 
 **Required Content**:
 ```markdown
@@ -273,7 +273,7 @@ PLAN [approve] → BUILD → DIFF → QA [pass] → APPROVAL [approve] → APPLY
 **Substate**: Set to `CODING`
 
 **Core Skill Nudge**:
-- Load `.agent/skills/build-execution/SKILL.md` when entering BUILD.
+- Load `.agent/skills/state-machine/build-execution/SKILL.md` when entering BUILD.
 
 **Actions**:
 1. Work in branch/temp clone (never main)
@@ -342,8 +342,8 @@ tests/test.ext    | 200 +++++++++++++++++++++++++++
 **Substate**: Set to `RUNNING`
 
 **Core Skill Nudges**:
-- Load `.agent/skills/verification-before-completion/SKILL.md` before making any pass, fixed, or complete claims.
-- If checks fail, the root cause is unclear, or repeated fixes start thrashing, load `.agent/skills/systematic-debugging/SKILL.md` and return to BUILD with a grounded fix.
+- Load `.agent/skills/state-machine/verification-before-completion/SKILL.md` before making any pass, fixed, or complete claims.
+- If checks fail, the root cause is unclear, or repeated fixes start thrashing, load `.agent/skills/state-machine/systematic-debugging/SKILL.md` and return to BUILD with a grounded fix.
 
 **Execute**:
 1. Test suite (via MCP or project command)
