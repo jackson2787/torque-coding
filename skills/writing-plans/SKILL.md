@@ -17,6 +17,21 @@ This skill enforces the strict `AGENTS.md` PLAN state. Write comprehensive imple
 - You must create the `memory-bank/tasks/plans/` directory if it does not exist.
 - Ask the user for explicit approval after saving the plan to the file.
 
+## Skill Injection
+
+Before starting plan formulation, read
+[references/injected-skills.md](references/injected-skills.md). If it lists
+required skills, load each one. These are behavioural disciplines that change
+how you plan — not optional reference material.
+
+Apply every loaded skill's concerns throughout the planning process. If a skill
+requires accessibility review, your plan must account for accessibility. If a
+skill requires security hardening, your plan must include security
+considerations.
+
+For framework or library reference documentation, query Context7 MCP instead.
+Injected skills are for behavioural disciplines, not API lookups.
+
 ## Scope Check
 
 If the spec or Task Contract covers multiple independent subsystems, suggest breaking this into separate iterative plans—one per subsystem. Each plan should produce working, testable software on its own.

@@ -72,6 +72,20 @@ Typical triggers:
 If any of those are true, stop and return control to the correct state or
 skill.
 
+## Skill Injection
+
+Before starting the BUILD execution loop, read
+[references/injected-skills.md](references/injected-skills.md). If it lists
+required skills, load each one. These are behavioural disciplines that change
+how you build — not optional reference material.
+
+Apply every loaded skill's constraints while writing code. If a skill requires
+accessible components, every component you build must follow its patterns. If a
+skill requires error handling standards, every error path must comply.
+
+For framework or library reference documentation, query Context7 MCP instead.
+Injected skills are for behavioural disciplines, not API lookups.
+
 ## Core Principles
 
 ### 1. The Approved Plan Is The Contract
