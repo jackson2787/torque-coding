@@ -58,7 +58,7 @@ OAuth will prompt on first use. For PAT-based auth:
 
 ### Probe — Code Search MCP Server
 
-**What it serves**: The Four Sacred Rules, PLAN state, Reuse Validation Checklist
+**What it serves**: The Four Sacred Rules, PLAN state, Reuse Validation Checklist, Bootstrap Memory Bank evidence sweep
 
 **Server**: [Probe](https://github.com/probelabs/probe) — Local, zero-setup
 
@@ -70,6 +70,15 @@ It's also token-aware — you can set a `--max-tokens` budget and it deduplicate
 
 Probe supports JavaScript, TypeScript, Python, Go, Rust, C/C++, Java, Ruby, PHP, Swift, C#, and more — covering any stack you work in.
 
+Probe is also the best fit for the Day 1 bootstrap contract in
+`.agent/bootstrap-memory-bank-contract.md`. That contract intentionally
+quarantines markdown and other prose during the primary evidence sweep, so the
+agent has to learn the repo from code, config, tests, schemas, and runtime
+files alone. If Probe is connected, the agent can do that sweep with structural
+repo-wide search instead of manually traversing directories, which makes the
+bootstrap faster and more thorough without weakening the anti-contamination
+rule.
+
 **Configuration**:
 ```json
 {
@@ -80,7 +89,7 @@ Probe supports JavaScript, TypeScript, Python, Go, Rust, C/C++, Java, Ruby, PHP,
 }
 ```
 
-**State machine touchpoints**: PLAN (analysing existing code, reuse strategy), BUILD (finding integration points, extending patterns), Reuse Validation Checklist (codebase search)
+**State machine touchpoints**: PLAN (analysing existing code, reuse strategy), BUILD (finding integration points, extending patterns), Bootstrap Memory Bank evidence sweep, Reuse Validation Checklist (codebase search)
 
 ---
 
@@ -224,7 +233,7 @@ Note: Exact configuration syntax varies by host tool (Claude Code, Cursor, etc.)
 | Server | Tier | What It Serves | Install When |
 |--------|------|---------------|--------------|
 | [GitHub Remote](https://github.com/github/github-mcp-server) | 1 — Core | BUILD, APPLY, Rollback, DOCS | Immediately |
-| [Probe](https://github.com/probelabs/probe) | 1 — Core | Four Sacred Rules, PLAN, Reuse | Immediately |
+| [Probe](https://github.com/probelabs/probe) | 1 — Core | Four Sacred Rules, PLAN, bootstrap evidence sweep, Reuse | Immediately |
 | Backend (Supabase, etc.) | 2 — Stack | PLAN, BUILD, Security Review | When project has a backend |
 | Framework (Vercel, etc.) | 2 — Stack | BUILD skills, QA skills | When using domain-tuned variant |
 | Memory Bank (custom) | 3 — Custom | Session Startup, MB reads | When MB exceeds ~15K tokens |

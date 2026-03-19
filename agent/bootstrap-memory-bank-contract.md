@@ -83,6 +83,12 @@ Inspect the repository directly before writing anything:
 
 Ignore markdown and other prose documents during this phase.
 
+If a code-search MCP server is connected, use it for this sweep. Prefer
+repo-wide structural search over manual directory walking when the tool can
+return complete functions, classes, handlers, routes, services, and other
+reusable code blocks. This makes the evidence sweep faster, broader, and more
+reliable without changing the no-markdown rule.
+
 Build an evidence notebook with three buckets:
 
 - `Observed`: directly supported by executable project files
