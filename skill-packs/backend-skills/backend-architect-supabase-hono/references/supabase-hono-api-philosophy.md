@@ -33,6 +33,10 @@ That means a feature is normally designed and shipped as one vertical slice:
 This is why database work and endpoint work can and should be done in one repo,
 one branch, and often one task.
 
+When that work includes migrations, treat committed migration files as
+immutable history. Add a new migration for a correction instead of editing an
+existing one.
+
 ## The Role of Hono
 
 Hono is the router, not the thinker.

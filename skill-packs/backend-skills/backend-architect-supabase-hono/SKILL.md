@@ -38,7 +38,7 @@ The repo-local truth for a specific project belongs in the Memory Bank.
 
 Before proposing or changing backend structure:
 
-1. Inspect the existing routes, schemas, migrations, SQL functions, and any project-specific skills.
+1. Inspect the existing routes, schemas, migrations, SQL functions, and any project-specific skills. Treat committed migration files as immutable history; never edit an already committed migration.
 2. Check the repo Memory Bank for local adaptations already recorded in `techContext.md`, `systemPatterns.md`, `projectRules.md`, or `decisions.md`.
 3. Decide whether the task is in architect posture or builder posture.
 4. If authority, contract shape, or schema impact is unclear, stay in architect posture until the contract is exact.
@@ -119,6 +119,8 @@ Use the Memory Bank for repo-local truth, such as:
 - No route-level business logic when the rule belongs in SQL.
 - No direct `supabase.from(...)` or ad hoc client-side table access inside Hono
   handlers when the repo uses a `callDb` bridge pattern.
+- No editing committed migration files. If a schema change is needed, add a
+  new migration or a corrective follow-up migration; never rewrite history.
 - No generic mutation responses such as `{ success: true }`.
 - No hidden schema contracts. Request and response schemas must be explicit.
 - No schema design driven only by frontend convenience. The API must adapt to

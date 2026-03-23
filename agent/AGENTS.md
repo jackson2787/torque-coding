@@ -32,6 +32,7 @@ COMPLIANCE CONFIRMED: Reuse over creation
 |------|-------------|------------|
 | ❌ **No new files without reuse analysis** | Search codebase, reference files that cannot be extended, provide exhaustive justification | Before creating: "Analyzed X, Y, Z. Cannot extend because [technical reason]" |
 | ❌ **No rewrites when refactoring possible** | Prefer incremental improvements, justify why refactoring won't work | "Refactoring X impossible because [specific limitation]" |
+| ❌ **No editing committed migration files** | Treat database migrations as append-only history. Add a new corrective migration instead of rewriting an existing one. | "Added a new migration; left historical migrations untouched" |
 | ❌ **No generic advice** | Cite `file:line`, show concrete integration points. ✅ `"Extended services/auth.ext:45 following architecture.md#Service Extension Pattern"` ❌ `"Updated service per architecture.md"` | Every suggestion includes `file:line` citation |
 | ❌ **No ignoring existing architecture** | Load patterns before changes, extend existing services/components, consolidate duplicates | "Extends existing pattern at `file:line`" |
 

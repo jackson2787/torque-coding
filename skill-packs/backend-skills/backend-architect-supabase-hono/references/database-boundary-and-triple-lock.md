@@ -27,10 +27,16 @@ The API should adapt to this model, not weaken it.
 
 Prefer versioned migrations over ad hoc schema mutation.
 
+Treat migrations as append-only history. Once a migration is committed, its
+contents are immutable.
+
 When the repo uses Supabase CLI migrations:
 
 - create a new migration for each database change
+- if a prior migration was wrong, add a new corrective migration rather than
+  editing the original file
 - do not overwrite historical migration intent
+- never rewrite an already committed migration file
 - keep SQL function changes versioned with the schema changes they depend on
 
 If a repo has a stricter local migration protocol, follow that protocol.
