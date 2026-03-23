@@ -20,7 +20,7 @@ if (!command || command === 'init') {
   console.log(readVersion(path.resolve(__dirname, '..')));
 } else if (command === '--help' || command === '-h') {
   console.log(`
-  Usage: agent-playbook [command]
+  Usage: torque-coding [command]
 
   Commands:
     init        Install the playbook into the current project (default)
@@ -31,6 +31,6 @@ if (!command || command === 'init') {
     -h, --help      Show this help
 `);
 } else {
-  console.error(`\n  Unknown command: ${command}\n  Run 'agent-playbook --help' for usage.\n`);
+  console.error(`\n  Unknown command: ${command}\n  Run 'torque-coding --help' for usage.\n`);
   process.exit(1);
 }

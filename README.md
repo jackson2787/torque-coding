@@ -10,7 +10,7 @@ An opinionated operating model for AI-assisted software delivery. Combines a sta
 ## Quick Start
 
 ```bash
-npx agent-playbook
+npx torque-coding
 ```
 
 This runs an interactive installer that:
@@ -19,7 +19,7 @@ This runs an interactive installer that:
 2. Asks which optional skills to include
 3. Installs the operating model into `.agent/`
 4. Scaffolds an empty `.memory-bank/`
-5. Writes `.agent-playbook.json` so future `npx agent-playbook update`
+5. Writes `.torque-coding.json` so future `npx torque-coding update`
    runs can refresh managed files without touching `.memory-bank/`
 
 Then open an AI session and run:
@@ -28,7 +28,7 @@ Then open an AI session and run:
 "Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it."
 ```
 
-This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, `.memory-bank/`, and `.agent-playbook.json` when done.
+This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, `.memory-bank/`, and `.torque-coding.json` when done.
 
 ### Install from GitHub directly
 
@@ -74,10 +74,10 @@ docs/memory-bank/
 └── tasks/YYYY-MM/                         ← Monthly task history
 ```
 
-`.agent-playbook.json` lives at the project root as the hidden install manifest
-for `npx agent-playbook update`. If it is missing on an older install, `update`
+`.torque-coding.json` lives at the project root as the hidden install manifest
+for `npx torque-coding update`. If it is missing on an older install, `update`
 will infer the installed skills from `.agent/skills/` and rewrite the manifest
-at the new root location. If inference also fails, rerun `npx agent-playbook init`.
+at the new root location. If inference also fails, rerun `npx torque-coding init`.
 `update` compares managed-file checksums before overwriting; if it sees local
 edits, it warns and asks before proceeding.
 
@@ -140,7 +140,7 @@ These are standalone skills selected during installation:
 
 ### sync-api (agent-assisted install)
 
-The `sync-api` skill requires project-level setup beyond a simple file copy — scripts in your project root, Orval config, npm dependencies. When selected during `npx agent-playbook`, it gets staged to `docs/memory-bank/skills-to-install/sync-api/` instead of installed directly.
+The `sync-api` skill requires project-level setup beyond a simple file copy — scripts in your project root, Orval config, npm dependencies. When selected during `npx torque-coding`, it gets staged to `docs/memory-bank/skills-to-install/sync-api/` instead of installed directly.
 
 To complete installation, ask your agent:
 

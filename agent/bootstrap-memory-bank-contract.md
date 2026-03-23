@@ -6,7 +6,7 @@ One-time cold start. Populate the scaffolded memory bank from repo code. No
 human interaction — just scan, write, and flag gaps.
 
 The memory bank files and directory structure already exist (created by
-`agent-playbook init`). This bootstrap fills them with evidence from the
+`torque-coding init`). This bootstrap fills them with evidence from the
 codebase.
 
 The canonical location is the hidden `.memory-bank/` directory. 

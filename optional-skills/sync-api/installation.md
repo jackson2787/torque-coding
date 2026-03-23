@@ -1,6 +1,6 @@
 # Sync API Installation
 
-This skill package was staged here by `agent-playbook init`. It requires
+This skill package was staged here by `torque-coding init`. It requires
 agent-assisted installation because it adds scripts and config to the project
 root, not just a skill to `.agent/skills/`.
 

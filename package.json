@@ -1,5 +1,5 @@
 {
-  "name": "agent-playbook",
+  "name": "torque-coding",
   "version": "2.4.0",
   "description": "Install the agent-engineering-playbook operating model into any project",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "url": "https://github.com/jackson2787/agent-engineering-playbook/issues"
   },
   "bin": {
-    "agent-playbook": "./bin/agent-playbook.js"
+    "torque-coding": "./bin/torque-coding.js"
   },
   "files": [
     "bin/",
