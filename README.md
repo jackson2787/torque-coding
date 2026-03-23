@@ -157,6 +157,22 @@ These are standalone skills selected during installation:
 | **best-practices-audit** | Produces a structured audit against installed playbook and skill packs |
 | **legal-compliance-checker** | Adds legal/regulatory review framing for privacy, payments, health data |
 
+### Turning Ideas Into Tasks
+
+If you have a rough human-language idea, ask the agent:
+
+```text
+Create task contract: [your brainstorming idea]
+```
+
+For example:
+
+```text
+Create task contract: I want a safer way to refresh installed skills without touching memory bank files.
+```
+
+This tells the `idea-to-task` skill to shape the idea into a task contract for the PLAN state.
+
 ### sync-api (agent-assisted install)
 
 The `sync-api` skill requires project-level setup beyond a simple file copy — scripts in your project root, Orval config, npm dependencies. When selected during `npx torque-coding`, it gets staged to `docs/memory-bank/skills-to-install/sync-api/` instead of installed directly.
