@@ -1,6 +1,25 @@
-# agent-engineering-playbook
+# Torque Coding
 
-An opinionated operating model for AI-assisted software delivery. Combines a state machine, memory bank, and skill system into a practical framework that works with Claude, Cursor, Copilot, Cline, Aider, and other AGENTS.md-compatible tools.
+A jack of all trades is a master of none, but oftentimes better than a master of one.
+
+AI agents are capable of everything. Paradoxically, this is a hindrance.
+
+Engineering tasks rarely call on a single domain. Reliability collapses when an agent is asked to operate as multiple personas across a multi-faceted task.
+
+In isolation, agents behave like experts.
+In combination, that clarity breaks down.
+
+Which persona owns the task?
+The database designer, the API engineer, or the system architect?
+
+Torque coding is an attempt to preserve that expert isolation across complex work.
+
+The capability does not change.
+The application of it does.
+
+Torque coding constrains how capability is applied through skills, memory, constraints, and survivability, rather than attempting to redefine the agent itself.
+
+It bridges the gap between the speed of vibe coding and the predictable, repeatable nature of traditional engineering.
 
 - **Version**: aligned with `agent/AGENTS.md` 2.4
 - **Status**: public template repo + NPX installer
@@ -33,7 +52,7 @@ This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.a
 ### Install from GitHub directly
 
 ```bash
-npx github:jackson2787/agent-engineering-playbook
+npx github:jackson2787/torque-coding
 ```
 
 ---
