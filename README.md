@@ -6,7 +6,7 @@
 
 **Bridge vibe speed with engineering repeatability — one approval gate at a time.**
 
-A jack of all trades is a master of none, but oftentimes better than a master of one.
+> A jack of all trades is a master of none, but oftentimes better than a master of one.
 
 AI agents are capable of everything. Paradoxically, this is a hindrance.
 
