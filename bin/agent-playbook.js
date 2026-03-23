@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 
-const { run } = require('../lib/cli');
+const { run, update } = require('../lib/cli');
 
 const command = process.argv[2];
 
 if (!command || command === 'init') {
   run().catch((err) => {
+    console.error(`\n\x1b[31mError: ${err.message}\x1b[0m`);
+    process.exit(1);
+  });
+} else if (command === 'update') {
+  update().catch((err) => {
     console.error(`\n\x1b[31mError: ${err.message}\x1b[0m`);
     process.exit(1);
   });
@@ -19,6 +24,7 @@ if (!command || command === 'init') {
 
   Commands:
     init        Install the playbook into the current project (default)
+    update      Refresh managed playbook files from the saved install manifest
 
   Options:
     -v, --version   Show version

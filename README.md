@@ -19,6 +19,8 @@ This runs an interactive installer that:
 2. Asks which optional skills to include
 3. Installs the operating model into `.agent/`
 4. Scaffolds an empty `.memory-bank/`
+5. Writes `.agent-playbook.json` so future `npx agent-playbook update`
+   runs can refresh managed files without touching `.memory-bank/`
 
 Then open an AI session and run:
 
@@ -26,7 +28,7 @@ Then open an AI session and run:
 "Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it."
 ```
 
-This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, and `.memory-bank/` when done.
+This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, `.memory-bank/`, and `.agent-playbook.json` when done.
 
 ### Install from GitHub directly
 
@@ -71,6 +73,13 @@ docs/memory-bank/
 ├── toc.md                                 ← File index
 └── tasks/YYYY-MM/                         ← Monthly task history
 ```
+
+`.agent-playbook.json` lives at the project root as the hidden install manifest
+for `npx agent-playbook update`. If it is missing on an older install, `update`
+will infer the installed skills from `.agent/skills/` and rewrite the manifest
+at the new root location. If inference also fails, rerun `npx agent-playbook init`.
+`update` compares managed-file checksums before overwriting; if it sees local
+edits, it warns and asks before proceeding.
 
 The Memory Bank is intentionally hidden under `.memory-bank/`. Treat that as
 the canonical path rather than looking for a visible `memory-bank/` folder.
