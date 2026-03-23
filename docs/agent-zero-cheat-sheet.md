@@ -56,7 +56,7 @@ Every session lands in **EXPLORE**. From there:
 | You want to... | Do this |
 |----------------|---------|
 | Jump straight to work | Paste a task contract |
-| Shape a vague idea first | Use the `idea-to-task` skill, then paste the output |
+| Shape a vague idea first | Say `Create task contract` or use the `idea-to-task` skill, then paste the output |
 | Just understand the code | Ask questions — stay in EXPLORE as long as you want |
 | Fix a bug quickly | Paste a minimal task contract, agent uses Fast Track MB load |
 
@@ -76,7 +76,7 @@ Constraints: [must/must not]
 Instructions: Create a plan for approval. Do not code until approved.
 ```
 
-Full format in AGENTS.md Section 5. Or use `idea-to-task` to generate one from conversation.
+Full format in AGENTS.md Section 5. Or say `Create task contract` / use `idea-to-task` to generate one from conversation. When the skill runs, it will announce `Ideas to Task Contract running...` in-session first.
 
 ---
 

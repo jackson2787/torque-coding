@@ -23,6 +23,7 @@ optional-skills/<skill-name>/
 
 Current optional skills:
 
+- `idea-to-task/` - turns loose ideas into task contracts, triggered by `Create task contract`, and announces `Ideas to Task Contract running...`
 - `best-practices-audit/`
 - `sync-api/`
 

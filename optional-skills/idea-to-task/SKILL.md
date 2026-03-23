@@ -3,8 +3,9 @@ name: idea-to-task
 description: >-
   Use when the user has a vague idea, feature request, or loose requirement that
   is not yet a formal task contract. Turns raw human intent into a structured
-  task contract ready for the AGENTS.md PLAN state. Outputs a prompt — never
-  code, never a plan, never architecture.
+  task contract ready for the AGENTS.md PLAN state. Also use when the user says
+  "Create task contract". Outputs a prompt — never code, never a plan, never
+  architecture.
 metadata:
   author: uber-ai-workflow
   version: "1.0"
@@ -17,6 +18,12 @@ metadata:
 Transform a vague human idea into a precise task contract that the AGENTS.md
 state machine can execute. You produce the **input** to PLAN — you do not
 produce the plan itself.
+
+## Activation
+
+When this skill is used, emit this exact session message before continuing:
+
+`Ideas to Task Contract running...`
 
 ## When To Use
 

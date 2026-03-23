@@ -122,7 +122,7 @@ These are standalone skills selected during installation:
 
 | Skill | What It Does |
 |-------|-------------|
-| **idea-to-task** | Turns vague ideas into structured task contracts for the PLAN state |
+| **idea-to-task** | Turns vague ideas into structured task contracts for the PLAN state. Trigger with `Create task contract`; emits `Ideas to Task Contract running...` when used. |
 | **best-practices-audit** | Produces a structured audit against installed playbook and skill packs |
 | **legal-compliance-checker** | Adds legal/regulatory review framing for privacy, payments, health data |
 
