@@ -1,5 +1,11 @@
 # Torque Coding
 
+<p align="center">
+  <img src="./.assets/0d39f7870f3a26463bc3cd6cd8b3abfde956f386fde2b3a01aa59f833d752ee7.jpg" alt="Torque Coding" width="720" />
+</p>
+
+**Bridge vibe speed with engineering repeatability — one approval gate at a time.**
+
 A jack of all trades is a master of none, but oftentimes better than a master of one.
 
 AI agents are capable of everything. Paradoxically, this is a hindrance.
