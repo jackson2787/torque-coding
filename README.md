@@ -72,6 +72,9 @@ docs/memory-bank/
 └── tasks/YYYY-MM/                         ← Monthly task history
 ```
 
+The Memory Bank is intentionally hidden under `.memory-bank/`. Treat that as
+the canonical path rather than looking for a visible `memory-bank/` folder.
+
 ---
 
 ## The State Machine

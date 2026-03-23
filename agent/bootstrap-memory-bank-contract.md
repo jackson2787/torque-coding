@@ -9,6 +9,7 @@ The memory bank files and directory structure already exist (created by
 `agent-playbook init`). This bootstrap fills them with evidence from the
 codebase.
 
+The canonical location is the hidden `.memory-bank/` directory. 
 ## Source And Install Path
 
 - Template source path: `agent/bootstrap-memory-bank-contract.md`

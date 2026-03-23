@@ -142,7 +142,7 @@ These don't exist off the shelf. They're small custom MCP servers tailored to yo
 
 **What it serves**: Session Startup, Compaction Recovery, all MB read operations
 
-Replaces brute-force file loading with query-based retrieval over your `memory-bank/` directory. The agent asks "find decisions about caching" and gets back the relevant ADR section rather than loading all of `decisions.md`.
+Replaces brute-force file loading with query-based retrieval over your `.memory-bank/` directory. The agent asks "find decisions about caching" and gets back the relevant ADR section rather than loading all of `decisions.md`.
 
 **When to build**: When your Memory Bank grows large enough that loading whole files wastes meaningful context. Rules of thumb:
 - Total MB content exceeds 15-20K tokens
@@ -152,7 +152,7 @@ Replaces brute-force file loading with query-based retrieval over your `memory-b
 
 **What it does**: Indexes MB files by heading structure, supports keyword and (optionally) semantic search, returns sections with source paths. Also supports the `mb_read_section` pattern for following citations like `decisions.md#2025-09-15-caching-strategy`.
 
-**Architecture**: Local process, reads from `memory-bank/` directory, no external dependencies. Travels with the repo. Falls back gracefully — if the server isn't running, the agent reads files directly as it does today.
+**Architecture**: Local process, reads from `.memory-bank/` directory, no external dependencies. Travels with the repo. Falls back gracefully — if the server isn't running, the agent reads files directly as it does today.
 
 **State machine touchpoints**: Session Startup (all loading modes), Compaction Recovery, PLAN (MB context), DOCS (MB writes)
 

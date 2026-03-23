@@ -65,6 +65,9 @@ COMPLIANCE CONFIRMED: Reuse over creation
 4. Enter EXPLORE state
 5. Output state: `[STATE: EXPLORE/IDLE] Task: none`
 
+**Canonical path**: The Memory Bank lives in the hidden `.memory-bank/`
+directory.
+
 Load `decisions.md`, `productContext.md`, or specific task docs on demand when
 needed during the session. Do not pre-load everything.
 

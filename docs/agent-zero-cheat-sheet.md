@@ -103,6 +103,9 @@ Full format in AGENTS.md Section 5. Or say `Create task contract` / use `idea-to
 └── tasks/YYYY-MM/        ← Monthly summaries + task docs
 ```
 
+The Memory Bank is intentionally hidden under `.memory-bank/`. Treat that as
+the canonical path rather than looking for a visible `memory-bank/` folder.
+
 **You rarely touch these directly.** The agent uses per-document skills to write them correctly.
 
 ---
