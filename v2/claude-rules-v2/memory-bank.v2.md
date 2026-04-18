@@ -35,8 +35,27 @@ Load in this order. Constitution first — it is the highest authority and sets 
 |---|---|---|---|
 | `constitution.md` | Stable truths: domain definitions, durable architectural rules, security boundaries, scope. Boring by design. | Rare — requires human ratification | `update-constitution` |
 | `operational-context.md` | Current working rules: do this, do not do this, prefer this, avoid this, current constraints, current workflows. Present-tense only. | Per-learning, via debrief | `update-operational-context` |
-| `activeContext.md` | Compaction recovery anchor: current state, progress, session data | Every state transition | `update-active-context` *(v1 skill, reused)* |
+| `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition | `update-active-context` *(v1 skill, reused)* |
 | `toc.md` | Mechanical index of both machine and human halves | When files are added or removed | `update-toc` *(v1 skill, reused)* |
+| `current-task/` *(folder, v2.1)* | Holds all artifacts for the currently active task — at most one task active at a time | Written by state-machine skills during the task lifecycle | `writing-plans-v2`, `plan-contextualize`, `build-loop`, `qa-v2`, `escalate`, `debrief` |
+
+### The current-task/ folder (v2.1)
+
+```
+machine/current-task/
+├── plan.md                  ← written by writing-plans-v2 (PLAN state)
+├── plan_context.md          ← written by plan-contextualize (PLAN-CONTEXTUALIZE state)
+├── build-log.md             ← written by build-loop (BUILD state)
+├── qa-report.md             ← written by qa-v2 (QA state)
+└── escalation-brief.md      ← written by escalate (only when stalled)
+```
+
+**Rules for current-task/**:
+- **At most one task is active at a time.** If a new task needs to start while `current-task/` is populated, either complete the current task (via debrief) or explicitly abandon it.
+- **Loaded at session startup** alongside the other machine files. The budget model reads `plan.md` and `plan_context.md` without any exploration.
+- **Archived by debrief.** On successful task completion, debrief moves `current-task/*` into `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/` and clears `current-task/`.
+- **Survives compaction and session handoff.** If the session is lost mid-task, re-entering the project reads `current-task/` and resumes at the appropriate state.
+- **Any-state entry uses these files.** The presence or absence of `plan.md`, `plan_context.md`, etc., determines which state a new session enters.
 
 ### What machine documents must NOT contain
 

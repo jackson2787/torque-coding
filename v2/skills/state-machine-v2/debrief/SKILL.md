@@ -27,25 +27,59 @@ When the answer is "yes," debrief applies a strict rubric, shows the human a dif
 
 ## When to Use
 
+Two invocation modes:
+
+### Post-task mode (automatic)
+
 Always. After every task. After changes are applied and the user has approved.
+
+- Input source: `.memory-bank-v2/machine/current-task/*` — plan, plan_context, build-log, qa-report
+- Archives `current-task/` to `human/tasks/YYYY-MM/DDMMDD_<slug>/` on successful completion
+- Clears `current-task/` at the end
+- Resets `activeContext.md` to PLAN/IDLE
+
+### Ad-hoc mode (user-invoked) — new in v2.1
+
+Invoked at any time by the human (typically via `/debrief` or explicit "run debrief on this session").
+
+- Input source: the current session transcript — plus anything in `current-task/` if present, but `current-task/` is NOT required
+- Applies the same five-gate rubric to observations drawn from the session
+- Writes to `human/tasks/YYYY-MM/` with status `Ad Hoc` (no plan, no QA section)
+- **Does NOT touch `current-task/`.** If a task is mid-flight, it stays mid-flight.
+- **Does NOT reset `activeContext.md`.** The active state is preserved.
+
+When in doubt which mode applies: if `current-task/` has a populated `qa-report.md` showing all-green, run post-task mode. If the user explicitly invoked debrief outside the state machine (e.g., "summarise what we learned in this conversation"), run ad-hoc mode.
 
 ## When NOT to Use
 
-- The task was abandoned before applying changes (still write the task history with `kind=task`, status=Abandoned)
+- The task was abandoned before applying changes (still write the task history with `kind=task`, status=Abandoned; clear `current-task/`)
 - The user says "skip debrief" — note this in the task history and stop (rare, acceptable)
 
 ---
 
 ## Inputs
 
+### Post-task mode
+
 Gather these before beginning debrief:
 
-- [ ] The task contract (objective, acceptance criteria, constraints)
-- [ ] The final diff (what was actually changed)
-- [ ] QA results
-- [ ] Any notes taken during BUILD LOOP
+- [ ] `current-task/plan.md` (the task contract — objective, acceptance criteria, constraints)
+- [ ] `current-task/plan_context.md` (the context pack used by BUILD)
+- [ ] `current-task/build-log.md` (iteration history)
+- [ ] `current-task/qa-report.md` (final pass/fail checks)
+- [ ] The final diff (what was actually changed — `git diff` against the task's starting commit)
 - [ ] `operational-context.md` (read — do not modify during gathering)
 - [ ] `constitution.md` (read — do not modify during gathering)
+
+### Ad-hoc mode
+
+Gather these instead:
+
+- [ ] The session transcript (scroll back — what did the user ask, what was observed, what patterns emerged)
+- [ ] Any diffs applied during the session (if applicable — `git status`, `git diff`)
+- [ ] `operational-context.md` (read)
+- [ ] `constitution.md` (read)
+- [ ] Note: `current-task/*` may be empty or populated with an in-flight task. **Do not read it as the task contract.** If present, leave it alone.
 
 ---
 
@@ -203,7 +237,9 @@ Load `update-human-log` with `kind=task`.
 
 The task history is written after every task without exception, including tasks with no learning.
 
-Required fields: objective, outcome, files modified, patterns applied, debrief result.
+**Post-task mode**: Required fields: objective, outcome, files modified, patterns applied, debrief result. Status: `Completed` or `Abandoned`.
+
+**Ad-hoc mode**: Set `Status: Ad Hoc`. Objective becomes "Session observation — [user's invocation reason]". Plan/QA sections may read "N/A (ad-hoc debrief)". Files modified reflects actual session diff (if any).
 
 ### If a decision was made
 
@@ -225,15 +261,28 @@ Write a constitutional proposal. Set `Status: Proposed`. Note that ratification 
 
 ---
 
-## Phase 6: Reset activeContext
+## Phase 6: Archive current-task/ and Reset activeContext
 
-Load `skills/memory-bank/update-active-context/SKILL.md` (v1 skill, reused).
+### Post-task mode
 
-Update Current State section:
+1. **Archive `current-task/`**. Move all files from `.memory-bank-v2/machine/current-task/` to `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/`. Include `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and any `escalation-brief.md`.
+2. **Clear `current-task/`**. The directory exists but is empty after archive.
+3. **Reset `activeContext.md`**. Load `skills/memory-bank/update-active-context/SKILL.md` (v1 skill, reused). Update Current State section:
+   ```
+   State: PLAN/IDLE
+   Task: none
+   Debrief: YYYY-MM-DD — [task slug] — [no learning | new rule | updated pattern | retired rule | constitutional flag]
+   ```
+
+### Ad-hoc mode
+
+**Do NOT archive `current-task/`.** Do NOT clear it. An in-flight task stays in flight.
+
+**Do NOT reset `activeContext.md`.** The active state is preserved.
+
+Append to `activeContext.md` a line under "Recent Debriefs" (create the section if missing):
 ```
-State: PLAN/IDLE
-Task: none
-Debrief: YYYY-MM-DD — [task slug] — [no learning | new rule | updated pattern | retired rule | constitutional flag]
+- YYYY-MM-DD — ad-hoc — [no learning | new rule | updated pattern]
 ```
 
 ---
@@ -265,7 +314,9 @@ OR:
 - human/rationale/<topic>.md ✓ (if applicable)
 
 ### State
-activeContext.md reset to PLAN/IDLE ✓
+Mode: [post-task | ad-hoc]
+Post-task: current-task/ archived to human/tasks/YYYY-MM/DDMMDD_<slug>/ ✓; activeContext.md reset to PLAN/IDLE ✓
+Ad-hoc:    current-task/ preserved; activeContext.md state preserved; debrief line appended
 ```
 
 ---
@@ -289,13 +340,23 @@ Stop and surface to the human if:
 
 Debrief is complete when all of the following are true:
 
+Both modes:
 - [ ] Five-gate rubric applied to all candidates
 - [ ] operational-context.md change proposed and either applied or confirmed as none
 - [ ] `human/tasks/YYYY-MM/DDMMDD_<task>.md` written
 - [ ] `human/decisions/` written (if applicable)
 - [ ] `human/rationale/` written (if applicable)
-- [ ] `activeContext.md` reset to PLAN/IDLE
 - [ ] Debrief Report presented to human
+
+Post-task mode only:
+- [ ] `current-task/` archived to `human/tasks/YYYY-MM/DDMMDD_<slug>/`
+- [ ] `current-task/` cleared
+- [ ] `activeContext.md` reset to PLAN/IDLE
+
+Ad-hoc mode only:
+- [ ] `current-task/` preserved (not archived, not cleared)
+- [ ] `activeContext.md` state preserved (not reset)
+- [ ] Debrief line appended to `activeContext.md` Recent Debriefs
 
 ---
 

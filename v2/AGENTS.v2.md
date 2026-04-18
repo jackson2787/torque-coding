@@ -56,14 +56,15 @@ COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
 2. Attach MCP servers: read `.brain/mcp.config.json` or `.mcp.json` if present
 3. Load Machine Memory (default set):
    ```
-   - [ ] .memory-bank-v2/machine/constitution.md      (highest authority — stable truths)
+   - [ ] .memory-bank-v2/machine/constitution.md       (highest authority — stable truths)
    - [ ] .memory-bank-v2/machine/operational-context.md (current working rules)
    - [ ] .memory-bank-v2/machine/activeContext.md      (compaction recovery anchor)
-   - [ ] .memory-bank-v2/machine/toc.md               (file index)
+   - [ ] .memory-bank-v2/machine/toc.md                (file index)
+   - [ ] .memory-bank-v2/machine/current-task/*        (any files present — the active task's artifacts)
    ```
 4. Do NOT load human-side memory at startup — it is on-demand only
-5. Enter PLAN state (or resume from `activeContext.md` if a task is in progress)
-6. Output state: `[v2 STATE: PLAN/IDLE] Task: none`
+5. Determine entry state via input-contract evaluation (see §5 — any-state entry). If `current-task/` is empty and no task has been assigned, enter `PLAN/IDLE`.
+6. Output state: `[v2 STATE: <STATE>] Task: <task-slug-or-none>`
 
 **Canonical path**: Machine memory lives in `.memory-bank-v2/machine/`. Human memory lives in `.memory-bank-v2/human/`. The `toc.md` indexes both.
 
@@ -76,7 +77,7 @@ COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
 
 Compaction can happen at any time without advance notice. State persistence is continuous.
 
-**At every state transition** (PLAN → BUILD LOOP → DEBRIEF):
+**At every state transition** (PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF; or into ESCALATE):
 1. Load `skills/memory-bank/update-active-context/SKILL.md` (v1 skill, reused) → update Current State
 2. If new architectural decisions: load `v2/skills/memory-bank-v2/update-human-log/SKILL.md` → `kind=decision`
 
@@ -102,15 +103,32 @@ Compaction can happen at any time without advance notice. State persistence is c
 │   ├── constitution.md             ← stable truths (highest authority)
 │   ├── operational-context.md      ← current working rules
 │   ├── activeContext.md            ← compaction anchor (current state / progress / session data)
-│   └── toc.md                      ← mechanical index of both halves
+│   ├── toc.md                      ← mechanical index of both halves
+│   └── current-task/               ← the active task's artifacts (v2.1) — at most one task active
+│       ├── plan.md                 ← produced by writing-plans-v2 (PLAN)
+│       ├── plan_context.md         ← produced by plan-contextualize (PLAN-CONTEXTUALIZE)
+│       ├── build-log.md            ← produced by build-loop (BUILD)
+│       ├── qa-report.md            ← produced by qa-v2 (QA)
+│       └── escalation-brief.md     ← produced by escalate (only when stalled)
 └── human/                          ← loaded on demand only
     ├── README.md                   ← landing page
     ├── decisions/                  ← one file per ADR
-    ├── tasks/                      ← task histories by month
+    ├── tasks/                      ← task histories by month (archived current-task/ lives here)
     ├── meetings/                   ← discussion summaries
     ├── rationale/                  ← standing "why we do X" documents
     └── progress/                   ← quarterly notes
 ```
+
+### current-task/ — the canonical active-task record (v2.1)
+
+The memory bank is canonical and always-on. **Claude Code's session context sits inside the memory-bank domain as an enhancement, not a replacement.** Everything a model needs to resume, hand off, or be switched mid-task lives in `current-task/` on disk.
+
+Rules:
+- **At most one task is active at a time.** Starting a new task while `current-task/` is populated requires completing it (via debrief) or explicitly abandoning it.
+- **Loaded at session startup.** The BUILD-phase budget model reads `plan.md` and `plan_context.md` with zero exploration required.
+- **Survives compaction and session handoff.** Re-entering the project reads `current-task/` and resumes at the appropriate state.
+- **Archived by debrief.** On successful completion, debrief moves the entire contents to `human/tasks/YYYY-MM/DDMMDD_<slug>/` and clears `current-task/`.
+- **Drives any-state entry.** The files present determine which state a new session enters (see §5).
 
 ### Document Skills
 
@@ -120,6 +138,11 @@ Compaction can happen at any time without advance notice. State persistence is c
 | `operational-context.md` | `update-operational-context` | Called by debrief (propose-diff flow) or human. Prescriptive voice enforced. |
 | `activeContext.md` | `update-active-context` *(v1 skill, reused)* | Every state transition. Compaction recovery anchor. |
 | `toc.md` | `update-toc` *(v1 skill, reused)* | Mechanical reflection of actual files in both halves. |
+| `current-task/plan.md` | `writing-plans-v2` | PLAN state output. |
+| `current-task/plan_context.md` | `plan-contextualize` | PLAN-CONTEXTUALIZE output — the zero-exploration map for the budget model. |
+| `current-task/build-log.md` | `build-loop` | Iteration log during BUILD. |
+| `current-task/qa-report.md` | `qa-v2` | Pass/fail per check; overwritten each cycle. |
+| `current-task/escalation-brief.md` | `escalate` | Written only when a state stalls 3× and escalation triggers. |
 | `human/*` | `update-human-log` | Routes to `{decisions, tasks, meetings, rationale, progress}`. Updates INDEX.md. |
 
 **Rule**: Always use the corresponding skill when writing to a memory-bank file. Never write directly.
@@ -147,34 +170,89 @@ See `claude-rules-v2/authority-order.v2.md` for worked examples.
 
 ## 5. State Machine
 
-**v2 machine**: `PLAN → BUILD LOOP → DEBRIEF`
+**v2.1 machine**:
 
-**Current status**: BUILD LOOP skill is not yet decomposed. Until `v2/skills/state-machine-v2/build-loop/SKILL.md` exists, use the v1 BUILD → DIFF → QA → APPROVAL → APPLY cycle as the implementation of BUILD LOOP. DEBRIEF replaces v1 DOCS.
+```
+PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  →  QA  →  DEBRIEF
+                                  ↑_______↓
+                                  [QA fails → BUILD, max 3 cycles]
+                                         ↓
+                                    [3 stalls → ESCALATE]
+```
 
-### PLAN
+The v1 DIFF state is removed in v2.1 — its role is absorbed into BUILD (which now applies and logs) and QA (which verifies skeptically).
 
-**In**: User provides a task contract | **Out**: Approved implementation plan | **Exit**: User approves
+### Model-switching philosophy
 
-**Actions**:
-- Load `constitution.md` and `operational-context.md` before writing the plan
-- Validate plan against both — flag conflicts before presenting to human
-- Cite `file:line` for code references and `constitution.md#Section` or `operational-context.md#Section` for doctrine references
+Each state declares which model tier it expects. States that benefit from reasoning use the powerful model; states that are mechanical execution use the budget model.
 
-**Exit**: User says "approved", "proceed", "looks good"
+| State | Model tier | Why |
+|---|---|---|
+| PLAN | powerful (e.g., Opus) | Reasoning-heavy; must reconcile doctrine with task |
+| PLAN-CONTEXTUALIZE | powerful | Exploration-heavy; produces the map so BUILD needs zero exploration |
+| BUILD | budget (e.g., Haiku / Sonnet) | Mechanical execution against a complete map |
+| QA | budget | Checklist verification; test-runner; paranoid, not creative |
+| ESCALATE | powerful (subagent or user-switch) | Reasoning-heavy; invoked only on stall |
+| DEBRIEF | any | Rubric application; does not require top-tier reasoning |
 
-### BUILD LOOP *(currently: v1 BUILD → DIFF → QA → APPROVAL → APPLY)*
+The hand-off between tiers is **files on disk** — `plan.md` + `plan_context.md` — not in-session context.
 
-**In**: Approved plan | **Out**: Applied changes | **Exit**: User approves and changes are applied
+### State contracts
 
-- Follow v1 BUILD, DIFF, QA, APPROVAL, APPLY states from `agent/AGENTS.md`
-- Reference `operational-context.md` for patterns, not `architecture.md` (v2 installs)
-- Constitutional conflicts discovered during BUILD → flag immediately, do not apply
+| State | Inputs required | Outputs produced | Exit |
+|---|---|---|---|
+| **PLAN** | Task description + memory bank | `current-task/plan.md` | User approves plan |
+| **PLAN-CONTEXTUALIZE** | `plan.md` + memory bank + codebase | `current-task/plan_context.md` | Context pack complete |
+| **BUILD** | `plan.md` + `plan_context.md` + constitution + operational-context | Applied changes + `build-log.md` | Budget model declares done → QA |
+| **QA** | Applied changes + memory bank (rules as benchmarks) | `qa-report.md` pass/fail per check | All green → DEBRIEF |
+| **ESCALATE** | All of `current-task/*` | `escalation-brief.md` + resolution attempt via stronger model | Stall resolved → back to BUILD or QA |
+| **DEBRIEF** | Post-task: `current-task/*`; Ad-hoc: session transcript | Operational-context diff (proposed) + human-side writes | current-task archived to `human/tasks/` |
 
-### DEBRIEF
+### Stall rules
 
-**In**: Changes applied | **Out**: Memory updates, task history | **Exit**: Debrief report complete
+- **BUILD** — max 3 internal iterations before escalation
+- **QA → BUILD cycles** — max 3 before escalation
+- **Same error signature twice** → immediate escalation candidate
 
-Load `v2/skills/state-machine-v2/debrief/SKILL.md`.
+### Any-state entry (stateless operation)
+
+A session starts in the earliest state whose input contract is satisfied. The files in `current-task/` determine entry:
+
+| Inputs present | Entry state |
+|---|---|
+| Task description, empty `current-task/` | **PLAN** |
+| `plan.md` approved, no `plan_context.md` | **PLAN-CONTEXTUALIZE** |
+| `plan.md` + `plan_context.md` present | **BUILD** |
+| Applied changes, no `qa-report.md` with all-green | **QA** |
+| `escalation-brief.md` present, stalled | **ESCALATE** |
+| Any session, user invokes `/debrief` | **DEBRIEF** (ad-hoc mode) |
+
+`activeContext.md` records the active state so compaction or session loss resumes cleanly.
+
+### State skills (v2.1)
+
+| State | Skill |
+|---|---|
+| PLAN | `v2/skills/state-machine-v2/writing-plans-v2/SKILL.md` |
+| PLAN-CONTEXTUALIZE | `v2/skills/state-machine-v2/plan-contextualize/SKILL.md` |
+| BUILD | `v2/skills/state-machine-v2/build-loop/SKILL.md` |
+| QA | `v2/skills/state-machine-v2/qa-v2/SKILL.md` |
+| ESCALATE | `v2/skills/state-machine-v2/escalate/SKILL.md` |
+| DEBRIEF | `v2/skills/state-machine-v2/debrief/SKILL.md` |
+
+### BUILD LOOP — zero exploration
+
+The BUILD skill runs on the budget model. It reads `plan.md` and `plan_context.md` and proceeds directly to implementation. Exploration (finding files, inferring patterns) is the PLAN-CONTEXTUALIZE job — not BUILD's. If BUILD finds itself needing to explore, that is a signal the context pack is incomplete; the correct response is to return the task to PLAN-CONTEXTUALIZE, not to guess.
+
+### QA — skeptical by design
+
+QA exists to catch a budget model declaring victory too early. It does not believe anything the build claims. It runs tests (does not just read them), runs the linter, verifies each applicable `operational-context.md` directive was followed, and checks acceptance criteria against the actual diff. Failures return to BUILD with a cycle counter.
+
+### ESCALATE — fallback is graceful
+
+When a state stalls 3×:
+1. **Primary path (Claude Code)**: Spawn an Agent subagent with `model: "opus"` override, pass `escalation-brief.md` as the prompt. The subagent has full context from `current-task/`.
+2. **Fallback path (Agent tool unavailable)**: Write `escalation-brief.md` and instruct the user to switch models. Because the memory bank is canonical, nothing is lost — the user re-enters the project under a stronger model and resumes at the stalled state.
 
 ---
 
@@ -235,9 +313,12 @@ Action:   Run bootstrap-memory-bank-v2-contract.md to cold-start.
           See: v2/bootstrap-memory-bank-v2-contract.md
 ```
 
-### Stall detection (inherited from v1)
+### Stall detection (v2.1)
 
-Cycle budget: max 3 BUILD LOOP iterations. Tracked in `activeContext.md` Current State. Same STALL protocol as v1 `AGENTS.md#Section 5`.
+- BUILD: max 3 attempts → ESCALATE
+- QA → BUILD cycles: max 3 → ESCALATE
+- Same error signature twice → immediate escalation candidate
+- Tracked in `current-task/build-log.md` (BUILD) and `current-task/qa-report.md` (QA); cycle counter mirrored in `activeContext.md`
 
 ---
 
@@ -253,7 +334,7 @@ Cycle budget: max 3 BUILD LOOP iterations. Tracked in `activeContext.md` Current
 
 ### State flow
 
-`PLAN → BUILD LOOP (v1 BUILD/DIFF/QA/APPROVAL/APPLY) → DEBRIEF → PLAN`
+`PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF → PLAN` (with ESCALATE on stall)
 
 ### Critical prohibitions
 

@@ -1,12 +1,61 @@
 # Torque Coding v2 — Operating Model
 
-**Version**: 2.0-dev | **Status**: Additive parallel — v1 remains fully functional
+**Version**: 2.1-dev | **Status**: Additive parallel — v1 remains fully functional
 
 This directory contains the complete v2 operating model. Nothing in `agent/`, `skills/`, `optional-skills/`, or `skill-packs/` has been modified. v2 is additive and parallel.
 
 ---
 
-## Why v2 exists
+## Why this project exists
+
+Most modern AI-coding frameworks — Claude Agent SDK, Cursor composer, Devin, the agent patterns baked into the latest IDE extensions — are optimised for the developer who lives inside a single ecosystem. Full Claude Max, Cursor Ultra, unlimited Copilot — the £200/month tier where the session is the substrate, rate limits rarely bite, and you rarely need to leave the tool you started in.
+
+**Torque Coding is built for the other market.** The mid-tier developer on a £20/month plan who is, in practice, a nomad:
+
+- Rate-limited, so context-switching between Claude, ChatGPT, Cursor, and whatever the free-tier model-of-the-month is
+- Hitting usage caps mid-task and having to resume in a different tool
+- Running on whichever model their provider's tier ships today (Sonnet one week, something cheaper the next)
+- Moving between Claude Code, Cursor, Aider, Copilot, and plain API chat depending on which does this particular step best
+- Unable to rely on long sessions — context windows get clipped, "memory" features are flaky and non-portable
+
+For that developer, the session is ephemeral and the tool is interchangeable. What isn't interchangeable is the **project on disk**.
+
+### The core bet
+
+Torque Coding treats the memory bank on disk as canonical and always-on. **The agent session — Claude Code's context, Cursor's composer history, ChatGPT's memory — sits inside the memory-bank domain as an enhancement, not a replacement.** Everything a model needs to resume, hand off, or be switched mid-task lives in `.memory-bank-v2/` on disk.
+
+This inverts the frontier-tool assumption. Frontier tools assume you stay in the session; Torque Coding assumes you won't. Consequences of the inversion:
+
+- Hit a Claude rate limit → open Cursor → it reads `current-task/` → resume at the same state
+- Budget model stalls on a hard problem → switch to a stronger tier for one session → that session reads `escalation-brief.md` → fix lands → back to the budget model
+- Session gets compacted and loses the thread → `activeContext.md` + `current-task/` restores exactly where you were
+- Come back two weeks later on a different laptop → the memory bank tells the next session what's true
+
+None of those paths require paying for a single ecosystem. They require paying for **whichever model you need right now** — which is the actual budget shape for mid-tier developers.
+
+### Why the planner-executor split follows from the budget
+
+The v2.1 state machine runs planning on a powerful model and execution on a budget model, with the hand-off as files on disk (`plan.md` + `plan_context.md`).
+
+At £200/month this is an architectural nicety. At £20/month it is the difference between one complex task per day and five on the same subscription. Planning burns tokens but happens once per task; execution burns tokens continuously. Putting them on different tiers — with a context pack complete enough that the budget model needs zero exploration — stretches the cap where it matters.
+
+### What gets traded away
+
+This positioning costs portability tax inside any single tool:
+
+- Skills are Markdown, not typed tool schemas — so they run across Claude Code, Cursor, Copilot, Aider, plain chat, rather than locking to one SDK
+- Protocols (propose-diff, ratification keyword, approval gates) are conversational rituals rather than structured tool calls — auditability trades for portability
+- Escalation is sequential (one stronger model, one retry) rather than parallel fan-out/gather — because at £20/month you cannot afford three concurrent subagents
+
+These are deliberate choices, not catching-up. Inside Claude Code specifically, some of this work could be native to the Agent SDK. But Torque Coding is not a Claude Code product — it is a tool-agnostic operating model that has to survive wherever the developer's budget takes them that week.
+
+### The shape of the claim
+
+Torque Coding is a late-2025 operating model designed for the part of the AI-coding market that cannot afford late-2025 tool lock-in. That is a larger market than the frontier, and it is the one this project serves.
+
+---
+
+## Why v2 exists (vs v1)
 
 v1's memory bank mixes three kinds of material in one directory:
 
@@ -64,15 +113,24 @@ See [`claude-rules-v2/authority-order.v2.md`](./claude-rules-v2/authority-order.
 
 ---
 
-## State machine — direction of travel
+## State machine (v2.1)
 
 ```
-PLAN → BUILD LOOP → DEBRIEF
+PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  ↔  QA  →  DEBRIEF
+                                        ↓ (3 stalls)
+                                    ESCALATE
 ```
 
-- **PLAN**: produce an approved implementation plan.
-- **BUILD LOOP**: implement, verify, iterate. *(BUILD LOOP skill is a future pass — v2 falls back to v1's BUILD/DIFF/QA/APPROVAL/APPLY cycle until it lands.)*
-- **DEBRIEF**: terminal phase. Applies the five-gate learning rubric. Proposes diffs to operational-context.md. Routes task history and decisions to the human side. Replaces v1 DOCS.
+Each state declares a model tier and an input contract (files on disk).
+
+- **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria.
+- **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration.
+- **BUILD** — budget model. Applies the plan, logs attempts. Max 3 attempts before escalation.
+- **QA** — budget model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately.
+- **ESCALATE** — subagent with stronger model override (primary), or user-prompted model switch (fallback). Triggered on stall.
+- **DEBRIEF** — any model. Five-gate learning rubric. Proposes diffs to `operational-context.md`. Archives `current-task/` to the human side.
+
+Any session enters at the earliest state whose input contract is satisfied — determined by which files exist in `current-task/`. This is what makes stateless / resumable operation across tools possible.
 
 See [`claude-rules-v2/state-machine.v2.md`](./claude-rules-v2/state-machine.v2.md).
 
@@ -94,7 +152,14 @@ v2/
 ├── templates/
 │   ├── machine/
 │   │   ├── constitution.md               ← blank constitution template
-│   │   └── operational-context.md        ← blank operational-context template
+│   │   ├── operational-context.md        ← blank operational-context template
+│   │   ├── activeContext.md              ← v2 activeContext with current-task pointer
+│   │   └── current-task/                 ← per-task artifact templates (v2.1)
+│   │       ├── plan.md
+│   │       ├── plan_context.md
+│   │       ├── build-log.md
+│   │       ├── qa-report.md
+│   │       └── escalation-brief.md
 │   └── human/
 │       └── README.md                     ← human-side landing page template
 └── skills/
@@ -103,7 +168,12 @@ v2/
     │   ├── update-operational-context/SKILL.md
     │   └── update-human-log/SKILL.md
     └── state-machine-v2/
-        └── debrief/SKILL.md
+        ├── writing-plans-v2/SKILL.md     ← PLAN state
+        ├── plan-contextualize/SKILL.md   ← PLAN-CONTEXTUALIZE state
+        ├── build-loop/SKILL.md           ← BUILD state (zero-exploration)
+        ├── qa-v2/SKILL.md                ← QA state (skeptical, six checks)
+        ├── escalate/SKILL.md             ← ESCALATE (subagent primary, user-switch fallback)
+        └── debrief/SKILL.md              ← DEBRIEF (post-task + ad-hoc modes)
 ```
 
 ---
@@ -120,10 +190,10 @@ v2/
 
 ## What is deferred to future passes
 
-- `build-loop/SKILL.md` — full BUILD LOOP decomposition
-- `writing-plans-v2/SKILL.md`
 - `mb-rebase-v2/SKILL.md`
 - `compaction.v2.md`
 - `v2/docs/` — doctrine prose, migration-from-v1 mapping table
 - Skill-pack v2 parallels
 - Installer wiring (`bin/`, `lib/`)
+- **Token/cost budgets per state** (v2.2 target) — soft and hard caps per state tier, so a budget-model stall on cap exhaustion is just another form of escalation. This is where the mid-tier-developer positioning earns its next concrete feature.
+- Configurable escalation ladder (currently hard-coded to `opus`)
