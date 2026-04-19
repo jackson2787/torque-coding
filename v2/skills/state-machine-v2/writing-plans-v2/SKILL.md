@@ -7,19 +7,25 @@ description: >-
   plan-contextualize's job. Writes to the machine side of the memory bank.
 metadata:
   author: torque-coding
-  version: "2.1"
+  version: "2.2"
   state-machine: v2
   state: PLAN
   model-tier: powerful
+  requires:
+    - .memory-bank-v2/machine/constitution.md
+    - .memory-bank-v2/machine/operational-context.md
+    - .memory-bank-v2/machine/limits.md (for PLAN hard cap — v2.2)
   produces: .memory-bank-v2/machine/current-task/plan.md
   successor-skill: plan-contextualize
+  escalates-to: escalate
+  default-hard-cap: 25000 input tokens
 ---
 
 # writing-plans-v2
 
 ## Overview
 
-Planning is the first state of the v2.1 state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
+Planning is the first state of the v2.2 state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
 
 The goal is a plan that can survive model switching, session handoff, and compaction. If the planning session is lost, a fresh session should be able to read `plan.md` alone and understand the task as well as the original planner did.
 
@@ -49,6 +55,16 @@ If any is missing, resolve before writing the plan.
 ### 1. Load doctrine
 
 Re-read `constitution.md` and `operational-context.md` before planning, even if they were loaded at session startup. The planner is the first line of defense against doctrine drift — if doctrine has changed since session start, the plan reflects the current state.
+
+### 1a. Cap check (v2.2)
+
+Read `limits.md` for the PLAN hard cap (default 25k input tokens).
+
+Estimate input size: task description + constitution + operational-context + files you plan to read for reuse analysis.
+
+- Estimate > hard cap → do NOT draft the plan. Surface to the human: "This task is too large to plan under the current tier's PLAN cap ([X] tokens estimated, [hard-cap] hard cap). Options: (a) narrow scope, (b) split into multiple tasks, (c) raise the PLAN cap in `limits.md` if your tier permits." Stop. Cap exhaustion at PLAN is a human decision, not an auto-escalation — planning failures cannot be fixed by a stronger executor.
+- Estimate > soft cap → proceed, but note "crossed PLAN soft cap" in the plan's Risks section.
+- Estimate ≤ soft cap → proceed normally.
 
 ### 2. Authority check
 
@@ -151,12 +167,13 @@ A plan missing any of these is incomplete. Fix before handing off.
 | Acceptance criteria are subjective ("looks better") | Refuse. Rewrite as testable or cut. |
 | `current-task/plan.md` already exists with Status ≠ Superseded | Stop. Either complete the current task (debrief) or explicitly abandon. |
 | The task description is too vague to write acceptance criteria | Stop. Ask the human clarifying questions. Do not guess. |
+| Estimated PLAN input exceeds the hard cap in `limits.md` (v2.2) | Stop. Surface to the human — narrow scope, split the task, or raise the cap. Do not auto-escalate; planning failures are not fixed by a stronger executor. |
 
 ## Relationship to v1
 
 Replaces v1 `writing-plans` skill. Key differences:
 
-| v1 | v2.1 |
+| v1 | v2.2 |
 |---|---|
 | Plan written inline in chat | Plan written to `current-task/plan.md` on disk |
 | Context carried in conversation | Context carried in memory bank (survives switching) |

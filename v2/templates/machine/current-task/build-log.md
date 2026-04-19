@@ -13,6 +13,8 @@
 
 **Started**: YYYY-MM-DD HH:MM
 **Approach**: [one-sentence summary of the approach taken this attempt]
+**Tokens** (v2.2): [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
+**Ladder step** (if post-escalation): [N — model name]
 
 ### Changes applied
 
@@ -37,7 +39,9 @@ OR
 
 **Started**: YYYY-MM-DD HH:MM
 **Approach**: [how this differs from attempt 1]
-**Reason for retry**: [QA failure / build error / same-signature check]
+**Reason for retry**: [QA failure / build error / same-signature check / cap exhaustion]
+**Tokens** (v2.2): [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
+**Ladder step** (if post-escalation): [N — model name]
 
 ### Changes applied
 
@@ -62,6 +66,8 @@ OR
 **Started**: YYYY-MM-DD HH:MM
 **Approach**: [how this differs from attempt 2]
 **Reason for retry**: [...]
+**Tokens** (v2.2): [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
+**Ladder step** (if post-escalation): [N — model name]
 
 ### Changes applied
 
@@ -98,4 +104,6 @@ Repeat detected: [yes → escalate | no]
 
 - Attempts used: [n] / 3
 - Exit: [QA | ESCALATE]
+- Cap exhaustion triggered (v2.2): [no | yes — attempt N]
+- Ladder step last used (v2.2): [none | N — model name]
 - Current diff: [summary — or see git diff against task start]

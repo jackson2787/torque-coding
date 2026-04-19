@@ -1,6 +1,6 @@
 # Torque Coding v2 — Operating Model
 
-**Version**: 2.1-dev | **Status**: Additive parallel — v1 remains fully functional
+**Version**: 2.2-dev | **Status**: Additive parallel — v1 remains fully functional
 
 This directory contains the complete v2 operating model. Nothing in `agent/`, `skills/`, `optional-skills/`, or `skill-packs/` has been modified. v2 is additive and parallel.
 
@@ -77,6 +77,7 @@ v2 splits these into two domains and adds a disciplined learning phase.
 |---|---|---|
 | `constitution.md` | Stable truths — domain definitions, durable architectural rules, security boundaries, scope. Rarely changes. | Ceremonial — requires explicit human ratification |
 | `operational-context.md` | Current working rules — present-tense directives: do this, do not do this, prefer this, avoid this, current constraints. Updates when the repo evolves. | Per-learning, via debrief |
+| `limits.md` *(v2.2)* | Runtime config — per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by developer tier. | When the developer's tier or project scale changes |
 | `activeContext.md` | *(carried from v1)* — compaction recovery anchor: current state, progress, session data | Every state transition |
 | `toc.md` | *(carried from v1)* — mechanical index of both memory halves | When files are added or removed |
 
@@ -113,24 +114,28 @@ See [`claude-rules-v2/authority-order.v2.md`](./claude-rules-v2/authority-order.
 
 ---
 
-## State machine (v2.1)
+## State machine (v2.2)
 
 ```
 PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  ↔  QA  →  DEBRIEF
-                                        ↓ (3 stalls)
-                                    ESCALATE
+                                        ↓ (3 stalls OR cap exhaustion)
+                                    ESCALATE (ladder-stepped)
 ```
 
-Each state declares a model tier and an input contract (files on disk).
+Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`.
 
-- **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria.
-- **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration.
-- **BUILD** — budget model. Applies the plan, logs attempts. Max 3 attempts before escalation.
-- **QA** — budget model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately.
-- **ESCALATE** — subagent with stronger model override (primary), or user-prompted model switch (fallback). Triggered on stall.
+- **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria. Hard cap (default): 25k input tokens.
+- **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration. Hard cap (default): 40k.
+- **BUILD** — budget model. Applies the plan, logs attempts. Max 3 attempts OR cap exhaustion before escalation. Hard cap per attempt (default): 15k.
+- **QA** — budget model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately. Hard cap per cycle (default): 12k.
+- **ESCALATE** — subagent at the next rung of the configurable ladder (default: `sonnet → opus → user-switched session`). Steps up on repeated stall.
 - **DEBRIEF** — any model. Five-gate learning rubric. Proposes diffs to `operational-context.md`. Archives `current-task/` to the human side.
 
 Any session enters at the earliest state whose input contract is satisfied — determined by which files exist in `current-task/`. This is what makes stateless / resumable operation across tools possible.
+
+### Cap exhaustion = stall (v2.2)
+
+A state hitting its hard cap is indistinguishable in effect from a failed attempt. It counts against the cycle budget and escalates on the same thresholds. This makes cost-awareness first-class at the operating-model level, not an afterthought.
 
 See [`claude-rules-v2/state-machine.v2.md`](./claude-rules-v2/state-machine.v2.md).
 
@@ -153,6 +158,7 @@ v2/
 │   ├── machine/
 │   │   ├── constitution.md               ← blank constitution template
 │   │   ├── operational-context.md        ← blank operational-context template
+│   │   ├── limits.md                     ← runtime config: budgets + escalation ladder (v2.2)
 │   │   ├── activeContext.md              ← v2 activeContext with current-task pointer
 │   │   └── current-task/                 ← per-task artifact templates (v2.1)
 │   │       ├── plan.md
@@ -188,6 +194,12 @@ v2/
 
 ---
 
+## What landed in v2.2
+
+- `limits.md` — machine-side runtime config loaded at session startup
+- Per-state token budgets (soft/hard caps) with cap exhaustion as a first-class stall signal
+- Configurable escalation ladder (no longer hard-coded to `opus`) with ladder-stepping discipline
+
 ## What is deferred to future passes
 
 - `mb-rebase-v2/SKILL.md`
@@ -195,5 +207,4 @@ v2/
 - `v2/docs/` — doctrine prose, migration-from-v1 mapping table
 - Skill-pack v2 parallels
 - Installer wiring (`bin/`, `lib/`)
-- **Token/cost budgets per state** (v2.2 target) — soft and hard caps per state tier, so a budget-model stall on cap exhaustion is just another form of escalation. This is where the mid-tier-developer positioning earns its next concrete feature.
-- Configurable escalation ladder (currently hard-coded to `opus`)
+- Telemetry feedback into `limits.md` — today the human tunes by hand; a future pass could surface "you crossed the soft cap 8/10 times this week — consider raising it" from `build-log.md` history

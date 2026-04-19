@@ -1,6 +1,6 @@
 # AGENTS.v2.md
 
-**Version**: 2.0-dev | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
+**Version**: 2.2-dev | **Compatibility**: Claude, Cursor, Copilot, Cline, Aider, all AGENTS.md-compatible tools
 **Parallel to**: `agent/AGENTS.md` (v1 — untouched)
 
 ---
@@ -58,6 +58,7 @@ COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
    ```
    - [ ] .memory-bank-v2/machine/constitution.md       (highest authority — stable truths)
    - [ ] .memory-bank-v2/machine/operational-context.md (current working rules)
+   - [ ] .memory-bank-v2/machine/limits.md             (v2.2 — per-state budgets + escalation ladder)
    - [ ] .memory-bank-v2/machine/activeContext.md      (compaction recovery anchor)
    - [ ] .memory-bank-v2/machine/toc.md                (file index)
    - [ ] .memory-bank-v2/machine/current-task/*        (any files present — the active task's artifacts)
@@ -102,6 +103,7 @@ Compaction can happen at any time without advance notice. State persistence is c
 ├── machine/                        ← loaded at session start
 │   ├── constitution.md             ← stable truths (highest authority)
 │   ├── operational-context.md      ← current working rules
+│   ├── limits.md                   ← runtime config: per-state budgets + escalation ladder (v2.2)
 │   ├── activeContext.md            ← compaction anchor (current state / progress / session data)
 │   ├── toc.md                      ← mechanical index of both halves
 │   └── current-task/               ← the active task's artifacts (v2.1) — at most one task active
@@ -136,6 +138,7 @@ Rules:
 |---|---|---|
 | `constitution.md` | `update-constitution` | Requires `ratified` keyword from human. Append-only Change Log. |
 | `operational-context.md` | `update-operational-context` | Called by debrief (propose-diff flow) or human. Prescriptive voice enforced. |
+| `limits.md` *(v2.2)* | Human directly (no dedicated skill) | Runtime config — tunable by developer tier / project. Low ceremony. |
 | `activeContext.md` | `update-active-context` *(v1 skill, reused)* | Every state transition. Compaction recovery anchor. |
 | `toc.md` | `update-toc` *(v1 skill, reused)* | Mechanical reflection of actual files in both halves. |
 | `current-task/plan.md` | `writing-plans-v2` | PLAN state output. |
@@ -184,18 +187,28 @@ The v1 DIFF state is removed in v2.1 — its role is absorbed into BUILD (which 
 
 ### Model-switching philosophy
 
-Each state declares which model tier it expects. States that benefit from reasoning use the powerful model; states that are mechanical execution use the budget model.
+Each state declares which model tier it expects. States that benefit from reasoning use the powerful model; states that are mechanical execution use the budget model. v2.2 adds explicit per-state token budgets loaded from `limits.md`.
 
-| State | Model tier | Why |
-|---|---|---|
-| PLAN | powerful (e.g., Opus) | Reasoning-heavy; must reconcile doctrine with task |
-| PLAN-CONTEXTUALIZE | powerful | Exploration-heavy; produces the map so BUILD needs zero exploration |
-| BUILD | budget (e.g., Haiku / Sonnet) | Mechanical execution against a complete map |
-| QA | budget | Checklist verification; test-runner; paranoid, not creative |
-| ESCALATE | powerful (subagent or user-switch) | Reasoning-heavy; invoked only on stall |
-| DEBRIEF | any | Rubric application; does not require top-tier reasoning |
+| State | Model tier | Why | Default hard cap (v2.2) |
+|---|---|---|---|
+| PLAN | powerful (e.g., Opus) | Reasoning-heavy; must reconcile doctrine with task | 25k input |
+| PLAN-CONTEXTUALIZE | powerful | Exploration-heavy; produces the map so BUILD needs zero exploration | 40k input |
+| BUILD | budget (e.g., Haiku / Sonnet) | Mechanical execution against a complete map | 15k per attempt |
+| QA | budget | Checklist verification; test-runner; paranoid, not creative | 12k per cycle |
+| ESCALATE | powerful (subagent or user-switch) | Reasoning-heavy; invoked only on stall | 50k |
+| DEBRIEF | any | Rubric application; does not require top-tier reasoning | 20k |
 
 The hand-off between tiers is **files on disk** — `plan.md` + `plan_context.md` — not in-session context.
+
+### Cap exhaustion as a stall (v2.2)
+
+Every state treats hard-cap exhaustion the same way a failed attempt is treated: it counts against the cycle budget. A BUILD attempt that blows past 15k input tokens is indistinguishable from a BUILD attempt that produced a failing test — both increment the counter, both feed into the 3-attempt ESCALATE threshold. See `claude-rules-v2/state-machine.v2.md#Stall-rules-consolidated` for the full catalogue.
+
+### Escalation ladder (v2.2)
+
+ESCALATE reads the ladder from `limits.md#Escalation-ladder`. The default ladder is `sonnet → opus → user-switched session`. On first escalation in a task, ESCALATE spawns a subagent at the next rung up (`opus`). If that subagent also stalls, the ladder advances by one rung. At the top (user-switched session), the memory bank is the hand-off medium — no in-session context needs to survive.
+
+Projects on a premium tier may override the ladder; projects on a stricter budget may shorten it. The one rule: the final rung must always be `<user-switched session>`.
 
 ### State contracts
 
@@ -313,12 +326,15 @@ Action:   Run bootstrap-memory-bank-v2-contract.md to cold-start.
           See: v2/bootstrap-memory-bank-v2-contract.md
 ```
 
-### Stall detection (v2.1)
+### Stall detection (v2.2)
 
 - BUILD: max 3 attempts → ESCALATE
 - QA → BUILD cycles: max 3 → ESCALATE
 - Same error signature twice → immediate escalation candidate
-- Tracked in `current-task/build-log.md` (BUILD) and `current-task/qa-report.md` (QA); cycle counter mirrored in `activeContext.md`
+- **Hard cap exhaustion in BUILD/QA** → counts as a failed attempt/cycle (v2.2)
+- **Hard cap exhaustion in PLAN / PLAN-CONTEXTUALIZE** → surfaces to user (task too large for current tier)
+- **ESCALATE at top of ladder still stalling** → surfaces to user (v2.2)
+- Tracked in `current-task/build-log.md` (BUILD, with token usage) and `current-task/qa-report.md` (QA, with token usage); cycle counter and ladder step mirrored in `activeContext.md`
 
 ---
 

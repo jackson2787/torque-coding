@@ -13,6 +13,7 @@ State: [PLAN/IDLE | PLAN | PLAN-CONTEXTUALIZE | BUILD | QA | ESCALATE | DEBRIEF]
 Task:  [task slug | none]
 Model tier (expected): [powerful | budget | subagent]
 Cycle: [n/3 for BUILD or QA; n/a otherwise]
+Ladder step last used (v2.2): [none | N — model name from limits.md]
 Started: YYYY-MM-DD HH:MM
 Last transition: YYYY-MM-DD HH:MM — [from-state] → [to-state]
 ```
@@ -68,3 +69,5 @@ If this file is being read to recover from compaction or to enter a new session,
 | + escalation-brief.md | ESCALATE |
 
 The `Last transition` line above disambiguates when files alone are ambiguous.
+
+**v2.2 note**: `escalation-brief.md` may be present even after ESCALATE returns — it is preserved as a ladder-progression record, not a signal flag. Use `State:` from the block above, not the brief's presence, to determine the actual entry state. If State = BUILD or QA despite an existing brief, the task is mid-post-escalation-verification; proceed accordingly.

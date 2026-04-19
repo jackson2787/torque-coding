@@ -8,9 +8,21 @@ description: >-
   before writing. Routes task history and decisions to the human side. Replaces v1 DOCS.
 metadata:
   author: torque-coding
-  version: "2.0"
+  version: "2.2"
   state-machine: v2
+  state: DEBRIEF
+  model-tier: any
+  requires:
+    - .memory-bank-v2/machine/operational-context.md
+    - .memory-bank-v2/machine/constitution.md
+    - .memory-bank-v2/machine/limits.md (for DEBRIEF hard cap — v2.2)
+    - post-task mode: .memory-bank-v2/machine/current-task/*
+    - ad-hoc mode: session transcript
+  produces:
+    - proposed operational-context.md diff (via update-operational-context)
+    - .memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/
   replaces: v1 DOCS state
+  default-hard-cap: 20000 input tokens
 ---
 
 # Debrief
@@ -82,6 +94,18 @@ Gather these instead:
 - [ ] Note: `current-task/*` may be empty or populated with an in-flight task. **Do not read it as the task contract.** If present, leave it alone.
 
 ---
+
+## Phase 0: Cap check (v2.2)
+
+Read `limits.md` for the DEBRIEF hard cap (default 20k input tokens).
+
+Estimate input size: current-task artifacts (post-task) or session transcript slice (ad-hoc) + operational-context + constitution + diff.
+
+- Estimate ≤ soft cap → proceed normally.
+- Estimate > soft cap → proceed, but trim the candidate list before Phase 2: keep only candidates with the strongest `file:line` evidence. Note the trim in the Debrief Report ("soft cap crossed — candidate list trimmed from N to M before rubric").
+- Estimate > hard cap → do NOT run the full rubric. Ship a **minimal debrief**: task history only, no operational-context proposal, no constitutional flag. Note in the Debrief Report: "cap exhaustion — deferred learning analysis; re-run `/debrief` ad-hoc on a stronger tier if the task likely carries memory-worthy signal." This still counts as a successful debrief for state-machine purposes — the task closes, archive proceeds as normal.
+
+Cap exhaustion at DEBRIEF does not trigger ESCALATE. Debrief is the terminal state; the cost of a missed learning is smaller than the cost of holding the state machine open.
 
 ## Phase 1: Candidate Identification
 
@@ -341,8 +365,8 @@ Stop and surface to the human if:
 Debrief is complete when all of the following are true:
 
 Both modes:
-- [ ] Five-gate rubric applied to all candidates
-- [ ] operational-context.md change proposed and either applied or confirmed as none
+- [ ] Five-gate rubric applied to all candidates (or explicitly deferred under cap exhaustion — v2.2)
+- [ ] operational-context.md change proposed and either applied or confirmed as none (or skipped under minimal-debrief path — v2.2)
 - [ ] `human/tasks/YYYY-MM/DDMMDD_<task>.md` written
 - [ ] `human/decisions/` written (if applicable)
 - [ ] `human/rationale/` written (if applicable)

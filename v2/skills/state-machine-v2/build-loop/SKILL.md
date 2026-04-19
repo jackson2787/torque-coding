@@ -7,18 +7,20 @@ description: >-
   escalate. Declares done when the plan is executed; does NOT self-verify — that is QA.
 metadata:
   author: torque-coding
-  version: "2.1"
+  version: "2.2"
   state-machine: v2
   state: BUILD
   model-tier: budget
   requires:
     - .memory-bank-v2/machine/current-task/plan.md
     - .memory-bank-v2/machine/current-task/plan_context.md
+    - .memory-bank-v2/machine/limits.md (for per-attempt hard cap — v2.2)
   produces:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/build-log.md
   successor-skill: qa-v2
   escalates-to: escalate
+  default-hard-cap: 15000 input tokens per attempt
 ---
 
 # build-loop
@@ -64,6 +66,16 @@ Check `build-log.md`:
 - If present with FAIL attempts: start Attempt N+1.
 - If attempts ≥ 3: go to step 7 (stall).
 
+### 1a. Cap check (v2.2)
+
+Read `limits.md` for the BUILD hard cap (default 15k input tokens per attempt).
+
+Estimate input size for this attempt: plan + plan_context + current-task artifacts + relevant memory bank.
+
+- Estimate > hard cap → do NOT start this attempt. Treat as immediate cap-exhaustion stall: log in `build-log.md` as "Attempt N: FAIL (cap exhaustion — pre-start estimate [X] tokens exceeds hard cap)" and go to step 7.
+- Estimate > soft cap but ≤ hard cap → proceed but log a warning in the attempt entry.
+- Estimate ≤ soft cap → proceed normally.
+
 ### 2. Read the pack
 
 - Read `plan.md` (objective, steps, acceptance criteria, out-of-scope)
@@ -92,12 +104,13 @@ Append to `build-log.md`:
 ## Attempt N
 - Started: YYYY-MM-DD HH:MM
 - Approach: [one sentence]
+- Tokens (v2.2): [estimated-in] in / [actual-in] in / [soft-cap] soft / [hard-cap] hard
 - Changes applied:
   - path/to/file.ext — [what changed]
-- Result: [Declared done → QA] or [Failed: error signature]
+- Result: [Declared done → QA] | [Failed: error signature] | [Failed: cap exhaustion]
 ```
 
-If the attempt failed (compiler error, obvious exception while applying), include the error signature. Do not attempt to run tests here — that is QA.
+If the attempt failed (compiler error, obvious exception while applying), include the error signature. If the attempt was cut short by cap exhaustion, record the token count that triggered the stop. Do not attempt to run tests here — that is QA.
 
 ### 6. Declare done or retry
 
@@ -106,9 +119,10 @@ If the attempt failed (compiler error, obvious exception while applying), includ
 
 ### 7. Stall check (at every attempt)
 
-Trigger ESCALATE if either:
+Trigger ESCALATE if any:
 - Attempt count has reached 3
 - Two attempts produced the same error signature
+- **Cap exhaustion triggered this attempt to fail, and attempt count has reached 3** (v2.2 — cap exhaustion counts as a failed attempt)
 
 Write `escalation-brief.md` (via the `escalate` skill) and transition to ESCALATE.
 

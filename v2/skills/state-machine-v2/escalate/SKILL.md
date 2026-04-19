@@ -7,13 +7,14 @@ description: >-
   to switch model and re-enter — because the memory bank is canonical, nothing is lost.
 metadata:
   author: torque-coding
-  version: "2.1"
+  version: "2.2"
   state-machine: v2
   state: ESCALATE
-  model-tier: powerful (via subagent) or user-switched
+  model-tier: powerful (via subagent) or user-switched — determined by the ladder
   requires:
-    - stalled BUILD or QA (3 attempts or same-signature repeat)
+    - stalled BUILD or QA (3 attempts, same-signature repeat, or cap exhaustion)
     - current-task/ populated (plan, plan_context, build-log, and usually qa-report)
+    - .memory-bank-v2/machine/limits.md (for the escalation ladder)
   produces: .memory-bank-v2/machine/current-task/escalation-brief.md
   resumes-to: BUILD or QA (whichever stalled)
 ---
@@ -36,6 +37,8 @@ Two paths:
 - BUILD has used 3 attempts without a "declared done"
 - QA has FAILed for 3 cycles
 - Same error signature has appeared twice in `build-log.md` or `qa-report.md`
+- **Hard cap exhaustion** in BUILD or QA has pushed the cycle counter to its limit (v2.2)
+- **ESCALATE's own subagent stalled** and the ladder is not yet at the top rung (v2.2)
 - The stalled skill explicitly invokes this one
 
 ## When NOT to Use
@@ -50,6 +53,7 @@ Two paths:
 - [ ] `current-task/plan_context.md` present
 - [ ] `current-task/build-log.md` present with at least the attempts that triggered the stall
 - [ ] `current-task/qa-report.md` present if QA triggered the escalation
+- [ ] `.memory-bank-v2/machine/limits.md` readable — needed for the ladder (v2.2)
 
 ## Procedure
 
@@ -62,7 +66,21 @@ Is the Agent tool available?
 
 Do not skip this step. Environment detection is the first thing the skill does.
 
-### 2. Write `escalation-brief.md`
+### 1a. Resolve the ladder step (v2.2)
+
+Read `.memory-bank-v2/machine/limits.md#Escalation-ladder` for the configured ladder.
+
+Check `current-task/escalation-brief.md` for the current ladder step:
+- **Does not exist** → this is the first escalation for this task. Next rung = rung 2 (first non-budget tier — default `opus`).
+- **Exists with `Ladder step: N`** → previous escalation was at rung N. Advance: next rung = N+1.
+
+If the next rung is the final rung (`<user-switched session>`):
+- Force the **fallback path** regardless of whether the Agent tool is available. The top of the ladder is always the user-switched path.
+
+If advancing would go past the final rung:
+- Stop. Surface to human: "Escalation ladder exhausted. The stronger-model attempts did not resolve this task. Manual intervention required." Do not re-escalate.
+
+### 2. Write or update `escalation-brief.md`
 
 Use the template at `v2/templates/machine/current-task/escalation-brief.md`. The brief is self-contained — a stronger model reading it (possibly in a fresh session) must understand the task, what was tried, why it failed, and where to look.
 
@@ -74,42 +92,55 @@ Required sections:
 - Current code state (diff summary)
 - Hypotheses explored (and why each was insufficient)
 - What the stronger model should consider (directional framing, not a solution)
+- **Ladder step** *(v2.2)*: the rung this escalation is targeting (e.g., "Ladder step: 2 — opus")
+- **Previous escalations in this task** *(v2.2)*: if any, list each rung that has already been tried and what it returned
 - Resume point (how to return control to the state machine)
 
-### 3. Primary path — spawn subagent
+If `escalation-brief.md` already exists from a previous escalation in this task, **update it in place** — append this rung's attempt to the "Previous escalations" section — rather than overwriting. The audit trail across rungs is valuable.
 
-If the Agent tool is available:
+### 3. Primary path — spawn subagent at the resolved ladder rung (v2.2)
+
+If the Agent tool is available AND the resolved next rung is not the final rung:
 
 ```
 Agent({
-  description: "Escalation from stalled BUILD/QA",
+  description: "Escalation from stalled BUILD/QA — ladder step N",
   subagent_type: "general-purpose",
-  model: "opus",
+  model: "<resolved-rung-from-limits.md>",   // e.g. "opus" at step 2; per-project override at higher rungs
   prompt: <contents of escalation-brief.md, followed by:
-    "You are resolving an escalation. Read current-task/plan.md and
-     current-task/plan_context.md. Propose and apply a fix, then update
-     current-task/build-log.md with a new attempt entry labeled
-     'Attempt N (post-escalation)'. Hand control back to the state machine
-     by leaving the fix applied and logging your changes — do NOT run QA."
+    "You are resolving an escalation at ladder step N. Read
+     current-task/plan.md and current-task/plan_context.md. Propose
+     and apply a fix, then update current-task/build-log.md with a
+     new attempt entry labeled 'Attempt M (post-escalation, ladder step N)'.
+     Respect the ESCALATE hard cap from limits.md. Hand control back to
+     the state machine by leaving the fix applied — do NOT run QA."
 })
 ```
 
-Notes:
-- Pass the model override explicitly (`model: "opus"` or the top of the configured ladder). Do not rely on the subagent inheriting.
+Rules:
+- Pass the model override explicitly — read it from `limits.md`, do not hard-code.
 - The subagent's job is the fix, not the verification. QA re-runs on return.
-- If the Agent tool returns an error or is not available despite first appearing so, fall through to the fallback path.
+- If the subagent itself stalls (declares unresolvable, or hits its own hard cap), advance the ladder one rung and re-enter this skill. Do not loop at the same rung.
+- If the Agent tool errors or is unavailable despite detection, fall through to the fallback path for this escalation (but keep the ladder step recorded — next escalation in this task still advances).
 
 ### 4. Fallback path — instruct the user
 
-If the Agent tool is not available, output:
+Take this path if any of:
+- Agent tool is not available, or
+- Resolved next rung is the final rung (`<user-switched session>`), or
+- Primary path failed for this escalation after being attempted.
+
+Output:
 
 ```
-STALLED after [n] attempts in [BUILD|QA].
+STALLED in [BUILD|QA] — escalation at ladder step [N/total].
 
-An escalation brief has been written to:
+An escalation brief has been written/updated at:
   .memory-bank-v2/machine/current-task/escalation-brief.md
 
-To resume: switch to a stronger model (e.g., Opus) and re-enter this project.
+Previous rungs tried in this task: [list]
+
+To resume: switch to a stronger model ([rung name from limits.md]) and re-enter this project.
 The memory bank at .memory-bank-v2/machine/ has everything needed to continue.
 On re-entry, the agent will detect escalation-brief.md and pick up from ESCALATE.
 
@@ -131,11 +162,14 @@ Update `activeContext.md`:
 State: [BUILD | QA]
 Task:  [slug]
 Cycle: [reset to 1 for the post-escalation pass]
+Ladder step last used: [N]      (v2.2)
 Last transition: YYYY-MM-DD HH:MM — ESCALATE → [BUILD | QA]
-Note: resumed post-escalation
+Note: resumed post-escalation at ladder step [N]
 ```
 
-Remove (or archive) `escalation-brief.md` once the resume is confirmed. Leaving it in place would trigger ESCALATE on re-entry.
+**Do NOT delete `escalation-brief.md` on resume** (v2.2). Keep it in place so the ladder step is preserved — if this task escalates again, the next escalation advances the ladder rather than restarting at rung 2. The brief is archived to `human/tasks/` by debrief along with the rest of `current-task/`.
+
+The "leaving it in place triggers ESCALATE on re-entry" concern from v2.1 is resolved by reading `activeContext.md#State` first — if State is BUILD or QA, the agent enters that state regardless of `escalation-brief.md` presence. The brief is now a historical record of the ladder progression for this task, not a signal flag.
 
 ### 6. If the stronger model concludes the plan is wrong
 
@@ -154,11 +188,13 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 
 ## Output contract
 
-- [ ] `escalation-brief.md` written with all required sections
-- [ ] Environment detected (primary or fallback path chosen explicitly)
-- [ ] Primary path: subagent spawned with model override; handoff logged in `build-log.md`
-- [ ] Fallback path: user instructed clearly; session paused
-- [ ] On return: `escalation-brief.md` cleared or archived; `activeContext.md` reflects resume state
+- [ ] Ladder step resolved from `limits.md` and recorded in `escalation-brief.md`
+- [ ] `escalation-brief.md` written or updated (preserving prior rungs) with all required sections
+- [ ] Environment detected and path chosen (primary / fallback / forced-fallback-at-top-of-ladder)
+- [ ] Primary path: subagent spawned with `model: "<rung-from-limits>"` — not hard-coded
+- [ ] Fallback path: user instructed clearly, including which model to switch to per the ladder
+- [ ] On return: `activeContext.md` reflects resume state including ladder step last used
+- [ ] `escalation-brief.md` preserved for the duration of the task (archived by debrief, not removed on resume)
 
 ## What This Skill Does NOT Do
 
@@ -172,16 +208,35 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 
 | Flag | Action |
 |---|---|
-| Agent tool is available but the subagent itself stalls | Surface to human. Do NOT re-escalate infinitely. |
+| Agent tool is available but the subagent itself stalls | Advance the ladder one rung and re-enter this skill. If already at the top rung, surface to human. Do NOT loop at the same rung. |
+| Ladder is exhausted (past the final rung) | Surface to human. Task is beyond the system. Do NOT wrap around. |
+| `limits.md` missing or unreadable | Fall back to the default ladder embedded in this skill's documentation (`sonnet → opus → user-switched`). Log the fallback. |
 | Subagent edits `plan.md` or `plan_context.md` directly | Reject the fix. Route to PLAN for human revision. |
 | Subagent edits `constitution.md` or `operational-context.md` | Reject. Those writes go through their dedicated skills only. |
 | Fallback path triggered but user returns without switching models | The same budget model will stall again. Re-run escalate; if that was already attempted, surface to human. |
 | `escalation-brief.md` already present when escalation triggers (previous unresolved) | Do NOT overwrite. Surface to human — previous escalation was not completed. |
 
-## Configuration: the model ladder (v2.1 — not yet parameterised)
+## Configuration: the model ladder (v2.2 — parameterised)
 
-For now, escalation targets `opus` as the default stronger model. A future v2 pass will add a configurable ladder (e.g., `haiku → sonnet → opus → opus-4.7`) so escalations can step up incrementally. Until then, `opus` is the single escalation tier.
+Escalation reads the ladder from `.memory-bank-v2/machine/limits.md#Escalation-ladder`. The default ladder is:
 
-## Relationship to v1
+```
+1. sonnet                       (budget tier — not an escalation destination; listed for clarity)
+2. opus                         (first escalation target)
+3. <user-switched session>      (graceful fallback — memory bank carries the context)
+```
 
-There is no direct v1 predecessor. v1's stall protocol surfaced every stall to the human. v2.1 keeps that as the fallback path but adds a primary path that can self-resolve within Claude Code.
+Per-project overrides are allowed. Rules:
+- Rung 1 is the default budget tier (listed for clarity — ESCALATE never targets it).
+- Each rung must be a strictly stronger model than the previous.
+- The final rung must always be `<user-switched session>`.
+
+See `limits.md` for the full contract and tuning guidance.
+
+## Relationship to v1 and v2.1
+
+There is no direct v1 predecessor. v1's stall protocol surfaced every stall to the human.
+
+v2.1 added a subagent primary path hard-coded to `opus`, with a user-switched fallback.
+
+v2.2 parameterises the ladder, adds ladder-stepping discipline (no skipping rungs, no loops at the same rung), and treats token-cap exhaustion as a first-class stall trigger alongside attempt-count exhaustion.

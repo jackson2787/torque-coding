@@ -7,13 +7,17 @@ description: >-
   hand-off to BUILD is files on disk, not in-session context.
 metadata:
   author: torque-coding
-  version: "2.1"
+  version: "2.2"
   state-machine: v2
   state: PLAN-CONTEXTUALIZE
   model-tier: powerful
-  requires: .memory-bank-v2/machine/current-task/plan.md (Status = Approved)
+  requires:
+    - .memory-bank-v2/machine/current-task/plan.md (Status = Approved)
+    - .memory-bank-v2/machine/limits.md (for PLAN-CONTEXTUALIZE hard cap — v2.2)
   produces: .memory-bank-v2/machine/current-task/plan_context.md
   successor-skill: build-loop
+  escalates-to: escalate
+  default-hard-cap: 40000 input tokens
 ---
 
 # plan-contextualize
@@ -49,6 +53,16 @@ The output, `plan_context.md`, is the map. BUILD reads the map and proceeds dire
 ### 1. Read the plan
 
 Read `plan.md` end to end. Note every file mentioned, every pattern referenced, every acceptance criterion.
+
+### 1a. Cap check (v2.2)
+
+Read `limits.md` for the PLAN-CONTEXTUALIZE hard cap (default 40k input tokens).
+
+Estimate input size: plan + all files in `plan.md#Analyzed-files` + expected integration-point files + doctrine slices.
+
+- Estimate > hard cap → do NOT build the pack. Surface to the human: "Context-pack budget ([X] tokens estimated) exceeds hard cap ([hard-cap]). Options: (a) split the task so each sub-task has a smaller touched-file set, (b) raise the CONTEXTUALIZE cap in `limits.md`, (c) ship a slimmer pack and accept that BUILD may have to escalate more often." Stop. Like PLAN, cap exhaustion here is a human decision — a stronger executor cannot fix a too-large scope.
+- Estimate > soft cap → proceed, but add a warning note in `plan_context.md` header ("crossed PLAN-CONTEXTUALIZE soft cap — pack may be lean in non-critical sections").
+- Estimate ≤ soft cap → proceed normally.
 
 ### 2. Paste current file state
 
@@ -144,9 +158,12 @@ A valid `plan_context.md` must have:
 | A touched file cannot be located | Stop. Flag as planning error. |
 | Self-audit reveals BUILD would still need to explore | Do NOT declare done. Complete the missing pieces. |
 | The context pack is growing past a few hundred lines and the task is small | Reconsider scope — either the plan is too broad or the pack is too verbose |
+| Estimated input exceeds the CONTEXTUALIZE hard cap in `limits.md` (v2.2) | Stop. Surface to the human — split the task, raise the cap, or accept a leaner pack. Do not auto-escalate. |
 
-## Relationship to v1 and v2.0
+## Relationship to v1, v2.0, v2.1
 
 This skill is new in v2.1. It has no v1 predecessor. It was created to make the planner-executor split work: splitting exploration (powerful model) from execution (budget model) is only viable if the hand-off is complete enough to skip re-exploration.
 
 In v2.0, planning and execution both assumed the same in-session context. In v2.1, the hand-off is files on disk, and this skill produces the most important file.
+
+v2.2 adds a hard cap (default 40k) and the accompanying cap-check step — at mid-tier budgets, an oversized context pack just moves the cost problem from BUILD to CONTEXTUALIZE. Better to split the task than to ship a pack neither state can afford.

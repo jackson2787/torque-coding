@@ -1,6 +1,6 @@
 # CLAUDE.v2.md
 
-**Version**: 2.0-dev | **Compatibility**: Claude Code
+**Version**: 2.2-dev | **Compatibility**: Claude Code
 **Parallel to**: `agent/CLAUDE.md` (v1 — untouched)
 
 ---
@@ -16,12 +16,14 @@
    ```
    - [ ] .memory-bank-v2/machine/constitution.md
    - [ ] .memory-bank-v2/machine/operational-context.md
+   - [ ] .memory-bank-v2/machine/limits.md             (v2.2 — per-state budgets + escalation ladder)
    - [ ] .memory-bank-v2/machine/activeContext.md
    - [ ] .memory-bank-v2/machine/toc.md
+   - [ ] .memory-bank-v2/machine/current-task/*        (any files present)
    ```
 4. Do NOT load human-side memory at startup
-5. Resume from `activeContext.md` if a task is in progress; otherwise enter PLAN state
-6. Output state: `[v2 STATE: PLAN/IDLE] Task: none`
+5. Resolve entry state from `current-task/` contents (any-state entry); or resume from `activeContext.md`; otherwise enter PLAN/IDLE
+6. Output state: `[v2 STATE: <STATE>] Task: <slug-or-none>`
 
 **Canonical paths**:
 - Machine memory: `.memory-bank-v2/machine/`
@@ -51,10 +53,11 @@
 
 `constitution.md > operational-context.md > task instructions > reasoning`
 
-### State flow
+### State flow (v2.2)
 
-`PLAN → BUILD LOOP → DEBRIEF → PLAN`
-*(BUILD LOOP currently uses v1 BUILD/DIFF/QA/APPROVAL/APPLY; DEBRIEF replaces v1 DOCS)*
+`PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF` (with ESCALATE on stall)
+
+Per-state budgets and the escalation ladder are loaded from `limits.md`. Cap exhaustion is a stall signal.
 
 ### Critical rules
 

@@ -8,7 +8,7 @@ description: >-
   with per-check pass/fail. On fail, returns specific issues to BUILD.
 metadata:
   author: torque-coding
-  version: "2.1"
+  version: "2.2"
   state-machine: v2
   state: QA
   model-tier: budget
@@ -16,10 +16,12 @@ metadata:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/plan.md
     - .memory-bank-v2/machine/current-task/plan_context.md
+    - .memory-bank-v2/machine/limits.md (for per-cycle hard cap — v2.2)
   produces: .memory-bank-v2/machine/current-task/qa-report.md
   successor-skill-on-pass: debrief
   successor-skill-on-fail: build-loop
   escalates-to: escalate
+  default-hard-cap: 12000 input tokens per cycle
 ---
 
 # qa-v2
@@ -103,6 +105,16 @@ For each numbered criterion in `plan.md#Acceptance-criteria`:
 
 Check `qa-report.md` (if present) and `build-log.md` for previous QA→BUILD cycles. This is cycle N of 3.
 
+### 1a. Cap check (v2.2)
+
+Read `limits.md` for the QA hard cap (default 12k input tokens per cycle).
+
+Estimate input size: plan + plan_context + applied diff + memory bank slices for Checks 4 & 5.
+
+- Estimate > hard cap → do NOT run the checks. Write `qa-report.md` with Overall: FAIL and reason "cap exhaustion (pre-check estimate exceeds hard cap)". This counts as a failed cycle — return to BUILD (or escalate if cycle == 3).
+- Estimate > soft cap → proceed but note in `qa-report.md#Summary` that the cycle crossed the soft cap.
+- Estimate ≤ soft cap → proceed normally.
+
 ### 2. Run each check in order
 
 Do not short-circuit. Even if Check 1 fails, run Checks 2-6 — the full picture matters for BUILD's next attempt.
@@ -125,6 +137,7 @@ Include, for every check:
 - Any check FAIL and cycle < 3 → return specific issues to BUILD; BUILD cycle counter increments.
 - Any check FAIL and cycle == 3 → ESCALATE.
 - Check 5 FAIL at any cycle → stop and surface to human (do not auto-escalate constitutional violations).
+- **Cap exhaustion during this cycle** (v2.2) → treat as FAIL for the whole cycle; apply the same cycle-count rules (cycle < 3 → back to BUILD with the reason; cycle == 3 → ESCALATE).
 
 ### 5. List issues returned to BUILD (on FAIL)
 

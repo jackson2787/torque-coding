@@ -3,8 +3,9 @@
 **Slug**: [same as plan.md]
 **Date**: YYYY-MM-DD HH:MM
 **Stalled state**: [BUILD | QA]
-**Trigger**: [3 attempts exhausted | same-signature repeat]
-**Target model tier**: powerful (Opus or top of configured ladder)
+**Trigger**: [3 attempts exhausted | same-signature repeat | cap exhaustion (v2.2)]
+**Ladder step** (v2.2): [N — model name from `limits.md#Escalation-ladder`]
+**Target model**: [model at rung N, read from `limits.md`]
 
 <!-- Written by: v2/skills/state-machine-v2/escalate
      Consumed by: escalation subagent (primary path) or user-switched session (fallback) -->
@@ -13,9 +14,11 @@
 
 ## How this brief will be used
 
-Primary path (Claude Code, Agent tool available): an Agent subagent is spawned with `model: "opus"` and this file is passed as the prompt. The subagent has full context — `current-task/`, memory bank, and repo — and returns a resolution.
+Primary path (Claude Code, Agent tool available, and resolved rung is NOT the final rung): an Agent subagent is spawned with `model: "<rung-from-limits.md>"` and this file is passed as the prompt. The subagent has full context — `current-task/`, memory bank, and repo — and returns a resolution.
 
-Fallback path (Agent tool unavailable): the user is instructed to switch to a stronger model and re-enter the project. The memory bank contains everything needed to resume; this file plus `plan.md` + `plan_context.md` + `build-log.md` is a complete hand-off.
+Fallback path (Agent tool unavailable OR resolved rung is the final rung — default `<user-switched session>`): the user is instructed to switch to a stronger model and re-enter the project. The memory bank contains everything needed to resume; this file plus `plan.md` + `plan_context.md` + `build-log.md` is a complete hand-off.
+
+This brief is **updated in place**, not overwritten, across repeated escalations on the same task. The "Previous escalations" section below tracks the ladder progression.
 
 ---
 
@@ -75,6 +78,21 @@ See `current-task/plan.md` and `current-task/plan_context.md` for the full plann
 
 ---
 
+## Previous escalations in this task (v2.2)
+
+<!-- Leave empty on first escalation. On subsequent escalations, each rung appends an entry here;
+     the `Ladder step` field at the top always reflects the CURRENT rung being targeted. -->
+
+### Escalation 1 — Ladder step [N — model name]
+- **Date**: YYYY-MM-DD HH:MM
+- **Trigger at that time**: [...]
+- **Outcome**: [fix applied | subagent stalled | user did not resume | plan flagged wrong]
+- **What returned**: [one-sentence description of the fix or verdict]
+
+<!-- Repeat block per previous escalation. -->
+
+---
+
 ## Hypotheses explored (and why each was insufficient)
 
 - **[Hypothesis A]**: [what was tried] — [why it did not resolve]
@@ -97,8 +115,11 @@ See `current-task/plan.md` and `current-task/plan_context.md` for the full plann
 On resolution, the stronger model should:
 
 1. Apply the fix.
-2. Update `current-task/build-log.md` with a new attempt entry (Attempt 4+ — post-escalation).
-3. Hand control back to the state machine — BUILD declares done, QA re-runs, normal flow resumes.
+2. Update `current-task/build-log.md` with a new attempt entry labelled "Attempt M (post-escalation, ladder step N)".
+3. Respect the ESCALATE hard cap from `limits.md`. If the subagent itself hits the cap, log it as a subagent stall — the state machine will advance the ladder one rung on re-entry.
+4. Hand control back to the state machine — BUILD declares done, QA re-runs, normal flow resumes. Do NOT run QA inline; QA re-verifies on return.
+
+**Do NOT delete this brief on return.** It is preserved for the duration of the task so the ladder step is tracked across any further escalations. Debrief archives it to `human/tasks/` at task close.
 
 If the stronger model concludes the plan itself is wrong (not just the implementation), it should:
 

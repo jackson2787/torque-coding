@@ -1,8 +1,8 @@
-# Bootstrap Memory Bank v2
+# Bootstrap Memory Bank v2 (v2.2)
 
 ## Purpose
 
-One-time cold start for `.memory-bank-v2/`. Populate `machine/constitution.md` and `machine/operational-context.md` from repo code. No human interaction — scan, write, flag gaps.
+One-time cold start for `.memory-bank-v2/`. Populate `machine/constitution.md` and `machine/operational-context.md` from repo code, and seed `machine/limits.md` with defaults. No human interaction — scan, write, flag gaps.
 
 **Parallel to**: `agent/bootstrap-memory-bank-contract.md` (v1 — untouched)
 
@@ -108,28 +108,36 @@ Sections to populate:
 
 Leave empty sections as commented placeholders rather than inventing entries.
 
-### Step 4: Populate activeContext.md and toc.md
+### Step 4: Seed limits.md (v2.2)
+
+Copy the template `v2/templates/machine/limits.md` to `.memory-bank-v2/machine/limits.md` verbatim. Do not tune values during bootstrap — the defaults target a mid-tier developer plan and are correct as a starting point.
+
+The human adjusts `limits.md` directly as their tier or project scale changes; it requires no skill ceremony.
+
+### Step 5: Populate activeContext.md and toc.md
 
 Use v1 skills (reused in v2):
 
 - `skills/memory-bank/update-active-context/SKILL.md` → Current State: "Bootstrap complete. No active task."
-- `skills/memory-bank/update-toc/SKILL.md` → Reflect both `machine/` and `human/` halves
+- `skills/memory-bank/update-toc/SKILL.md` → Reflect both `machine/` and `human/` halves (including `limits.md`)
 
-### Step 5: Summary
+### Step 6: Summary
 
 Output:
 
 ```
-BOOTSTRAP v2 COMPLETE
+BOOTSTRAP v2.2 COMPLETE
 
 Files populated:
   - .memory-bank-v2/machine/constitution.md
   - .memory-bank-v2/machine/operational-context.md
+  - .memory-bank-v2/machine/limits.md              (default budgets + ladder)
   - .memory-bank-v2/machine/activeContext.md
   - .memory-bank-v2/machine/toc.md
 
 Constitution entries:    [n observed] + [n needs confirmation]
 Operational entries:     [n observed] + [n needs confirmation]
+Limits:                  default template (tune in limits.md if needed)
 
 Next step: Run mb-rebase on constitution.md and operational-context.md
            to ratify bootstrap entries with human confirmation.

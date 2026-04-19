@@ -1,4 +1,4 @@
-# State Machine v2.1
+# State Machine v2.2
 
 **Parallel to**: `agent/claude-rules/state-machine.md` (v1 — untouched)
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-**v2.1 machine**: `PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF` with `ESCALATE` as a recovery state.
+**v2.2 machine**: `PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF` with `ESCALATE` as a recovery state.
 
 ```
 PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
@@ -18,7 +18,7 @@ PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
                      [Resolved → resume stalled state]
 ```
 
-### Key properties of v2.1
+### Key properties of v2.2
 
 1. **Planner-executor split.** PLAN and PLAN-CONTEXTUALIZE use a powerful model (Opus). BUILD and QA use a budget model. The hand-off is files on disk.
 2. **v1 DIFF is dropped.** Build presents its work to QA directly. No separate DIFF state.
@@ -26,6 +26,8 @@ PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
 4. **Memory bank is canonical.** `current-task/` folder holds all task artifacts. Sessions can be lost or handed off; the memory bank contains enough to resume.
 5. **Any-state entry.** A session starts in the earliest state whose input contract is satisfied.
 6. **Stateless operation.** Each state skill declares its inputs and outputs explicitly. States are loosely coupled, not a strict FSM.
+7. **Per-state token budgets.** *(v2.2)* Every state declares a soft and hard cap from `limits.md`. Cap exhaustion is a first-class stall signal.
+8. **Configurable escalation ladder.** *(v2.2)* `ESCALATE` reads the ladder from `limits.md` and steps up one rung per escalation within a task.
 
 ### State announcement rule
 
@@ -51,6 +53,53 @@ Each state is entered if and only if its input contract is satisfied. Contracts 
 | **DEBRIEF (ad-hoc)** | A session transcript; user invocation | Conversation |
 
 A session entering mid-flow follows this table: the earliest state whose contract is satisfied is the entry point.
+
+---
+
+## Per-state token budgets (v2.2)
+
+Every state enforces a soft and hard input-token cap loaded from `.memory-bank-v2/machine/limits.md`. Caps are tuned per project and per developer tier — the defaults are targeted at a £20/month mid-tier plan.
+
+| State | Soft cap (default) | Hard cap (default) | On hard cap |
+|---|---|---|---|
+| PLAN | 15,000 | 25,000 | Surface to user |
+| PLAN-CONTEXTUALIZE | 25,000 | 40,000 | Surface to user |
+| BUILD (per attempt) | 10,000 | 15,000 | Counts as failed attempt |
+| QA (per cycle) | 8,000 | 12,000 | Counts as failed cycle |
+| ESCALATE (subagent) | 30,000 | 50,000 | Step up ladder |
+| DEBRIEF | 10,000 | 20,000 | Trim candidates, note in report |
+
+### Skill procedure for budgets
+
+Every state skill must:
+1. Before work: estimate input-token size; if already above hard cap, do NOT start — treat as cap exhaustion.
+2. At soft-cap crossing during work: log a warning in the state's output file.
+3. On completion: record actual tokens used. This is evidence for future tuning.
+
+Cap exhaustion is a stall signal — it is identical in effect to a failed attempt. See the consolidated stall-rules table below.
+
+---
+
+## Escalation ladder (v2.2)
+
+ESCALATE no longer hard-codes `opus`. It reads the ladder from `.memory-bank-v2/machine/limits.md#Escalation-ladder` and steps up one rung per escalation within a task.
+
+### Default ladder
+
+```
+1. sonnet    (budget tier — not a destination; listed for clarity)
+2. opus      (first escalation target)
+3. <user-switched session>   (graceful fallback)
+```
+
+### Stepping discipline
+
+- Initial escalation for a task: jump to rung 2.
+- Second escalation in the same task: advance to rung 3.
+- Cross-task: the ladder resets when a new `current-task/` begins.
+- No skipping rungs; no lateral moves.
+
+Because the memory bank is canonical, rung 3 (user-switched session) is genuinely graceful — nothing is lost in the hand-off.
 
 ---
 
@@ -212,11 +261,12 @@ All checks green. QA report archived. Transition to DEBRIEF.
 
 ### Primary path (Claude Code — Agent tool available)
 
-1. Write `escalation-brief.md` — original plan, plan_context, all attempts, last known error, current code state, hypotheses explored
-2. Spawn an Agent subagent with `model: "opus"` (or top of configured ladder)
+1. Write `escalation-brief.md` — original plan, plan_context, all attempts, last known error, current code state, hypotheses explored, **current ladder step** *(v2.2)*
+2. Read the next rung from `limits.md#Escalation-ladder`. Spawn an Agent subagent with `model: "<next-rung>"` (v2.2: no more hard-coded `opus` — the ladder is configurable)
 3. Pass the escalation-brief as the subagent's prompt
 4. Subagent attempts a fix; returns result
 5. Parent session applies the fix and resumes at the stalled state
+6. If the subagent itself stalls, advance the ladder one rung and re-escalate; if at top rung, fall through to the user-switched path
 
 ### Fallback path (no Agent tool available)
 
@@ -260,14 +310,20 @@ Same five-gate rubric applied to session observations. Writes to `human/tasks/YY
 | BUILD internal iterations | 3 | Escalate |
 | QA → BUILD cycles | 3 | Escalate |
 | Same error signature twice | 2 | Early escalation candidate |
+| **Hard cap exhaustion in BUILD** *(v2.2)* | 1 occurrence | Counts as a failed attempt; increment cycle counter |
+| **Hard cap exhaustion in QA** *(v2.2)* | 1 occurrence | Counts as a failed cycle; return to BUILD or escalate |
+| **Hard cap exhaustion in PLAN or PLAN-CONTEXTUALIZE** *(v2.2)* | 1 occurrence | Surface to user — task too large for current tier |
+| **Hard cap exhaustion in ESCALATE** *(v2.2)* | 1 occurrence | Step up the ladder; if at top → surface to user |
 | Deviation from plan in BUILD | 1 | Stop, return to plan author |
 | Constitutional conflict discovered | 1 | Stop, flag for resolution |
 
-Cycle counters live in `activeContext.md` (Current State section) and in `build-log.md`.
+Cycle counters live in `activeContext.md` (Current State section) and in `build-log.md`. Token usage per attempt is logged in `build-log.md` and `qa-report.md` for tuning.
 
 ---
 
-## Any-state entry (v2.1)
+## Any-state entry
+
+<!-- Entry rules unchanged in v2.2 from v2.1 — only the stall-trigger catalogue was extended -->
 
 A session starting mid-flow evaluates input contracts in order and enters the earliest satisfied state:
 
@@ -313,21 +369,28 @@ The planner-executor split is the financial mechanic: spend the big model on PLA
 |---|---|---|
 | (idle) | User provides task | PLAN |
 | PLAN | Plan approved | PLAN-CONTEXTUALIZE |
+| PLAN | Hard cap exhausted | Surface to user (v2.2) |
 | PLAN-CONTEXTUALIZE | plan_context.md complete | BUILD |
+| PLAN-CONTEXTUALIZE | Hard cap exhausted | Surface to user (v2.2) |
 | BUILD | Declares done | QA |
 | BUILD | 3 failed iterations | ESCALATE |
+| BUILD | Hard cap exhausted (any attempt) | Counts as failed attempt (v2.2) |
 | QA | All checks green | DEBRIEF |
 | QA | Failures found | BUILD (cycle n+1 of 3) |
 | QA → BUILD | 3 cycles failed | ESCALATE |
+| QA | Hard cap exhausted | Counts as failed cycle (v2.2) |
 | ESCALATE | Resolved | Resume at stalled state |
+| ESCALATE | Subagent stalled, ladder not at top | Advance ladder, re-escalate (v2.2) |
+| ESCALATE | Subagent stalled, ladder at top | Surface to user (v2.2) |
 | DEBRIEF (post-task) | Archive complete | (idle) |
+| DEBRIEF | Hard cap exhausted | Trim candidates, note in report (v2.2) |
 | (any) | User invokes debrief | DEBRIEF (ad-hoc) |
 
 ---
 
 ## What changed from v1
 
-| v1 | v2.1 |
+| v1 | v2.2 |
 |---|---|
 | EXPLORE → PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS | PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF |
 | DIFF separate state | Dropped (rolled into BUILD→QA handoff) |
@@ -338,3 +401,12 @@ The planner-executor split is the financial mechanic: spend the big model on PLA
 | Stall = user intervention | Stall = ESCALATE with fallback |
 | Strict FSM | Loosely coupled states; any-state entry |
 | Task artifacts scattered | Unified under `current-task/` folder |
+| No per-state budgets | `limits.md` per-state soft/hard caps (v2.2) |
+| Escalation model hard-coded | Configurable escalation ladder in `limits.md` (v2.2) |
+
+## What changed from v2.1 to v2.2
+
+- **Added** `limits.md` — machine-side runtime config loaded at session startup
+- **Added** per-state token budgets as a first-class stall signal
+- **Changed** ESCALATE from hard-coded `opus` to a ladder-stepping mechanism
+- **Unchanged** state machine shape, input contracts, any-state entry, memory-bank-is-canonical principle
