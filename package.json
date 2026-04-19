@@ -12,13 +12,20 @@
   "bugs": {
     "url": "https://github.com/jackson2787/torque-coding/issues"
   },
+  "bin": {
+    "torque-coding": "./bin/cli.js"
+  },
   "files": [
+    "bin/",
+    "lib/",
     "rules/",
     "skills/",
     "templates/",
     "docs/",
+    "examples/",
     "AGENTS.md",
     "CLAUDE.md",
+    "GETTING-STARTED.md",
     "bootstrap-memory-bank-contract.md",
     "ROADMAP.md"
   ],

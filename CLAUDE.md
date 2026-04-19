@@ -41,11 +41,13 @@ Claude Code loads the doctrine files via `@-imports` at the end of this section.
 - [Memory Bank](@rules/memory-bank.md)
 - [Authority Order](@rules/authority-order.md)
 - [State Machine](@rules/state-machine.md)
+- [Compaction](@rules/compaction.md)
 
 @rules/sacred-rules.md
 @rules/memory-bank.md
 @rules/authority-order.md
 @rules/state-machine.md
+@rules/compaction.md
 
 ---
 

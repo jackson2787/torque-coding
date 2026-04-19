@@ -41,6 +41,7 @@ This file is the tool-agnostic canonical source for the Torque Coding operating 
 - `rules/memory-bank.md` — two-domain memory structure and load rules
 - `rules/authority-order.md` — the strict authority stack with worked examples
 - `rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
+- `rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
 
 If you cannot read any of these files, stop and report it. Do not proceed with task work until every rule file has been loaded. The inline sections below are a tripwire summary, not a substitute.
 
