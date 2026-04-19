@@ -1,6 +1,4 @@
-# Authority Order v2
-
-**New in v2** — no v1 equivalent.
+# Authority Order
 
 ---
 

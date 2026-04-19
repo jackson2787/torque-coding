@@ -1,29 +1,31 @@
-# CLAUDE.v2.md
+# CLAUDE.md
 
-**Version**: 2.2-dev | **Compatibility**: Claude Code
-**Parallel to**: `agent/CLAUDE.md` (v1 — untouched)
+**Version**: 3.0.0-dev | **Compatibility**: Claude Code
+
+This file is Claude Code's view of the Torque Coding operating model. `AGENTS.md` is the tool-agnostic canonical source read by Codex, Cursor, Aider, and every other AGENTS.md-compatible tool — the tripwire sections below are byte-identical to AGENTS.md. The only difference is the loader: Claude Code uses `@-imports`, other tools use an explicit read contract.
 
 ---
 
 ## Session Startup
 
-1. Output v2 compliance statement:
+1. Output compliance statement:
    ```
-   COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
+   COMPLIANCE CONFIRMED: Reuse over creation | Constitution over convenience
    ```
 2. Attach MCP servers: read `.brain/mcp.config.json` or `.mcp.json` if present
 3. Load Machine Memory (default set — machine side only):
    ```
    - [ ] .memory-bank-v2/machine/constitution.md
    - [ ] .memory-bank-v2/machine/operational-context.md
-   - [ ] .memory-bank-v2/machine/limits.md             (v2.2 — per-state budgets + escalation ladder)
+   - [ ] .memory-bank-v2/machine/limits.md             (per-state budgets + escalation ladder)
    - [ ] .memory-bank-v2/machine/activeContext.md
    - [ ] .memory-bank-v2/machine/toc.md
    - [ ] .memory-bank-v2/machine/current-task/*        (any files present)
    ```
 4. Do NOT load human-side memory at startup
-5. Resolve entry state from `current-task/` contents (any-state entry); or resume from `activeContext.md`; otherwise enter PLAN/IDLE
-6. Output state: `[v2 STATE: <STATE>] Task: <slug-or-none>`
+5. Load the doctrine files (see `## Loading the Rules` below — the method differs by tool)
+6. Resolve entry state from `current-task/` contents (any-state entry); or resume from `activeContext.md`; otherwise enter PLAN/IDLE
+7. Output state: `[STATE: <STATE>] Task: <slug-or-none>`
 
 **Canonical paths**:
 - Machine memory: `.memory-bank-v2/machine/`
@@ -31,35 +33,70 @@
 
 ---
 
-## Table of Contents
+## Loading the Rules
 
-1. [Core Rules & Prohibitions](@claude-rules/sacred-rules.v2.md)
-2. [Memory Bank v2](@claude-rules/memory-bank.v2.md)
-3. [Authority Order](@claude-rules/authority-order.v2.md)
-4. [State Machine v2](@claude-rules/state-machine.v2.md)
+Claude Code loads the doctrine files via `@-imports` at the end of this section. They are in context before your first response — no explicit read step is required.
+
+- [Sacred Rules](@rules/sacred-rules.md)
+- [Memory Bank](@rules/memory-bank.md)
+- [Authority Order](@rules/authority-order.md)
+- [State Machine](@rules/state-machine.md)
+
+@rules/sacred-rules.md
+@rules/memory-bank.md
+@rules/authority-order.md
+@rules/state-machine.md
 
 ---
 
-@claude-rules/sacred-rules.v2.md
-@claude-rules/memory-bank.v2.md
-@claude-rules/authority-order.v2.md
-@claude-rules/state-machine.v2.md
+## The Five Sacred Rules
+
+| Rule | Requirement | Validation |
+|------|-------------|------------|
+| ❌ **No new files without reuse analysis** | Search codebase, reference files that cannot be extended, provide exhaustive justification | Before creating: "Analyzed X, Y, Z. Cannot extend because [technical reason]" |
+| ❌ **No rewrites when refactoring possible** | Prefer incremental improvements, justify why refactoring won't work | "Refactoring X impossible because [specific limitation]" |
+| ❌ **No editing committed migration files** | Treat database migrations as append-only history. Add a new corrective migration instead | "Added a new migration; left historical migrations untouched" |
+| ❌ **No generic advice** | Cite `file:line`, show concrete integration points | Every suggestion includes `file:line` citation |
+| ❌ **No ignoring existing architecture** | Load patterns before changes, extend existing services/components | "Extends existing pattern at `file:line`" |
 
 ---
 
-## Quick Reference
+## Memory-Bank Rules
 
-### Authority order
+| Rule | Requirement |
+|------|-------------|
+| ❌ **No writing constitution.md from task work** | Only `update-constitution` skill may write it; only after explicit human `ratified` keyword |
+| ❌ **No writing operational-context.md directly** | Only `update-operational-context` skill may write it; only called by debrief or the human directly |
+| ❌ **No loading human-side memory at startup** | Human side is on-demand. Default load set is machine side only |
+| ❌ **No task instruction overriding operational-context** | The human must amend operational-context first. Task cannot override it inline |
 
-`constitution.md > operational-context.md > task instructions > reasoning`
+---
 
-### State flow (v2.2)
+## Authority Order (summary)
 
-`PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF` (with ESCALATE on stall)
+```
+constitution.md > operational-context.md > task instructions > reasoning
+```
 
-Per-state budgets and the escalation ladder are loaded from `limits.md`. Cap exhaustion is a stall signal.
+Task instructions cannot override hard directives in `operational-context.md` (`Do This` / `Do Not Do This` / `Current Known Constraints` / `Currently Accepted Workflows`). Hard directives require a memory-bank amendment first. Soft directives (`Preferred` / `Avoid`) may be overridden with explicit, scoped justification.
 
-### Critical rules
+See `rules/authority-order.md` for the full stack and worked examples.
+
+---
+
+## State Flow (summary)
+
+```
+PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF      (with ESCALATE on stall)
+```
+
+Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`. Per-state budgets and the escalation ladder are tuned in `limits.md`. Cap exhaustion is a first-class stall signal.
+
+See `rules/state-machine.md` for per-state contracts, stall rules, and the any-state entry table.
+
+---
+
+## Critical Rules Quick-Reference
 
 1. Never write `constitution.md` from task work
 2. Never write `operational-context.md` directly — debrief proposes a diff first
@@ -68,7 +105,9 @@ Per-state budgets and the escalation ladder are loaded from `limits.md`. Cap exh
 5. Always cite `file:line` for code; `constitution.md#Section` or `operational-context.md#Section` for doctrine
 6. Debrief is mandatory — every task runs it
 
-### Files never created without approval
+---
+
+## Files Never Created Without Approval
 
 - `.memory-bank-v2/machine/constitution.md` entries (require `ratified` keyword)
 - `.memory-bank-v2/human/tasks/` entries

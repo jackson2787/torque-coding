@@ -15,7 +15,7 @@ metadata:
   requires:
     - .memory-bank-v2/machine/operational-context.md
     - .memory-bank-v2/machine/constitution.md
-    - .memory-bank-v2/machine/limits.md (for DEBRIEF hard cap — v2.2)
+    - .memory-bank-v2/machine/limits.md (for DEBRIEF hard cap)
     - post-task mode: .memory-bank-v2/machine/current-task/*
     - ad-hoc mode: session transcript
   produces:
@@ -50,7 +50,7 @@ Always. After every task. After changes are applied and the user has approved.
 - Clears `current-task/` at the end
 - Resets `activeContext.md` to PLAN/IDLE
 
-### Ad-hoc mode (user-invoked) — new in v2.1
+### Ad-hoc mode (user-invoked)
 
 Invoked at any time by the human (typically via `/debrief` or explicit "run debrief on this session").
 
@@ -95,7 +95,7 @@ Gather these instead:
 
 ---
 
-## Phase 0: Cap check (v2.2)
+## Phase 0: Cap check
 
 Read `limits.md` for the DEBRIEF hard cap (default 20k input tokens).
 
@@ -291,7 +291,7 @@ Write a constitutional proposal. Set `Status: Proposed`. Note that ratification 
 
 1. **Archive `current-task/`**. Move all files from `.memory-bank-v2/machine/current-task/` to `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/`. Include `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and any `escalation-brief.md`.
 2. **Clear `current-task/`**. The directory exists but is empty after archive.
-3. **Reset `activeContext.md`**. Load `skills/memory-bank/update-active-context/SKILL.md` (v1 skill, reused). Update Current State section:
+3. **Reset `activeContext.md`**. Load `skills/memory-bank/update-active-context/SKILL.md`. Update Current State section:
    ```
    State: PLAN/IDLE
    Task: none
@@ -365,8 +365,8 @@ Stop and surface to the human if:
 Debrief is complete when all of the following are true:
 
 Both modes:
-- [ ] Five-gate rubric applied to all candidates (or explicitly deferred under cap exhaustion — v2.2)
-- [ ] operational-context.md change proposed and either applied or confirmed as none (or skipped under minimal-debrief path — v2.2)
+- [ ] Five-gate rubric applied to all candidates (or explicitly deferred under cap exhaustion)
+- [ ] operational-context.md change proposed and either applied or confirmed as none (or skipped under minimal-debrief path)
 - [ ] `human/tasks/YYYY-MM/DDMMDD_<task>.md` written
 - [ ] `human/decisions/` written (if applicable)
 - [ ] `human/rationale/` written (if applicable)
@@ -384,13 +384,3 @@ Ad-hoc mode only:
 
 ---
 
-## Relationship to v1 DOCS
-
-| v1 DOCS | v2 DEBRIEF |
-|---|---|
-| Loads per-document skills to update memory bank | Applies rubric first — most tasks produce no machine-side change |
-| Updates `architecture.md`, `decisions.md`, task docs | Updates `operational-context.md` (if learning passed) and writes to `human/` |
-| No learning filter | Five-gate filter — churn is explicitly rejected |
-| Task docs go to `.memory-bank/tasks/` | Task histories go to `.memory-bank-v2/human/tasks/` |
-| Writes decisions to `decisions.md` (append-only single file) | Writes decisions to `human/decisions/YYYY/<slug>.md` (one file per decision) |
-| No constitutional distinction | Constitutional implications flagged separately; never written during task work |

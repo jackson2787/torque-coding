@@ -1,6 +1,6 @@
 # Recommended MCP Servers for AGENTS.md
 
-**For**: AGENTS.md v2.2+
+**For**: AGENTS.md 3.0+
 **Purpose**: MCP servers that directly support the AGENTS.md workflow — mapped to specific states, rules, and operations in the system.
 
 AGENTS.md lists "MCP Preferred" as a Non-Negotiable. This guide explains which MCP servers to connect and why, tied back to the parts of the workflow they serve. Only servers that meaningfully improve the state machine, Memory Bank, or quality gates are included.

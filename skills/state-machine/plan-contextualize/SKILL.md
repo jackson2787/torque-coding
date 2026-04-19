@@ -13,7 +13,7 @@ metadata:
   model-tier: powerful
   requires:
     - .memory-bank-v2/machine/current-task/plan.md (Status = Approved)
-    - .memory-bank-v2/machine/limits.md (for PLAN-CONTEXTUALIZE hard cap — v2.2)
+    - .memory-bank-v2/machine/limits.md (for PLAN-CONTEXTUALIZE hard cap)
   produces: .memory-bank-v2/machine/current-task/plan_context.md
   successor-skill: build-loop
   escalates-to: escalate
@@ -54,7 +54,7 @@ The output, `plan_context.md`, is the map. BUILD reads the map and proceeds dire
 
 Read `plan.md` end to end. Note every file mentioned, every pattern referenced, every acceptance criterion.
 
-### 1a. Cap check (v2.2)
+### 1a. Cap check
 
 Read `limits.md` for the PLAN-CONTEXTUALIZE hard cap (default 40k input tokens).
 
@@ -158,12 +158,4 @@ A valid `plan_context.md` must have:
 | A touched file cannot be located | Stop. Flag as planning error. |
 | Self-audit reveals BUILD would still need to explore | Do NOT declare done. Complete the missing pieces. |
 | The context pack is growing past a few hundred lines and the task is small | Reconsider scope — either the plan is too broad or the pack is too verbose |
-| Estimated input exceeds the CONTEXTUALIZE hard cap in `limits.md` (v2.2) | Stop. Surface to the human — split the task, raise the cap, or accept a leaner pack. Do not auto-escalate. |
-
-## Relationship to v1, v2.0, v2.1
-
-This skill is new in v2.1. It has no v1 predecessor. It was created to make the planner-executor split work: splitting exploration (powerful model) from execution (budget model) is only viable if the hand-off is complete enough to skip re-exploration.
-
-In v2.0, planning and execution both assumed the same in-session context. In v2.1, the hand-off is files on disk, and this skill produces the most important file.
-
-v2.2 adds a hard cap (default 40k) and the accompanying cap-check step — at mid-tier budgets, an oversized context pack just moves the cost problem from BUILD to CONTEXTUALIZE. Better to split the task than to ship a pack neither state can afford.
+| Estimated input exceeds the CONTEXTUALIZE hard cap in `limits.md` | Stop. Surface to the human — split the task, raise the cap, or accept a leaner pack. Do not auto-escalate. |

@@ -1,5 +1,5 @@
 ---
-name: writing-plans-v2
+name: writing-plans
 description: >-
   PLAN-state skill. Produces current-task/plan.md — the task contract, doctrine-checked
   reuse-analyzed implementation plan. Intended to be invoked by the powerful model
@@ -14,7 +14,7 @@ metadata:
   requires:
     - .memory-bank-v2/machine/constitution.md
     - .memory-bank-v2/machine/operational-context.md
-    - .memory-bank-v2/machine/limits.md (for PLAN hard cap — v2.2)
+    - .memory-bank-v2/machine/limits.md (for PLAN hard cap)
   produces: .memory-bank-v2/machine/current-task/plan.md
   successor-skill: plan-contextualize
   escalates-to: escalate
@@ -25,7 +25,7 @@ metadata:
 
 ## Overview
 
-Planning is the first state of the v2.2 state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
+Planning is the first state of the state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
 
 The goal is a plan that can survive model switching, session handoff, and compaction. If the planning session is lost, a fresh session should be able to read `plan.md` alone and understand the task as well as the original planner did.
 
@@ -56,7 +56,7 @@ If any is missing, resolve before writing the plan.
 
 Re-read `constitution.md` and `operational-context.md` before planning, even if they were loaded at session startup. The planner is the first line of defense against doctrine drift — if doctrine has changed since session start, the plan reflects the current state.
 
-### 1a. Cap check (v2.2)
+### 1a. Cap check
 
 Read `limits.md` for the PLAN hard cap (default 25k input tokens).
 
@@ -121,7 +121,7 @@ Wait for explicit approval.
 
 ### 9. Record state transition
 
-On approval, update `activeContext.md` via `update-active-context` (v1 skill, reused):
+On approval, update `activeContext.md` via `update-active-context`:
 
 ```
 State: PLAN-CONTEXTUALIZE
@@ -167,16 +167,4 @@ A plan missing any of these is incomplete. Fix before handing off.
 | Acceptance criteria are subjective ("looks better") | Refuse. Rewrite as testable or cut. |
 | `current-task/plan.md` already exists with Status ≠ Superseded | Stop. Either complete the current task (debrief) or explicitly abandon. |
 | The task description is too vague to write acceptance criteria | Stop. Ask the human clarifying questions. Do not guess. |
-| Estimated PLAN input exceeds the hard cap in `limits.md` (v2.2) | Stop. Surface to the human — narrow scope, split the task, or raise the cap. Do not auto-escalate; planning failures are not fixed by a stronger executor. |
-
-## Relationship to v1
-
-Replaces v1 `writing-plans` skill. Key differences:
-
-| v1 | v2.2 |
-|---|---|
-| Plan written inline in chat | Plan written to `current-task/plan.md` on disk |
-| Context carried in conversation | Context carried in memory bank (survives switching) |
-| Single skill spans plan + context | Split into `writing-plans-v2` (PLAN) and `plan-contextualize` (PLAN-CONTEXTUALIZE) |
-| No explicit authority check | Mandatory authority check against constitution and operational-context |
-| No explicit reuse analysis | Reuse analysis section is mandatory (Sacred Rule) |
+| Estimated PLAN input exceeds the hard cap in `limits.md` | Stop. Surface to the human — narrow scope, split the task, or raise the cap. Do not auto-escalate; planning failures are not fixed by a stronger executor. |

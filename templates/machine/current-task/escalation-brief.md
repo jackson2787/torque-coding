@@ -3,8 +3,8 @@
 **Slug**: [same as plan.md]
 **Date**: YYYY-MM-DD HH:MM
 **Stalled state**: [BUILD | QA]
-**Trigger**: [3 attempts exhausted | same-signature repeat | cap exhaustion (v2.2)]
-**Ladder step** (v2.2): [N — model name from `limits.md#Escalation-ladder`]
+**Trigger**: [3 attempts exhausted | same-signature repeat | cap exhaustion]
+**Ladder step**: [N — model name from `limits.md#Escalation-ladder`]
 **Target model**: [model at rung N, read from `limits.md`]
 
 <!-- Written by: skills/state-machine/escalate
@@ -78,7 +78,7 @@ See `current-task/plan.md` and `current-task/plan_context.md` for the full plann
 
 ---
 
-## Previous escalations in this task (v2.2)
+## Previous escalations in this task
 
 <!-- Leave empty on first escalation. On subsequent escalations, each rung appends an entry here;
      the `Ladder step` field at the top always reflects the CURRENT rung being targeted. -->

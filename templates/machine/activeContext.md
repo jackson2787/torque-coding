@@ -1,6 +1,6 @@
-# activeContext (v2)
+# activeContext
 
-**Purpose**: Compaction recovery anchor and state-machine pointer. Updated at every state transition by `update-active-context` (v1 skill, reused).
+**Purpose**: Compaction recovery anchor and state-machine pointer. Updated at every state transition by `update-active-context`.
 
 **Canonical rule**: This file plus `current-task/` is everything a fresh session needs to resume exactly where the previous session left off. If this file disagrees with `current-task/`, `current-task/` wins — this file is an index, not the source of truth.
 
@@ -13,7 +13,7 @@ State: [PLAN/IDLE | PLAN | PLAN-CONTEXTUALIZE | BUILD | QA | ESCALATE | DEBRIEF]
 Task:  [task slug | none]
 Model tier (expected): [powerful | budget | subagent]
 Cycle: [n/3 for BUILD or QA; n/a otherwise]
-Ladder step last used (v2.2): [none | N — model name from limits.md]
+Ladder step last used: [none | N — model name from limits.md]
 Started: YYYY-MM-DD HH:MM
 Last transition: YYYY-MM-DD HH:MM — [from-state] → [to-state]
 ```
@@ -70,4 +70,4 @@ If this file is being read to recover from compaction or to enter a new session,
 
 The `Last transition` line above disambiguates when files alone are ambiguous.
 
-**v2.2 note**: `escalation-brief.md` may be present even after ESCALATE returns — it is preserved as a ladder-progression record, not a signal flag. Use `State:` from the block above, not the brief's presence, to determine the actual entry state. If State = BUILD or QA despite an existing brief, the task is mid-post-escalation-verification; proceed accordingly.
+**Note**: `escalation-brief.md` may be present even after ESCALATE returns — it is preserved as a ladder-progression record, not a signal flag. Use `State:` from the block above, not the brief's presence, to determine the actual entry state. If State = BUILD or QA despite an existing brief, the task is mid-post-escalation-verification; proceed accordingly.

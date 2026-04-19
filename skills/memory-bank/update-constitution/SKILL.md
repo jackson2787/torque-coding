@@ -1,7 +1,7 @@
 ---
 name: update-constitution
 description: >-
-  Writes to constitution.md in the v2 memory bank. Enforces the highest-authority
+  Writes to constitution.md in the memory bank. Enforces the highest-authority
   document's structural rules and ratification requirements. Requires the human to
   have said "ratified" in the current approving message. Never called from task work
   or debrief — only called via explicit human ratification ceremonies or bootstrap.

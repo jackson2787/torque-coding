@@ -1,19 +1,17 @@
-# Core Rules v2
-
-**Parallel to**: `agent/claude-rules/sacred-rules.md` (v1 — untouched)
+# Core Rules
 
 ---
 
 ## Startup Compliance (Output Every Session)
 
 ```
-COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
-[Continue with Memory Bank v2 loading...]
+COMPLIANCE CONFIRMED: Reuse over creation | Constitution over convenience
+[Continue with Memory Bank loading...]
 ```
 
 ---
 
-## The Four Sacred Rules (unchanged from v1)
+## The Five Sacred Rules
 
 | Rule | Requirement | Validation |
 |------|-------------|------------|
@@ -36,7 +34,7 @@ COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
 
 ---
 
-## v2 Additional Rules
+## Additional Memory-Bank Rules
 
 | Rule | Requirement | Consequence |
 |------|-------------|------------|
@@ -48,7 +46,7 @@ COMPLIANCE CONFIRMED [v2]: Reuse over creation | Constitution over convenience
 
 ---
 
-## Absolute Prohibitions (carried from v1)
+## Absolute Prohibitions
 
 | Prohibition | Consequence |
 |-------------|-------------|
@@ -74,13 +72,13 @@ Test fixtures and test mocks are acceptable. Production fake data is never accep
 
 **When to update memory** (always use the corresponding skill):
 - ✅ Task complete → `debrief` skill (handles all memory updates)
-- ✅ Compaction recovery → `update-active-context` (v1 skill, reused)
+- ✅ Compaction recovery → `update-active-context`
 - ✅ Human explicitly requests memory update → relevant skill
 - ❌ During task execution — memory updates happen in DEBRIEF, not during BUILD LOOP
 
 ---
 
-## Versioning & Rollback (carried from v1)
+## Versioning & Rollback
 
 **Rollback triggers**: APPLY fails | User requests revert | Critical error | Security vulnerability
 

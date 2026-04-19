@@ -1,12 +1,10 @@
-# Memory Bank v2 (v2.2)
-
-**Parallel to**: `agent/claude-rules/memory-bank.md` (v1 — untouched)
+# Memory Bank
 
 ---
 
 ## Two-Domain Structure
 
-The v2 memory bank has two domains with different purposes, load rules, and writers.
+The memory bank has two domains with different purposes, load rules, and writers.
 
 ```
 .memory-bank-v2/
@@ -36,19 +34,19 @@ Load in this order. Constitution first — it is the highest authority and sets 
 |---|---|---|---|
 | `constitution.md` | Stable truths: domain definitions, durable architectural rules, security boundaries, scope. Boring by design. | Rare — requires human ratification | `update-constitution` |
 | `operational-context.md` | Current working rules: do this, do not do this, prefer this, avoid this, current constraints, current workflows. Present-tense only. | Per-learning, via debrief | `update-operational-context` |
-| `limits.md` *(v2.2)* | Runtime config: per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by the developer's current tier/project. | As tier or project scale changes | Human directly (low ceremony — no dedicated skill) |
-| `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition | `update-active-context` *(v1 skill, reused)* |
-| `toc.md` | Mechanical index of both machine and human halves | When files are added or removed | `update-toc` *(v1 skill, reused)* |
-| `current-task/` *(folder, v2.1)* | Holds all artifacts for the currently active task — at most one task active at a time | Written by state-machine skills during the task lifecycle | `writing-plans-v2`, `plan-contextualize`, `build-loop`, `qa-v2`, `escalate`, `debrief` |
+| `limits.md` | Runtime config: per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by the developer's current tier/project. | As tier or project scale changes | Human directly (low ceremony — no dedicated skill) |
+| `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition | `update-active-context` |
+| `toc.md` | Mechanical index of both machine and human halves | When files are added or removed | `update-toc` |
+| `current-task/` | Holds all artifacts for the currently active task — at most one task active at a time | Written by state-machine skills during the task lifecycle | `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief` |
 
-### The current-task/ folder (v2.1)
+### The current-task/ folder
 
 ```
 machine/current-task/
-├── plan.md                  ← written by writing-plans-v2 (PLAN state)
+├── plan.md                  ← written by writing-plans (PLAN state)
 ├── plan_context.md          ← written by plan-contextualize (PLAN-CONTEXTUALIZE state)
 ├── build-log.md             ← written by build-loop (BUILD state)
-├── qa-report.md             ← written by qa-v2 (QA state)
+├── qa-report.md             ← written by qa (QA state)
 └── escalation-brief.md      ← written by escalate (only when stalled)
 ```
 
@@ -131,8 +129,8 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 
 ### activeContext.md and toc.md
 
-- Written by v1 skills (`update-active-context`, `update-toc`) — these are reused unchanged
-- v2 adds one requirement to `toc.md`: it must index both `machine/` and `human/` halves
+- Written by `update-active-context` and `update-toc` skills
+- `toc.md` must index both `machine/` and `human/` halves
 
 ### human/* (all human-side documents)
 
@@ -150,37 +148,15 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 | `machine/constitution.md` | `update-constitution` | Human directly (with `ratified`) |
 | `machine/operational-context.md` | `update-operational-context` | Debrief (propose-diff), human directly |
 | `machine/limits.md` | Human directly (no dedicated skill) | — |
-| `machine/activeContext.md` | `update-active-context` *(v1)* | Debrief (reset to idle), compaction recovery |
-| `machine/toc.md` | `update-toc` *(v1)* | Bootstrap |
+| `machine/activeContext.md` | `update-active-context` | Debrief (reset to idle), compaction recovery |
+| `machine/toc.md` | `update-toc` | Bootstrap |
 | `human/**` | `update-human-log` | Debrief, human directly |
 
 ---
 
-## What Has Not Changed from v1
+## Deferred
 
-- `activeContext.md` shape: Current State / Progress / Session Data (unchanged)
-- `toc.md` shape: mechanical index (extended to cover both halves)
-- v1 `update-active-context` and `update-toc` skills: reused unchanged
-- Compaction recovery anchor: still `activeContext.md`
-- Compaction protocol: still continuous (state persisted at every transition)
+- `mb-rebase` skill
+- `compaction.md` rule file
 
-## What Is New in v2
-
-- `constitution.md` — new highest-authority document (no v1 equivalent)
-- `operational-context.md` — replaces the combined role of `architecture.md` + `projectBrief.md` + `productContext.md` for machine execution
-- `human/` domain — explicit, separated, on-demand only
-- `update-human-log` — single writer for all human-side documents
-- Debrief — the only path to update `operational-context.md`
-
-## What Is New in v2.2
-
-- `limits.md` — new machine-side runtime config with per-state token budgets and the escalation ladder
-- Cap exhaustion is now a first-class stall signal (equivalent to a failed attempt)
-- Escalation ladder is configurable (was hard-coded to `opus` in v2.1)
-
-## What Is Deferred
-
-- v2 parallel for `update-active-context` (v1 skill reused for now)
-- v2 parallel for `update-toc` (v1 skill reused for now)
-- `mb-rebase-v2` skill
-- `compaction.v2.md` rule file
+See `ROADMAP.md` for the full gap list.

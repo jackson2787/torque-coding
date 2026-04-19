@@ -1,7 +1,7 @@
 ---
 name: update-operational-context
 description: >-
-  Writes to operational-context.md in the v2 memory bank. Enforces prescriptive voice,
+  Writes to operational-context.md in the memory bank. Enforces prescriptive voice,
   section placement, evidence requirements, and constitutional conflict checks. Called
   only by the debrief skill (propose-diff flow) or by the human directly. Never called
   from task work or BUILD LOOP.

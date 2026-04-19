@@ -14,7 +14,7 @@ metadata:
   requires:
     - .memory-bank-v2/machine/current-task/plan.md
     - .memory-bank-v2/machine/current-task/plan_context.md
-    - .memory-bank-v2/machine/limits.md (for per-attempt hard cap — v2.2)
+    - .memory-bank-v2/machine/limits.md (for per-attempt hard cap)
   produces:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/build-log.md
@@ -66,7 +66,7 @@ Check `build-log.md`:
 - If present with FAIL attempts: start Attempt N+1.
 - If attempts ≥ 3: go to step 7 (stall).
 
-### 1a. Cap check (v2.2)
+### 1a. Cap check
 
 Read `limits.md` for the BUILD hard cap (default 15k input tokens per attempt).
 
@@ -104,7 +104,7 @@ Append to `build-log.md`:
 ## Attempt N
 - Started: YYYY-MM-DD HH:MM
 - Approach: [one sentence]
-- Tokens (v2.2): [estimated-in] in / [actual-in] in / [soft-cap] soft / [hard-cap] hard
+- Tokens: [estimated-in] in / [actual-in] in / [soft-cap] soft / [hard-cap] hard
 - Changes applied:
   - path/to/file.ext — [what changed]
 - Result: [Declared done → QA] | [Failed: error signature] | [Failed: cap exhaustion]
@@ -122,7 +122,7 @@ If the attempt failed (compiler error, obvious exception while applying), includ
 Trigger ESCALATE if any:
 - Attempt count has reached 3
 - Two attempts produced the same error signature
-- **Cap exhaustion triggered this attempt to fail, and attempt count has reached 3** (v2.2 — cap exhaustion counts as a failed attempt)
+- **Cap exhaustion triggered this attempt to fail, and attempt count has reached 3** (cap exhaustion counts as a failed attempt)
 
 Write `escalation-brief.md` (via the `escalate` skill) and transition to ESCALATE.
 
@@ -167,13 +167,3 @@ On declared-done:
 | The plan step is ambiguous enough that two reasonable implementations exist | Escalate — the planner needs to disambiguate. |
 | The step would modify a path in `plan.md#Out-of-scope` | Stop. Surface to human. |
 
-## Relationship to v1
-
-Replaces v1 BUILD + DIFF + APPROVAL + APPLY (in the execution sense). Key differences:
-
-| v1 | v2.1 |
-|---|---|
-| BUILD could explore the codebase freely | BUILD is zero-exploration; uses the pack |
-| DIFF was a separate state for approval | Folded into BUILD (applies directly) + QA (verifies skeptically) |
-| Single model across all states | Budget model tier; powerful model only for PLAN, PLAN-CONTEXTUALIZE, ESCALATE |
-| Stalls were surfaced to the human | Stalls trigger the escalate skill, which may self-resolve via subagent |

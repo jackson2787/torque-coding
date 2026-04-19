@@ -20,8 +20,6 @@ All human-side memory writes go through this skill. It is the only writer for th
 
 Accepts a `kind` that determines which subdirectory, filename pattern, template, and `INDEX.md` to use.
 
-**Coexistence note**: This skill writes to `.memory-bank-v2/human/`. The v1 skill `update-task-docs` writes to `.memory-bank/tasks/`. These are disjoint paths. Both skills coexist without conflict.
-
 ## Kinds
 
 | Kind | Target path | Use for |

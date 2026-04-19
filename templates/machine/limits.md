@@ -1,4 +1,4 @@
-# Limits & Escalation Ladder (v2.2)
+# Limits & Escalation Ladder
 
 **Purpose**: Runtime configuration for the state machine. Declares per-state token budgets and the model-escalation ladder. Loaded at session startup alongside `constitution.md` and `operational-context.md`.
 

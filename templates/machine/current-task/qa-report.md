@@ -5,8 +5,8 @@
 **Date**: YYYY-MM-DD HH:MM
 **Model tier**: budget (QA) — skeptical by design
 **Overall result**: PASS | FAIL
-**Tokens** (v2.2): [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
-**Cap status** (v2.2): within soft | crossed soft | cap exhausted → FAIL
+**Tokens**: [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
+**Cap status**: within soft | crossed soft | cap exhausted → FAIL
 
 <!-- Written by: skills/state-machine/qa-v2
      Overwritten on every cycle; previous cycles live in build-log.md
@@ -113,7 +113,7 @@ For each numbered criterion in `plan.md#Acceptance-criteria`:
 | 5. Constitution boundaries | PASS/FAIL |
 | 6. Acceptance criteria | PASS/FAIL |
 
-**Overall**: [PASS → DEBRIEF | FAIL → BUILD cycle n+1 | FAIL cycle 3 → ESCALATE | FAIL cap exhaustion (v2.2) → BUILD cycle n+1 or ESCALATE per cycle count]
+**Overall**: [PASS → DEBRIEF | FAIL → BUILD cycle n+1 | FAIL cycle 3 → ESCALATE | FAIL cap exhaustion → BUILD cycle n+1 or ESCALATE per cycle count]
 
 ---
 

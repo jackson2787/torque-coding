@@ -1,24 +1,22 @@
-# Bootstrap Memory Bank v2 (v2.2)
+# Bootstrap Memory Bank
 
 ## Purpose
 
 One-time cold start for `.memory-bank-v2/`. Populate `machine/constitution.md` and `machine/operational-context.md` from repo code, and seed `machine/limits.md` with defaults. No human interaction — scan, write, flag gaps.
-
-**Parallel to**: `agent/bootstrap-memory-bank-contract.md` (v1 — untouched)
 
 The `.memory-bank-v2/` directory and its subdirectories must already exist before running this bootstrap. The bootstrap populates, it does not scaffold.
 
 ## Source and Install Path
 
 - Template source: `bootstrap-memory-bank-contract.md`
-- Installed target-repo path: `docs/memory-bank/bootstrap-memory-bank-v2-contract.md`
+- Installed target-repo path: `docs/memory-bank/bootstrap-memory-bank-contract.md`
 
 ---
 
 ## Rules
 
 1. **Code is the only evidence.** Examine source code, configs, manifests, lockfiles, tests, CI files, schemas, migrations, and generated types. Do not read README files, docs, ADRs, or any other markdown as evidence.
-2. **Use the v2 memory bank skills for all writes.** Each document has an update skill under `skills/memory-bank/`. Never write directly.
+2. **Use the memory-bank skills for all writes.** Each document has an update skill under `skills/memory-bank/`. Never write directly.
 3. **Prefer sparse truth over detailed fiction.** If the code does not prove something, do not write it. Mark gaps as `<!-- NEEDS CONFIRMATION -->` and move on.
 4. **Do not ask the human anything.** Bootstrap is a machine operation. Flag what you cannot prove. The human uses `mb-rebase` to calibrate afterwards.
 5. **Do not create files that do not already exist.** The scaffolding is already done. You are populating, not creating.
@@ -108,7 +106,7 @@ Sections to populate:
 
 Leave empty sections as commented placeholders rather than inventing entries.
 
-### Step 4: Seed limits.md (v2.2)
+### Step 4: Seed limits.md
 
 Copy the template `templates/machine/limits.md` to `.memory-bank-v2/machine/limits.md` verbatim. Do not tune values during bootstrap — the defaults target a mid-tier developer plan and are correct as a starting point.
 
@@ -116,7 +114,7 @@ The human adjusts `limits.md` directly as their tier or project scale changes; i
 
 ### Step 5: Populate activeContext.md and toc.md
 
-Use v1 skills (reused in v2):
+Use the memory-bank update skills:
 
 - `skills/memory-bank/update-active-context/SKILL.md` → Current State: "Bootstrap complete. No active task."
 - `skills/memory-bank/update-toc/SKILL.md` → Reflect both `machine/` and `human/` halves (including `limits.md`)
@@ -126,7 +124,7 @@ Use v1 skills (reused in v2):
 Output:
 
 ```
-BOOTSTRAP v2.2 COMPLETE
+BOOTSTRAP COMPLETE
 
 Files populated:
   - .memory-bank-v2/machine/constitution.md
@@ -151,7 +149,7 @@ Next step: Run mb-rebase on constitution.md and operational-context.md
 Read bootstrap-memory-bank-contract.md and execute it.
 Examine the codebase — code, config, tests, manifests, CI, schemas, runtime files.
 Do not read markdown or documentation as evidence.
-Use the v2 memory bank skills for all writes.
+Use the memory-bank skills for all writes.
 If something is not provable from the repo, flag it <!-- NEEDS CONFIRMATION --> and move on.
 Do not ask me any questions during bootstrap.
 ```

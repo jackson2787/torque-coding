@@ -37,8 +37,8 @@ Two paths:
 - BUILD has used 3 attempts without a "declared done"
 - QA has FAILed for 3 cycles
 - Same error signature has appeared twice in `build-log.md` or `qa-report.md`
-- **Hard cap exhaustion** in BUILD or QA has pushed the cycle counter to its limit (v2.2)
-- **ESCALATE's own subagent stalled** and the ladder is not yet at the top rung (v2.2)
+- **Hard cap exhaustion** in BUILD or QA has pushed the cycle counter to its limit
+- **ESCALATE's own subagent stalled** and the ladder is not yet at the top rung
 - The stalled skill explicitly invokes this one
 
 ## When NOT to Use
@@ -53,7 +53,7 @@ Two paths:
 - [ ] `current-task/plan_context.md` present
 - [ ] `current-task/build-log.md` present with at least the attempts that triggered the stall
 - [ ] `current-task/qa-report.md` present if QA triggered the escalation
-- [ ] `.memory-bank-v2/machine/limits.md` readable — needed for the ladder (v2.2)
+- [ ] `.memory-bank-v2/machine/limits.md` readable — needed for the ladder
 
 ## Procedure
 
@@ -66,7 +66,7 @@ Is the Agent tool available?
 
 Do not skip this step. Environment detection is the first thing the skill does.
 
-### 1a. Resolve the ladder step (v2.2)
+### 1a. Resolve the ladder step
 
 Read `.memory-bank-v2/machine/limits.md#Escalation-ladder` for the configured ladder.
 
@@ -92,13 +92,13 @@ Required sections:
 - Current code state (diff summary)
 - Hypotheses explored (and why each was insufficient)
 - What the stronger model should consider (directional framing, not a solution)
-- **Ladder step** *(v2.2)*: the rung this escalation is targeting (e.g., "Ladder step: 2 — opus")
-- **Previous escalations in this task** *(v2.2)*: if any, list each rung that has already been tried and what it returned
+- **Ladder step**: the rung this escalation is targeting (e.g., "Ladder step: 2 — opus")
+- **Previous escalations in this task**: if any, list each rung that has already been tried and what it returned
 - Resume point (how to return control to the state machine)
 
 If `escalation-brief.md` already exists from a previous escalation in this task, **update it in place** — append this rung's attempt to the "Previous escalations" section — rather than overwriting. The audit trail across rungs is valuable.
 
-### 3. Primary path — spawn subagent at the resolved ladder rung (v2.2)
+### 3. Primary path — spawn subagent at the resolved ladder rung
 
 If the Agent tool is available AND the resolved next rung is not the final rung:
 
@@ -162,14 +162,14 @@ Update `activeContext.md`:
 State: [BUILD | QA]
 Task:  [slug]
 Cycle: [reset to 1 for the post-escalation pass]
-Ladder step last used: [N]      (v2.2)
+Ladder step last used: [N]
 Last transition: YYYY-MM-DD HH:MM — ESCALATE → [BUILD | QA]
 Note: resumed post-escalation at ladder step [N]
 ```
 
-**Do NOT delete `escalation-brief.md` on resume** (v2.2). Keep it in place so the ladder step is preserved — if this task escalates again, the next escalation advances the ladder rather than restarting at rung 2. The brief is archived to `human/tasks/` by debrief along with the rest of `current-task/`.
+**Do NOT delete `escalation-brief.md` on resume**. Keep it in place so the ladder step is preserved — if this task escalates again, the next escalation advances the ladder rather than restarting at rung 2. The brief is archived to `human/tasks/` by debrief along with the rest of `current-task/`.
 
-The "leaving it in place triggers ESCALATE on re-entry" concern from v2.1 is resolved by reading `activeContext.md#State` first — if State is BUILD or QA, the agent enters that state regardless of `escalation-brief.md` presence. The brief is now a historical record of the ladder progression for this task, not a signal flag.
+Leaving the brief in place does not trigger ESCALATE on re-entry — the agent reads `activeContext.md#State` first, and if State is BUILD or QA enters that state regardless of `escalation-brief.md` presence. The brief is a historical record of the ladder progression for this task, not a signal flag.
 
 ### 6. If the stronger model concludes the plan is wrong
 
@@ -216,7 +216,7 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 | Fallback path triggered but user returns without switching models | The same budget model will stall again. Re-run escalate; if that was already attempted, surface to human. |
 | `escalation-brief.md` already present when escalation triggers (previous unresolved) | Do NOT overwrite. Surface to human — previous escalation was not completed. |
 
-## Configuration: the model ladder (v2.2 — parameterised)
+## Configuration: the model ladder
 
 Escalation reads the ladder from `.memory-bank-v2/machine/limits.md#Escalation-ladder`. The default ladder is:
 
@@ -232,11 +232,3 @@ Per-project overrides are allowed. Rules:
 - The final rung must always be `<user-switched session>`.
 
 See `limits.md` for the full contract and tuning guidance.
-
-## Relationship to v1 and v2.1
-
-There is no direct v1 predecessor. v1's stall protocol surfaced every stall to the human.
-
-v2.1 added a subagent primary path hard-coded to `opus`, with a user-switched fallback.
-
-v2.2 parameterises the ladder, adds ladder-stepping discipline (no skipping rungs, no loops at the same rung), and treats token-cap exhaustion as a first-class stall trigger alongside attempt-count exhaustion.

@@ -1,6 +1,6 @@
 # OpenCode MCP Configuration
 
-**For**: AGENTS.md v2.2+ with [OpenCode](https://opencode.ai)
+**For**: AGENTS.md 3.0+ with [OpenCode](https://opencode.ai)
 **File**: `opencode.json` (project root)
 
 ---

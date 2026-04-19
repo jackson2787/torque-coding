@@ -1,5 +1,5 @@
 ---
-name: qa-v2
+name: qa
 description: >-
   QA state skill. Skeptical-by-design verification that runs after BUILD declares done.
   Disbelieves success until evidence is on disk. Runs tests (does not just read them),
@@ -16,7 +16,7 @@ metadata:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/plan.md
     - .memory-bank-v2/machine/current-task/plan_context.md
-    - .memory-bank-v2/machine/limits.md (for per-cycle hard cap — v2.2)
+    - .memory-bank-v2/machine/limits.md (for per-cycle hard cap)
   produces: .memory-bank-v2/machine/current-task/qa-report.md
   successor-skill-on-pass: debrief
   successor-skill-on-fail: build-loop
@@ -105,7 +105,7 @@ For each numbered criterion in `plan.md#Acceptance-criteria`:
 
 Check `qa-report.md` (if present) and `build-log.md` for previous QA→BUILD cycles. This is cycle N of 3.
 
-### 1a. Cap check (v2.2)
+### 1a. Cap check
 
 Read `limits.md` for the QA hard cap (default 12k input tokens per cycle).
 
@@ -137,7 +137,7 @@ Include, for every check:
 - Any check FAIL and cycle < 3 → return specific issues to BUILD; BUILD cycle counter increments.
 - Any check FAIL and cycle == 3 → ESCALATE.
 - Check 5 FAIL at any cycle → stop and surface to human (do not auto-escalate constitutional violations).
-- **Cap exhaustion during this cycle** (v2.2) → treat as FAIL for the whole cycle; apply the same cycle-count rules (cycle < 3 → back to BUILD with the reason; cycle == 3 → ESCALATE).
+- **Cap exhaustion during this cycle** → treat as FAIL for the whole cycle; apply the same cycle-count rules (cycle < 3 → back to BUILD with the reason; cycle == 3 → ESCALATE).
 
 ### 5. List issues returned to BUILD (on FAIL)
 
@@ -201,14 +201,3 @@ A valid `qa-report.md` has:
 | Same QA failure as previous cycle with same signature | Treat as stall — escalate regardless of cycle count |
 | QA would need to run a command that modifies state (DB migration on prod, deploy) | Stop. Surface to human. QA does not deploy. |
 
-## Relationship to v1
-
-Replaces v1 QA + parts of DIFF. Key differences:
-
-| v1 | v2.1 |
-|---|---|
-| QA was a review step, often model-reasoned | QA is evidence-based; all checks executed |
-| No formal check catalogue | Six fixed checks, always run |
-| No skepticism about BUILD's claims | QA disbelieves BUILD by design |
-| DIFF was where approval happened | DIFF removed; QA owns verification, debrief owns learning |
-| No explicit cycle counter | QA↔BUILD is an explicit loop with a 3-cycle ceiling |
