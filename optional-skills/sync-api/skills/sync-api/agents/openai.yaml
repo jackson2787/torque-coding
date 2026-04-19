@@ -1,6 +1,0 @@
-skill:
-  display_name: Sync API
-  short_description: Manually sync a frontend client to its OpenAPI contract.
-  default_prompt: Run the sync-api skill for this repository.
-policy:
-  allow_implicit_invocation: false

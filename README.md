@@ -1,250 +1,210 @@
-# Torque Coding
+# Torque Coding v2 — Operating Model
 
-<p align="center">
-  <img src="./.assets/0d39f7870f3a26463bc3cd6cd8b3abfde956f386fde2b3a01aa59f833d752ee7.jpg" alt="Torque Coding" width="720" />
-</p>
+**Version**: 2.2-dev | **Status**: Additive parallel — v1 remains fully functional
 
-**Bridge vibe speed with engineering repeatability — one approval gate at a time.**
-
-> A jack of all trades is a master of none, but oftentimes better than a master of one.
-
-AI agents are capable of everything. Paradoxically, this is a hindrance.
-
-Engineering tasks rarely call on a single domain. Reliability collapses when an agent is asked to operate as multiple personas across a multi-faceted task.
-
-In isolation, agents behave like experts.
-In combination, that clarity breaks down.
-
-Which persona owns the task?
-The database designer, the API engineer, or the system architect?
-
-Torque coding is an attempt to preserve that expert isolation across complex work.
-
-The capability does not change.
-The application of it does.
-
-Torque coding constrains how capability is applied through skills, memory, constraints, and survivability, rather than attempting to redefine the agent itself.
-
-It bridges the gap between the speed of vibe coding and the predictable, repeatable nature of traditional engineering.
-
-- **Version**: aligned with `agent/AGENTS.md` 2.4
-- **Status**: public template repo + NPX installer
+This directory contains the complete v2 operating model. Nothing in `agent/`, `skills/`, `optional-skills/`, or `skill-packs/` has been modified. v2 is additive and parallel.
 
 ---
 
-## Quick Start
+## Why this project exists
 
-```bash
-npx torque-coding
-```
+Most modern AI-coding frameworks — Claude Agent SDK, Cursor composer, Devin, the agent patterns baked into the latest IDE extensions — are optimised for the developer who lives inside a single ecosystem. Full Claude Max, Cursor Ultra, unlimited Copilot — the £200/month tier where the session is the substrate, rate limits rarely bite, and you rarely need to leave the tool you started in.
 
-This runs an interactive installer that:
+**Torque Coding is built for the other market.** The mid-tier developer on a £20/month plan who is, in practice, a nomad:
 
-1. Asks what you're building (Web, Mobile, Backend, or none)
-2. Asks which optional skills to include
-3. Installs the operating model into `.agent/`
-4. Scaffolds an empty `.memory-bank/`
-5. Writes `.torque-coding.json` so future `npx torque-coding update`
-   runs can refresh managed files without touching `.memory-bank/`
+- Rate-limited, so context-switching between Claude, ChatGPT, Cursor, and whatever the free-tier model-of-the-month is
+- Hitting usage caps mid-task and having to resume in a different tool
+- Running on whichever model their provider's tier ships today (Sonnet one week, something cheaper the next)
+- Moving between Claude Code, Cursor, Aider, Copilot, and plain API chat depending on which does this particular step best
+- Unable to rely on long sessions — context windows get clipped, "memory" features are flaky and non-portable
 
-Then open an AI session and run:
+For that developer, the session is ephemeral and the tool is interchangeable. What isn't interchangeable is the **project on disk**.
 
-```
-"Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it."
-```
+### The core bet
 
-This scans your actual code to populate the memory bank. Commit `AGENTS.md`, `.agent/`, `docs/memory-bank/`, `.memory-bank/`, and `.torque-coding.json` when done.
+Torque Coding treats the memory bank on disk as canonical and always-on. **The agent session — Claude Code's context, Cursor's composer history, ChatGPT's memory — sits inside the memory-bank domain as an enhancement, not a replacement.** Everything a model needs to resume, hand off, or be switched mid-task lives in `.memory-bank-v2/` on disk.
 
-### Install from GitHub directly
+This inverts the frontier-tool assumption. Frontier tools assume you stay in the session; Torque Coding assumes you won't. Consequences of the inversion:
 
-```bash
-npx github:jackson2787/torque-coding
-```
+- Hit a Claude rate limit → open Cursor → it reads `current-task/` → resume at the same state
+- Budget model stalls on a hard problem → switch to a stronger tier for one session → that session reads `escalation-brief.md` → fix lands → back to the budget model
+- Session gets compacted and loses the thread → `activeContext.md` + `current-task/` restores exactly where you were
+- Come back two weeks later on a different laptop → the memory bank tells the next session what's true
+
+None of those paths require paying for a single ecosystem. They require paying for **whichever model you need right now** — which is the actual budget shape for mid-tier developers.
+
+### Why the planner-executor split follows from the budget
+
+The v2.1 state machine runs planning on a powerful model and execution on a budget model, with the hand-off as files on disk (`plan.md` + `plan_context.md`).
+
+At £200/month this is an architectural nicety. At £20/month it is the difference between one complex task per day and five on the same subscription. Planning burns tokens but happens once per task; execution burns tokens continuously. Putting them on different tiers — with a context pack complete enough that the budget model needs zero exploration — stretches the cap where it matters.
+
+### What gets traded away
+
+This positioning costs portability tax inside any single tool:
+
+- Skills are Markdown, not typed tool schemas — so they run across Claude Code, Cursor, Copilot, Aider, plain chat, rather than locking to one SDK
+- Protocols (propose-diff, ratification keyword, approval gates) are conversational rituals rather than structured tool calls — auditability trades for portability
+- Escalation is sequential (one stronger model, one retry) rather than parallel fan-out/gather — because at £20/month you cannot afford three concurrent subagents
+
+These are deliberate choices, not catching-up. Inside Claude Code specifically, some of this work could be native to the Agent SDK. But Torque Coding is not a Claude Code product — it is a tool-agnostic operating model that has to survive wherever the developer's budget takes them that week.
+
+### The shape of the claim
+
+Torque Coding is a late-2025 operating model designed for the part of the AI-coding market that cannot afford late-2025 tool lock-in. That is a larger market than the frontier, and it is the one this project serves.
 
 ---
 
-## What Gets Installed
+## Why v2 exists (vs v1)
+
+v1's memory bank mixes three kinds of material in one directory:
+
+1. **Durable doctrine** — domain definitions, architectural laws, security boundaries. True for years.
+2. **Live working rules** — current patterns, active constraints, how things actually work today. True until the repo evolves.
+3. **Human narrative** — task histories, decision rationale, meeting outcomes, why a choice was made. True forever but retrospective.
+
+Agents load all of it. Context windows fill with retrospection that doesn't direct execution. The wrong things are sticky; the right things aren't clearly distinguished.
+
+v2 splits these into two domains and adds a disciplined learning phase.
+
+---
+
+## The two-domain split
+
+### Machine-facing memory — loaded every session
+
+| File | Purpose | Change frequency |
+|---|---|---|
+| `constitution.md` | Stable truths — domain definitions, durable architectural rules, security boundaries, scope. Rarely changes. | Ceremonial — requires explicit human ratification |
+| `operational-context.md` | Current working rules — present-tense directives: do this, do not do this, prefer this, avoid this, current constraints. Updates when the repo evolves. | Per-learning, via debrief |
+| `limits.md` *(v2.2)* | Runtime config — per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by developer tier. | When the developer's tier or project scale changes |
+| `activeContext.md` | *(carried from v1)* — compaction recovery anchor: current state, progress, session data | Every state transition |
+| `toc.md` | *(carried from v1)* — mechanical index of both memory halves | When files are added or removed |
+
+### Human-facing memory — loaded on demand only
 
 ```
-AGENTS.md                                    ← The operating model (state machine)
+.memory-bank-v2/human/
+├── decisions/   — architectural decision records, one file per decision
+├── tasks/       — task histories, outcomes, files modified
+├── meetings/    — discussion summaries, outcomes
+├── rationale/   — standing "why we do X" documents
+└── progress/    — quarterly notes
+```
 
-.agent/
+Agents do **not** load the human side at startup. They read it on explicit request or when a skill requires it.
+
+---
+
+## Authority order — strict
+
+```
+constitution.md
+    ↓ overrides
+operational-context.md
+    ↓ overrides
+task instructions
+    ↓ overrides
+temporary reasoning
+```
+
+Task instructions cannot override operational-context rules. The human must amend operational-context first.
+
+See [`claude-rules/authority-order.md`](./claude-rules/authority-order.md) for worked examples.
+
+---
+
+## State machine (v2.2)
+
+```
+PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  ↔  QA  →  DEBRIEF
+                                        ↓ (3 stalls OR cap exhaustion)
+                                    ESCALATE (ladder-stepped)
+```
+
+Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`.
+
+- **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria. Hard cap (default): 25k input tokens.
+- **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration. Hard cap (default): 40k.
+- **BUILD** — budget model. Applies the plan, logs attempts. Max 3 attempts OR cap exhaustion before escalation. Hard cap per attempt (default): 15k.
+- **QA** — budget model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately. Hard cap per cycle (default): 12k.
+- **ESCALATE** — subagent at the next rung of the configurable ladder (default: `sonnet → opus → user-switched session`). Steps up on repeated stall.
+- **DEBRIEF** — any model. Five-gate learning rubric. Proposes diffs to `operational-context.md`. Archives `current-task/` to the human side.
+
+Any session enters at the earliest state whose input contract is satisfied — determined by which files exist in `current-task/`. This is what makes stateless / resumable operation across tools possible.
+
+### Cap exhaustion = stall (v2.2)
+
+A state hitting its hard cap is indistinguishable in effect from a failed attempt. It counts against the cycle budget and escalates on the same thresholds. This makes cost-awareness first-class at the operating-model level, not an afterthought.
+
+See [`claude-rules/state-machine.md`](./claude-rules/state-machine.md).
+
+---
+
+## v2 source structure
+
+```
+v2/
+├── README.md                               ← this file
+├── AGENTS.v2.md                            ← v2 operating model (all agent types)
+├── CLAUDE.v2.md                            ← Claude Code adapter
+├── bootstrap-memory-bank-v2-contract.md    ← cold-start contract
+├── claude-rules-v2/
+│   ├── sacred-rules.v2.md                 ← four sacred rules + v2 additions
+│   ├── memory-bank.v2.md                  ← two-domain structure and load rules
+│   ├── authority-order.v2.md              ← strict authority stack
+│   └── state-machine.v2.md               ← PLAN > BUILD LOOP > DEBRIEF spec
+├── templates/
+│   ├── machine/
+│   │   ├── constitution.md               ← blank constitution template
+│   │   ├── operational-context.md        ← blank operational-context template
+│   │   ├── limits.md                     ← runtime config: budgets + escalation ladder (v2.2)
+│   │   ├── activeContext.md              ← v2 activeContext with current-task pointer
+│   │   └── current-task/                 ← per-task artifact templates (v2.1)
+│   │       ├── plan.md
+│   │       ├── plan_context.md
+│   │       ├── build-log.md
+│   │       ├── qa-report.md
+│   │       └── escalation-brief.md
+│   └── human/
+│       └── README.md                     ← human-side landing page template
 └── skills/
-    ├── state-machine/                     ← Core workflow skills
-    │   ├── writing-plans/                 ← PLAN state
-    │   ├── build-execution/               ← BUILD state
-    │   ├── systematic-debugging/          ← QA debugging
-    │   └── verification-before-completion/← QA verification
-    └── memory-bank/                       ← Per-document update skills
-        ├── update-architecture/
-        ├── update-active-context/
-        ├── update-decisions/
-        ├── update-task-docs/
-        ├── update-project-brief/
-        ├── update-product-context/
-        ├── update-toc/
-        └── mb-rebase/                     ← Human-in-the-loop doc calibration
-
-docs/memory-bank/
-├── bootstrap-memory-bank-contract.md      ← One-time memory bank setup
-└── templates/                             ← Document templates
-
-.memory-bank/
-├── architecture.md                        ← Tech stack, patterns, rules
-├── activeContext.md                        ← Current state, progress, session data
-├── projectBrief.md                        ← Project identity and scope
-├── productContext.md                       ← Users and product context
-├── decisions.md                           ← Architectural decision records
-├── toc.md                                 ← File index
-└── tasks/YYYY-MM/                         ← Monthly task history
-```
-
-`.torque-coding.json` lives at the project root as the hidden install manifest
-for `npx torque-coding update`. If it is missing on an older install, `update`
-will infer the installed skills from `.agent/skills/` and rewrite the manifest
-at the new root location. If inference also fails, rerun `npx torque-coding init`.
-`update` compares managed-file checksums before overwriting; if it sees local
-edits, it warns and asks before proceeding.
-
-The Memory Bank is intentionally hidden under `.memory-bank/`. Treat that as
-the canonical path rather than looking for a visible `memory-bank/` folder.
-
----
-
-## The State Machine
-
-```
-EXPLORE → PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS → EXPLORE
-```
-
-| State | What happens |
-|-------|-------------|
-| **EXPLORE** | Read-only investigation. Default entry state. |
-| **PLAN** | Design the approach. Cites `file:line`, maps reuse. |
-| **BUILD** | Write the code. Implements plan, writes tests. |
-| **DIFF** | Present changes with rationale. |
-| **QA** | Run tests, lint, verify. |
-| **APPROVAL** | Human gate. Say "approved" or request changes. |
-| **APPLY** | Apply to branch. |
-| **DOCS** | Update memory bank via per-document skills. |
-
-See [docs/agent-zero-cheat-sheet.md](./docs/agent-zero-cheat-sheet.md) for the full user reference.
-
----
-
-## Skill Packs
-
-Skill packs add domain-specific behavioural disciplines that get injected into the PLAN and BUILD states. The installer handles selection and merging.
-
-| Pack | Designed For | Skills Included |
-|------|-------------|-----------------|
-| **Web** | React / Next.js | react-best-practices, next-best-practices, next-cache-components, next-upgrade, accessible-ui, api-feature-request, composition-patterns |
-| **Mobile** | React Native / Expo | react-native-skills, expo-native-data-fetching, accessible-ui, api-feature-request, composition-patterns |
-| **Backend** | Supabase / Hono | backend-architect-supabase-hono, supabase-postgres-best-practices |
-
-Skill packs are stored in `skill-packs/` and organised by domain:
-
-- `skill-packs/frontend-web-skills/`
-- `skill-packs/frontend-mobile-skills/`
-- `skill-packs/frontend-shared-skills/` (shared across Web and Mobile)
-- `skill-packs/backend-skills/`
-
-Each pack includes `plan.injected-skills.md` and `build.injected-skills.md` files that the installer merges into the writing-plans and build-execution skill references.
-
----
-
-## Optional Skills
-
-These are standalone skills selected during installation:
-
-| Skill | What It Does |
-|-------|-------------|
-| **idea-to-task** | Turns vague ideas into structured task contracts for the PLAN state. Trigger with `Create task contract`; emits `Ideas to Task Contract running...` when used. |
-| **best-practices-audit** | Produces a structured audit against installed playbook and skill packs |
-| **legal-compliance-checker** | Adds legal/regulatory review framing for privacy, payments, health data |
-
-### Turning Ideas Into Tasks
-
-If you have a rough human-language idea, ask the agent:
-
-```text
-Create task contract: [your brainstorming idea]
-```
-
-For example:
-
-```text
-Create task contract: I want a safer way to refresh installed skills without touching memory bank files.
-```
-
-This tells the `idea-to-task` skill to shape the idea into a task contract for the PLAN state.
-
-### sync-api (agent-assisted install)
-
-The `sync-api` skill requires project-level setup beyond a simple file copy — scripts in your project root, Orval config, npm dependencies. When selected during `npx torque-coding`, it gets staged to `docs/memory-bank/skills-to-install/sync-api/` instead of installed directly.
-
-To complete installation, ask your agent:
-
-```
-"Read docs/memory-bank/skills-to-install/sync-api/installation.md and execute it."
-```
-
-The agent copies the files, installs dependencies, and cleans up the staging directory.
-
----
-
-## Memory Bank
-
-The memory bank is the agent's persistent context across sessions. It survives compaction and session restarts.
-
-| File | Purpose | Update Skill |
-|------|---------|-------------|
-| `projectBrief.md` | Project identity, mission, scope | `update-project-brief` |
-| `productContext.md` | Users, jobs to be done, flows | `update-product-context` |
-| `architecture.md` | Tech stack, patterns, rules | `update-architecture` |
-| `activeContext.md` | Current state, progress, session data | `update-active-context` |
-| `decisions.md` | Architectural decision records | `update-decisions` |
-| `toc.md` | File index | `update-toc` |
-
-Each file has a dedicated update skill that enforces its constitutional structure. The agent uses these skills automatically during the DOCS state.
-
-To calibrate a document with human knowledge, use the `mb-rebase` skill:
-
-```
-"mb-rebase architecture.md"
+    ├── memory-bank-v2/
+    │   ├── update-constitution/SKILL.md
+    │   ├── update-operational-context/SKILL.md
+    │   └── update-human-log/SKILL.md
+    └── state-machine-v2/
+        ├── writing-plans-v2/SKILL.md     ← PLAN state
+        ├── plan-contextualize/SKILL.md   ← PLAN-CONTEXTUALIZE state
+        ├── build-loop/SKILL.md           ← BUILD state (zero-exploration)
+        ├── qa-v2/SKILL.md                ← QA state (skeptical, six checks)
+        ├── escalate/SKILL.md             ← ESCALATE (subagent primary, user-switch fallback)
+        └── debrief/SKILL.md              ← DEBRIEF (post-task + ad-hoc modes)
 ```
 
 ---
 
-## The Operating Model
+## Coexistence with v1
 
-The operating model comes from `agent/AGENTS.md`, aligned to the [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO) approach.
-
-Key principles:
-
-- **Reuse over creation** — extend before you create
-- **Approval gates** — no changes applied without explicit human approval
-- **Architecture-first** — plans cite current code and existing patterns
-- **Memory bank discipline** — persist high-signal context for repeatable sessions
-- **Compaction safety** — state survives context compression via activeContext.md
+- v1 source: `agent/`, `skills/` → writes to `.memory-bank/`
+- v2 source: `v2/` → writes to `.memory-bank-v2/`
+- No file is shared between regimes.
+- When both are installed: v2 is canonical (declared in `AGENTS.v2.md`).
+- v1 is unaware of v2; the tie-break lives inside the v2 model.
 
 ---
 
-## Sources & Lineage
+## What landed in v2.2
 
-This repository is an original synthesis informed by ideas and patterns from excellent open-source projects. Credit is due to the teams whose work shaped the thinking here.
+- `limits.md` — machine-side runtime config loaded at session startup
+- Per-state token budgets (soft/hard caps) with cap exhaustion as a first-class stall signal
+- Configurable escalation ladder (no longer hard-coded to `opus`) with ladder-stepping discipline
 
-- [AGENT-ZERO](https://github.com/msitarzewski/AGENT-ZERO) — core operating-model inspiration for the state machine, approval gates, and memory bank discipline
-- [agency-agents](https://github.com/msitarzewski/agency-agents) — broader thinking around agent workflows and reusable agent behaviours
-- [Obra Superpowers](https://github.com/obra/superpowers) — skill-oriented composition model and the idea that agents benefit from explicit operating constraints
-- [Vercel / Next.js](https://github.com/vercel/next.js) — frontend and React/Next.js guidance
-- [Expo](https://github.com/expo/expo) — mobile and React Native guidance
-- [Supabase](https://github.com/supabase/supabase) — backend and Postgres-first architecture guidance
+## What is deferred to future passes
 
-This project is not an official implementation of, fork of, or endorsed derivative of any of the repositories above. Where ideas overlap, the intent is attribution, adaptation, and extension.
-
----
-
-## License
-
-[MIT](./LICENSE)
+- `mb-rebase-v2/SKILL.md`
+- `compaction.v2.md`
+- `v2/docs/` — doctrine prose, migration-from-v1 mapping table
+- Skill-pack v2 parallels
+- Installer wiring (`bin/`, `lib/`)
+- Telemetry feedback into `limits.md` — today the human tunes by hand; a future pass could surface "you crossed the soft cap 8/10 times this week — consider raising it" from `build-log.md` history

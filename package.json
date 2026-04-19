@@ -1,7 +1,7 @@
 {
   "name": "torque-coding",
-  "version": "2.5.0",
-  "description": "Install the torque-coding operating model into any project",
+  "version": "3.0.0-dev",
+  "description": "Torque Coding v2 — tool-agnostic AI agent operating model with stateless memory bank",
   "license": "MIT",
   "author": "Ian Jackson",
   "repository": {
@@ -12,16 +12,15 @@
   "bugs": {
     "url": "https://github.com/jackson2787/torque-coding/issues"
   },
-  "bin": {
-    "torque-coding": "./bin/torque-coding.js"
-  },
   "files": [
-    "bin/",
-    "lib/",
-    "agent/",
+    "claude-rules/",
     "skills/",
-    "skill-packs/",
-    "optional-skills/"
+    "templates/",
+    "docs/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "bootstrap-memory-bank-contract.md",
+    "ROADMAP.md"
   ],
   "engines": {
     "node": ">=18"
@@ -37,7 +36,9 @@
     "cline",
     "aider",
     "memory-bank",
-    "skills"
+    "skills",
+    "state-machine",
+    "torque-coding"
   ],
   "dependencies": {
     "prompts": "^2.4.2"

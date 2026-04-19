@@ -1,6 +1,0 @@
-skill:
-  display_name: Best Practices Audit
-  short_description: Run a manual best-practices or drift audit for a repo.
-  default_prompt: Run the best-practices audit skill for this repository.
-policy:
-  allow_implicit_invocation: false
