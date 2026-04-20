@@ -2,12 +2,12 @@
 slug: add-rate-limit-middleware
 date: 2026-04-19
 model-tier: powerful (PLAN-CONTEXTUALIZE)
-for: BUILD — budget model reads this; zero exploration required
+for: BUILD — executor model reads this; zero exploration required
 ---
 
 # Context Pack: Add Rate-Limit Middleware
 
-**Target property**: reading `plan.md` and this file, the budget model should need **zero exploration tool calls** to implement the task.
+**Target property**: reading `plan.md` and this file, the executor model should need **zero exploration tool calls** to implement the task.
 
 ---
 

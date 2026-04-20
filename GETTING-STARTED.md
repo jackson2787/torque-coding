@@ -119,7 +119,7 @@ This section walks through the complete state flow for a fictional task — addi
 **What you do**: nothing — this state runs automatically after plan approval.
 
 **What the agent does**:
-Runs the `plan-contextualize` skill. It reads your codebase deeply — pasting the relevant file ranges, extracting the applicable patterns from `operational-context.md`, noting dead-ends to avoid — and produces a context pack complete enough that the budget model needs **zero exploration tool calls** to start coding.
+Runs the `plan-contextualize` skill. It reads your codebase deeply — pasting the relevant file ranges, extracting the applicable patterns from `operational-context.md`, noting dead-ends to avoid — and produces a context pack complete enough that the executor model needs **zero exploration tool calls** to start coding.
 
 **What appears on disk**:
 ```
@@ -137,7 +137,7 @@ This is the most important state for budget control. The better the context pack
 
 ### BUILD
 
-**What you do**: switch to your budget model if you're managing tiers manually, or let your tool route to the budget tier automatically.
+**What you do**: switch to your executor model (fast/local/cheap — Haiku, Sonnet, a local coder) if you're managing tiers manually, or let your tool route to the executor tier automatically.
 
 **What the agent does**:
 Runs the `build-loop` skill. It reads `plan.md` and `plan_context.md` — no exploration required — and applies the changes. Each attempt is logged in `build-log.md`. When the implementation is complete, the agent declares done.

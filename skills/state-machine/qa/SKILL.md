@@ -8,10 +8,10 @@ description: >-
   with per-check pass/fail. On fail, returns specific issues to BUILD.
 metadata:
   author: torque-coding
-  version: "2.2"
+  version: "2.3"
   state-machine: v2
   state: QA
-  model-tier: budget
+  model-tier: executor
   requires:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/plan.md
@@ -28,7 +28,7 @@ metadata:
 
 ## Overview
 
-QA exists to catch a budget model declaring victory too early. BUILD is trained to say "done" after applying the diff — QA's job is to disbelieve that until evidence accumulates on disk.
+QA exists to catch the executor model declaring victory too early. BUILD is trained to say "done" after applying the diff — QA's job is to disbelieve that until evidence accumulates on disk.
 
 **Tone**: paranoid. Not adversarial — just ungullible.
 

@@ -3,7 +3,7 @@
 **Slug**: [same as plan.md]
 **Cycle**: [n] of 3 (QA→BUILD max)
 **Date**: YYYY-MM-DD HH:MM
-**Model tier**: budget (QA) — skeptical by design
+**Model tier**: executor (QA) — skeptical by design
 **Overall result**: PASS | FAIL
 **Tokens**: [estimated-in] estimated / [actual-in] actual / soft [soft-cap] / hard [hard-cap]
 **Cap status**: within soft | crossed soft | cap exhausted → FAIL

@@ -58,7 +58,7 @@ Conclusion:
 
 ## Implementation steps
 
-<!-- Ordered. Each step is concrete enough for a budget model to execute without exploration. -->
+<!-- Ordered. Each step is concrete enough for an executor model to execute without exploration. -->
 
 1. [Step — file, function, change]
 2. [Step — file, function, change]

@@ -40,17 +40,19 @@ Claude Code loads the doctrine files via `@-imports` at the end of this section.
 - [Memory Bank](@rules/memory-bank.md)
 - [Authority Order](@rules/authority-order.md)
 - [State Machine](@rules/state-machine.md)
+- [Execution Discipline](@rules/execution-discipline.md)
 - [Compaction](@rules/compaction.md)
 
 @rules/sacred-rules.md
 @rules/memory-bank.md
 @rules/authority-order.md
 @rules/state-machine.md
+@rules/execution-discipline.md
 @rules/compaction.md
 
 ---
 
-## The Five Sacred Rules
+## The Six Sacred Rules
 
 | Rule | Requirement | Validation |
 |------|-------------|------------|
@@ -59,6 +61,7 @@ Claude Code loads the doctrine files via `@-imports` at the end of this section.
 | ❌ **No editing committed migration files** | Treat database migrations as append-only history. Add a new corrective migration instead | "Added a new migration; left historical migrations untouched" |
 | ❌ **No generic advice** | Cite `file:line`, show concrete integration points | Every suggestion includes `file:line` citation |
 | ❌ **No ignoring existing architecture** | Load patterns before changes, extend existing services/components | "Extends existing pattern at `file:line`" |
+| ❌ **No building without an approved plan** | BUILD cannot run until `activeContext.md#Approval-Record` holds a verbatim human approval string | `plan.md` Status=Approved AND Approval Record non-empty AND State ∈ {PLAN-CONTEXTUALIZE, BUILD, QA} |
 
 ---
 
@@ -89,11 +92,36 @@ See `rules/authority-order.md` for the full stack and worked examples.
 
 ```
 PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF      (with ESCALATE on stall)
+         ↑
+  HARD HUMAN GATE: explicit approval required before advancing
 ```
 
 Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`. Per-state budgets and the escalation ladder are tuned in `limits.md`. Cap exhaustion is a first-class stall signal.
 
+**The PLAN → PLAN-CONTEXTUALIZE transition is the hard human gate.** The planning agent captures a verbatim human approval string and records it in `activeContext.md#Approval-Record`. PLAN-CONTEXTUALIZE and BUILD refuse to run without a populated Approval Record — regardless of whether `plan.md` shows `Status: Approved` (a skill can write that field; only a human can supply the quote).
+
+When entering PLAN state, announce planning-mode discipline:
+```
+[PLAN MODE] No file edits until this plan is approved.
+```
+If plan mode is available in Claude Code, also enter native plan mode so the UI enforces it.
+
 See `rules/state-machine.md` for per-state contracts, stall rules, and the any-state entry table.
+
+---
+
+## Mixing Tools (cross-tool workflows)
+
+Because the memory bank on disk is canonical, you can split a task across tools to control cost:
+
+| Phase | Recommended tool | Why |
+|---|---|---|
+| PLAN + PLAN-CONTEXTUALIZE | Claude Code (Opus) | Strong reasoning + native plan mode enforces the gate |
+| BUILD | OpenCode or any CLI with a fast/local executor model (Haiku, Sonnet, or a local coder) | Mechanical execution; `plan_context.md` is the complete map |
+| QA | Same executor tool or an upgraded model | Runs tests, enforces paranoia |
+| DEBRIEF / review | Codex or another agent | Fresh eyes on the diff; proposes learnings to `operational-context.md` |
+
+The handoff is always `.memory-bank-v2/machine/` — no session context needs to carry over. Any compliant tool opening the project reads `activeContext.md`, resolves the entry state, and continues. The Approval Record travels with the memory bank, so a BUILD tool cannot bypass the gate just because it wasn't present when approval happened.
 
 ---
 
@@ -105,6 +133,7 @@ See `rules/state-machine.md` for per-state contracts, stall rules, and the any-s
 4. Never let task instructions override operational-context `Do This` / `Do Not Do This` entries
 5. Always cite `file:line` for code; `constitution.md#Section` or `operational-context.md#Section` for doctrine
 6. Debrief is mandatory — every task runs it
+7. Never enter BUILD with an empty `activeContext.md#Approval-Record` — the human gate is non-negotiable
 
 ---
 

@@ -27,7 +27,7 @@ Torque Coding treats the memory bank on disk as canonical and always-on. **The a
 This inverts the frontier-tool assumption. Frontier tools assume you stay in the session; Torque Coding assumes you won't. Consequences of the inversion:
 
 - Hit a Claude rate limit → open Cursor → it reads `current-task/` → resume at the same state
-- Budget model stalls on a hard problem → switch to a stronger tier for one session → that session reads `escalation-brief.md` → fix lands → back to the budget model
+- Executor model stalls on a hard problem → switch to a stronger tier for one session → that session reads `escalation-brief.md` → fix lands → back to the executor model
 - Session gets compacted and loses the thread → `activeContext.md` + `current-task/` restores exactly where you were
 - Come back two weeks later on a different laptop → the memory bank tells the next session what's true
 
@@ -35,9 +35,9 @@ None of those paths require paying for a single ecosystem. They require paying f
 
 ### Why the planner-executor split follows from the budget
 
-The state machine runs planning on a powerful model and execution on a budget model, with the hand-off as files on disk (`plan.md` + `plan_context.md`).
+The state machine runs planning on a powerful model and execution on an executor-tier model (fast/local/cheap — whatever is available), with the hand-off as files on disk (`plan.md` + `plan_context.md`).
 
-At £200/month this is an architectural nicety. At £20/month it is the difference between one complex task per day and five on the same subscription. Planning burns tokens but happens once per task; execution burns tokens continuously. Putting them on different tiers — with a context pack complete enough that the budget model needs zero exploration — stretches the cap where it matters.
+At £200/month this is an architectural nicety. At £20/month it is the difference between one complex task per day and five on the same subscription. Planning burns tokens but happens once per task; execution burns tokens continuously. Putting them on different tiers — with a context pack complete enough that the executor model needs zero exploration — stretches the cap where it matters.
 
 ### What gets traded away
 
@@ -114,8 +114,8 @@ Each state declares a model tier, an input contract (files on disk), and a token
 
 - **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria. Hard cap (default): 25k input tokens.
 - **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration. Hard cap (default): 40k.
-- **BUILD** — budget model. Applies the plan, logs attempts. Max 3 attempts OR cap exhaustion before escalation. Hard cap per attempt (default): 15k.
-- **QA** — budget model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately. Hard cap per cycle (default): 12k.
+- **BUILD** — executor model. Applies the plan, logs attempts. Max 3 attempts OR cap exhaustion before escalation. Hard cap per attempt (default): 15k.
+- **QA** — executor model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately. Hard cap per cycle (default): 12k.
 - **ESCALATE** — subagent at the next rung of the configurable ladder (default: `sonnet → opus → user-switched session`). Steps up on repeated stall.
 - **DEBRIEF** — any model. Five-gate learning rubric. Proposes diffs to `operational-context.md`. Archives `current-task/` to the human side.
 
@@ -139,7 +139,7 @@ See [`rules/state-machine.md`](./rules/state-machine.md).
 ├── bootstrap-memory-bank-contract.md ← cold-start contract for a target repo
 ├── ROADMAP.md                      ← what's left to make this complete start-to-finish
 ├── rules/
-│   ├── sacred-rules.md             ← five sacred rules + memory-bank write rules
+│   ├── sacred-rules.md             ← six sacred rules + memory-bank write rules
 │   ├── memory-bank.md              ← two-domain structure and load rules
 │   ├── authority-order.md          ← strict authority stack with worked examples
 │   └── state-machine.md            ← PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF

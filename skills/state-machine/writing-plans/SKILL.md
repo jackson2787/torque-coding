@@ -103,6 +103,14 @@ Use the template at `templates/machine/current-task/plan.md`. Fill every section
 
 ### 8. Present for approval
 
+Announce planning-mode discipline before presenting the plan:
+
+```
+[PLAN MODE] No file edits until this plan is approved.
+```
+
+If running in Claude Code and plan mode is available, also enter native plan mode so the UI enforces the gate.
+
 Show the plan summary to the human:
 
 ```
@@ -117,17 +125,23 @@ Doctrine conflicts: [none | list]
 Approve to advance to PLAN-CONTEXTUALIZE (next state), or request revisions.
 ```
 
-Wait for explicit approval.
+Wait for explicit approval. Capture the human's verbatim approval string (e.g. `"approved"`, `"proceed"`, `"looks good, go"`). This exact string is required by the next step — do not paraphrase.
+
+An ambiguous response ("maybe", "I guess", "sure if you think so") is NOT approval — ask for a clear confirmation.
 
 ### 9. Record state transition
 
-On approval, update `activeContext.md` via `update-active-context`:
+On approval, flip `plan.md` Status from `Draft` to `Approved`. Then call `update-active-context` with:
 
 ```
-State: PLAN-CONTEXTUALIZE
-Task:  [slug]
-Last transition: YYYY-MM-DD HH:MM — PLAN → PLAN-CONTEXTUALIZE
+transition-from: PLAN
+transition-to:   PLAN-CONTEXTUALIZE
+state:           PLAN-CONTEXTUALIZE
+task-slug:       [slug]
+approval-quote:  "[verbatim human string captured in step 8]"
 ```
+
+`update-active-context` writes the Approval Record to `activeContext.md`. This is the hard human gate — downstream states (PLAN-CONTEXTUALIZE, BUILD, QA) refuse to run if the Approval Record is empty.
 
 ## Output contract
 
@@ -141,7 +155,7 @@ A valid `plan.md` must have:
 - [ ] Authority check (constitution and operational-context read; conflicts resolved)
 - [ ] Reuse analysis (Sacred Rule compliance)
 - [ ] Analyzed files
-- [ ] Implementation steps (ordered, concrete enough for a budget model)
+- [ ] Implementation steps (ordered, concrete enough for the executor model)
 - [ ] Integration points
 - [ ] Patterns to follow with `file:line` evidence
 - [ ] Risks and mitigations

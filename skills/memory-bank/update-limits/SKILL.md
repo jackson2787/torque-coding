@@ -3,7 +3,7 @@ name: update-limits
 description: >-
   Validates limits.md before or after the human writes it. Enforces five
   structural invariants: final rung is <user-switched session>, rungs are
-  non-duplicate, soft ≤ hard per state, at least 3 rungs, budget rung (rung 1)
+  non-duplicate, soft ≤ hard per state, at least 3 rungs, executor rung (rung 1)
   is never an escalation target. Shows corrections as a proposal; does not
   write without explicit human confirmation.
 metadata:
@@ -79,15 +79,15 @@ Soft cap must be ≤ hard cap. Proposed correction: soft cap = [m].
 
 ### Invariant 4 — At least 3 rungs
 
-The ladder must have a minimum of 3 entries: budget rung, at least one escalation target, and `<user-switched session>`.
+The ladder must have a minimum of 3 entries: executor rung, at least one escalation target, and `<user-switched session>`.
 
 **Hard block** if violated:
 ```
 Invariant 4 FAIL: Ladder has [n] rung(s). Minimum is 3.
-Required shape: [budget rung] → [escalation target] → <user-switched session>
+Required shape: [executor rung] → [escalation target] → <user-switched session>
 ```
 
-### Invariant 5 — Budget rung (rung 1) is never an escalation target
+### Invariant 5 — Executor rung (rung 1) is never an escalation target
 
 Rung 1 is listed "for clarity" — it is the baseline executor model and is never a step-up destination. There must be at least one rung between rung 1 and the final `<user-switched session>` rung.
 
@@ -127,7 +127,7 @@ Warnings: [n]
 2. Non-duplicate rungs: [PASS | FAIL | WARN]
 3. Soft ≤ hard per state: [PASS | FAIL — list each failing state]
 4. At least 3 rungs: [PASS | FAIL]
-5. Budget rung not an escalation target: [PASS | FAIL]
+5. Executor rung not an escalation target: [PASS | FAIL]
 
 Result: [VALID — no write needed | VALID — applying change | INVALID — see failures above, write blocked]
 ```

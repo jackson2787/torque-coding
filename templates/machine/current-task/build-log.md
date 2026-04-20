@@ -1,7 +1,7 @@
 # Build Log: [task name]
 
 **Slug**: [same as plan.md]
-**Model tier**: budget (BUILD)
+**Model tier**: executor (BUILD)
 **Max attempts before escalation**: 3
 
 <!-- Written by: skills/state-machine/build-loop

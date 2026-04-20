@@ -50,7 +50,7 @@ machine/current-task/
 
 **Rules for current-task/**:
 - **At most one task is active at a time.** If a new task needs to start while `current-task/` is populated, either complete the current task (via debrief) or explicitly abandon it.
-- **Loaded at session startup** alongside the other machine files. The budget model reads `plan.md` and `plan_context.md` without any exploration.
+- **Loaded at session startup** alongside the other machine files. The executor model reads `plan.md` and `plan_context.md` without any exploration.
 - **Archived by debrief.** On successful task completion, debrief moves `current-task/*` into `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/` and clears `current-task/`.
 - **Survives compaction and session handoff.** If the session is lost mid-task, re-entering the project reads `current-task/` and resumes at the appropriate state.
 - **Any-state entry uses these files.** The presence or absence of `plan.md`, `plan_context.md`, etc., determines which state a new session enters.

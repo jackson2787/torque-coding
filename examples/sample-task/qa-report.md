@@ -1,7 +1,7 @@
 ---
 slug: add-rate-limit-middleware
 date: 2026-04-19
-model-tier: budget (QA)
+model-tier: executor (QA)
 cycle: 1 of 3
 ---
 

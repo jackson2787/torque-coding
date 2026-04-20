@@ -18,9 +18,9 @@ PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
 
 ### Key properties
 
-1. **Planner-executor split.** PLAN and PLAN-CONTEXTUALIZE use a powerful model. BUILD and QA use a budget model. The hand-off is files on disk.
+1. **Planner-executor split.** PLAN and PLAN-CONTEXTUALIZE use a powerful model. BUILD and QA use an executor model. The hand-off is files on disk.
 2. **No DIFF state.** BUILD presents its work to QA directly.
-3. **QA is skeptical by design.** Exists to catch a budget model declaring victory too early. Paranoid. Runs tests — does not just look at them.
+3. **QA is skeptical by design.** Exists to catch an executor model declaring victory too early. Paranoid. Runs tests — does not just look at them.
 4. **Memory bank is canonical.** `current-task/` folder holds all task artifacts. Sessions can be lost or handed off; the memory bank contains enough to resume.
 5. **Any-state entry.** A session starts in the earliest state whose input contract is satisfied.
 6. **Stateless operation.** Each state skill declares its inputs and outputs explicitly. States are loosely coupled, not a strict FSM.
@@ -85,7 +85,7 @@ ESCALATE reads the ladder from `.memory-bank-v2/machine/limits.md#Escalation-lad
 ### Default ladder
 
 ```
-1. sonnet    (budget tier — not a destination; listed for clarity)
+1. sonnet    (executor tier — not a destination; listed for clarity)
 2. opus      (first escalation target)
 3. <user-switched session>   (graceful fallback)
 ```
@@ -165,7 +165,7 @@ If conflict found: stop and resolve via `authority-order.md`.
 
 ### Purpose
 
-Compress the codebase into everything the budget model needs to execute the plan without doing its own exploration.
+Compress the codebase into everything the executor model needs to execute the plan without doing its own exploration.
 
 ### Content of plan_context.md
 
@@ -177,7 +177,7 @@ Compress the codebase into everything the budget model needs to execute the plan
 - **Dead-ends to avoid** — things the planner explored and rejected, with reason
 - **Success criteria** — numbered, testable, extracted from plan acceptance criteria
 
-**Target property**: a budget model reading `plan.md` + `plan_context.md` + memory bank should need **zero exploration tool calls** to start coding.
+**Target property**: an executor model reading `plan.md` + `plan_context.md` + memory bank should need **zero exploration tool calls** to start coding.
 
 **Exit**: Context pack written; human optionally reviews; proceed to BUILD.
 
@@ -185,16 +185,16 @@ Compress the codebase into everything the budget model needs to execute the plan
 
 ## BUILD
 
-**Model**: Budget (Haiku, Sonnet 4.5)
+**Model**: Executor (Haiku, Sonnet 4.5)
 **Skill**: `skills/state-machine/build-loop/SKILL.md`
 
 **In**: `plan.md` + `plan_context.md` + memory bank
 **Out**: Applied changes + `current-task/build-log.md`
-**Exit**: Budget model declares "done" → transition to QA
+**Exit**: Executor model declares "done" → transition to QA
 
 ### Execution principles
 
-- **No exploration required.** plan_context.md is the map. If the budget model feels it needs to explore, plan_context.md was insufficient — escalate to plan-contextualize, do not guess.
+- **No exploration required.** plan_context.md is the map. If the executor model feels it needs to explore, plan_context.md was insufficient — escalate to plan-contextualize, do not guess.
 - **Follow the plan literally.** Deviations from the plan require stopping and either revising the plan or escalating.
 - **Respect the memory bank at all times.** Operational-context directives are not optional.
 - **Track every attempt.** Each iteration appends to `build-log.md`: approach, result, errors.
@@ -213,7 +213,7 @@ Implementation complete per plan. Build-log closed. Hand off to QA. **Do not sel
 
 ## QA
 
-**Model**: Budget (same budget model as BUILD, or optionally upgraded)
+**Model**: Executor (same executor model as BUILD, or optionally upgraded)
 **Skill**: `skills/state-machine/qa/SKILL.md`
 
 **In**: Applied changes + memory bank
@@ -321,14 +321,25 @@ Cycle counters live in `activeContext.md` (Current State section) and in `build-
 
 ## Any-state entry
 
-A session starting mid-flow evaluates input contracts in order and enters the earliest satisfied state:
+A session starting mid-flow resolves the entry state from `activeContext.md` first — the `State:` field plus `Approval Record` are authoritative. File presence is a cross-check, not the primary signal.
+
+### Resolution procedure
+
+1. **Read `activeContext.md#Current-State`.** If `State:` is a valid state and the Current Task Pointer is consistent with it, enter that state.
+2. **Cross-check Approval Record.** If State ∈ {PLAN-CONTEXTUALIZE, BUILD, QA} but the Approval Record is empty, the flow was bypassed — refuse to resume. Return to PLAN.
+3. **Cross-check file presence.** If the Current Task Pointer disagrees with files actually on disk, trust disk — but log the drift and notify the human.
+4. **Fallback (State missing or corrupted)**: resolve from files using the table below.
+
+### Fallback table (files only)
 
 ```
 IF task description provided, no current-task/:
     → PLAN
-ELSE IF current-task/plan.md approved, no plan_context.md:
+ELSE IF current-task/plan.md Draft, no plan_context.md:
+    → PLAN (awaiting approval)
+ELSE IF current-task/plan.md Approved AND activeContext.md Approval Record populated, no plan_context.md:
     → PLAN-CONTEXTUALIZE
-ELSE IF current-task/plan.md AND plan_context.md present, no applied changes:
+ELSE IF current-task/plan.md Approved AND plan_context.md present AND Approval Record populated, no applied changes:
     → BUILD
 ELSE IF applied changes present, no green qa-report.md:
     → QA
@@ -340,6 +351,8 @@ ELSE:
     → PLAN/IDLE, no active task
 ```
 
+**Hard gate**: if `plan.md` shows `Status: Approved` but `activeContext.md#Approval-Record` is empty, this is NOT an approved plan — refuse to enter PLAN-CONTEXTUALIZE or BUILD. The Approval Record is the single source of truth for the human gate; a `Status` line alone can be written by any skill and is not sufficient evidence.
+
 **Stateless discipline**: each skill validates its own inputs. A skill refusing to run because inputs are missing is correct behaviour — it directs the user to the prerequisite state.
 
 ---
@@ -350,12 +363,12 @@ ELSE:
 |---|---|---|
 | PLAN | Powerful (e.g. Opus) | Reasoning, exploration, authority check |
 | PLAN-CONTEXTUALIZE | Powerful (e.g. Opus) | Codebase reading, pattern extraction |
-| BUILD | Budget (e.g. Haiku, Sonnet) | Mechanical execution; plan_context is the map |
-| QA | Budget (same or slight upgrade) | Runs verification; enforces paranoia |
-| ESCALATE | Powerful (subagent per ladder) | Debugging beyond budget model's reach |
+| BUILD | Executor (e.g. Haiku, Sonnet) | Mechanical execution; plan_context is the map |
+| QA | Executor (same or slight upgrade) | Runs verification; enforces paranoia |
+| ESCALATE | Powerful (subagent per ladder) | Debugging beyond executor model's reach |
 | DEBRIEF | Any | Rubric application; doesn't need top-tier reasoning |
 
-The planner-executor split is the financial mechanic: spend the big model on PLAN and PLAN-CONTEXTUALIZE (where it matters), and let the budget model follow the map. Escalate only when the map runs out.
+The planner-executor split is the financial mechanic: spend the big model on PLAN and PLAN-CONTEXTUALIZE (where it matters), and let the executor model follow the map. Escalate only when the map runs out.
 
 ---
 

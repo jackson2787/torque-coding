@@ -3,7 +3,7 @@
 **Slug**: [same as plan.md]
 **Date**: YYYY-MM-DD
 **Model tier**: powerful (PLAN-CONTEXTUALIZE)
-**Target property**: A budget model reading this file plus plan.md should need ZERO exploration tool calls to start coding.
+**Target property**: An executor model reading this file plus plan.md (and loaded doctrine — constitution.md and operational-context.md) should need ZERO exploration tool calls to start coding.
 
 <!-- Written by: skills/state-machine/plan-contextualize
      Consumed by: build-loop (BUILD state)
@@ -14,7 +14,7 @@
 ## Files to touch — current state pasted
 
 <!-- For each file the plan modifies, paste the EXACT current content of the relevant
-     range. Line numbers must match. The budget model should not need to re-read the
+     range. Line numbers must match. The executor model should not need to re-read the
      file to know what it currently says. -->
 
 ### `path/to/file.ext`
@@ -30,9 +30,10 @@
 
 ## Patterns to follow — with repo examples
 
-<!-- Extract each applicable directive from operational-context.md and pair it with a
-     concrete example from the codebase. The budget model mimics the example, not the
-     abstract directive. -->
+<!-- For each applicable directive from operational-context.md, pair it with a
+     concrete example from the codebase. The executor model mimics the example, not the
+     abstract directive. Doctrine itself is NOT restated here — BUILD reads
+     operational-context.md directly. -->
 
 ### Pattern: [name]
 
@@ -45,16 +46,6 @@
 ```
 
 **How to apply here**: [one sentence — connect the example to the files being touched]
-
----
-
-## Constraints to respect — task-specific slice
-
-<!-- Extract constitutional and operational-context constraints that apply to this
-     specific task. Not the whole constitution — only the relevant lines. -->
-
-- `constitution.md#[Section]` — "[exact text]" — applies because: [reason]
-- `operational-context.md#[Section]` — "[exact text]" — applies because: [reason]
 
 ---
 
@@ -83,7 +74,7 @@
 ## Dead ends — explored and rejected
 
 <!-- The planner explored these approaches and rejected them. Listing them prevents the
-     budget model from re-exploring the same dead ends. -->
+     executor model from re-exploring the same dead ends. -->
 
 - **[Approach A]**: tried [what] — rejected because [reason grounded in `file:line` or doctrine].
 - **[Approach B]**: tried [what] — rejected because [reason].

@@ -53,15 +53,16 @@ Callers must pass these values explicitly. This skill cannot infer them from dis
 |---|---|---|
 | `state` | New state name | Must be one of the 7 valid states |
 | `task-slug` | Slug string or `none` | `none` on PLAN/IDLE |
-| `model-tier` | `powerful`, `budget`, `subagent`, or `any` | Matches the state's expected tier |
+| `model-tier` | `powerful`, `executor`, `subagent`, or `any` | Matches the state's expected tier |
 | `cycle` | `N/3` or `n/a` | Required for BUILD and QA; must be `n/a` for all others |
 | `ladder-step` | `none` or `N — [model name]` | Set by escalate on return; `none` otherwise |
 | `transition-from` | Prior state name | The state being exited |
 | `transition-to` | New state name | Must match `state` |
+| `approval-quote` | Verbatim human string | **Required** when `transition-from → transition-to` is `PLAN → PLAN-CONTEXTUALIZE`. **Must be omitted** for every other transition. |
 
 ## Pre-Checks
 
-Run all three before writing anything.
+Run all four before writing anything.
 
 ### 1. Valid state name
 
@@ -100,10 +101,22 @@ Reason: Cycle field mismatch.
 State [X] requires cycle [N/3 | n/a] — received "[value]".
 ```
 
+### 4. Approval-quote coherence
+
+- If `transition-from → transition-to` is `PLAN → PLAN-CONTEXTUALIZE`: `approval-quote` must be present and non-empty. Missing or empty → stop. This is the hard human gate; a state transition cannot fabricate approval.
+- If the transition is anything else: `approval-quote` must be omitted. Present → stop. Approval is recorded once, at the moment of plan approval.
+- **Exception**: on debrief reset to PLAN/IDLE, `approval-quote` must be omitted (the record is cleared, not updated).
+
+If violated:
+```
+Cannot write activeContext.md.
+Reason: approval-quote [missing on PLAN → PLAN-CONTEXTUALIZE | provided on [from] → [to] (only allowed on PLAN → PLAN-CONTEXTUALIZE)].
+```
+
 ## Procedure
 
 1. **Read** current `activeContext.md` (one file read — no other exploration).
-2. **Run the three pre-checks.** Surface blockers before writing anything.
+2. **Run the four pre-checks.** Surface blockers before writing anything.
 3. **Write the Current State block** with exactly these fields in this order:
    ```
    State: [new state]
@@ -122,13 +135,19 @@ State [X] requires cycle [N/3 | n/a] — received "[value]".
    - qa-report.md: [present — PASS | present — FAIL | absent]
    - escalation-brief.md: [present — Ladder step N | absent]
    ```
-5. **Update Progress.** Prepend one bullet (newest at top):
+5. **On PLAN → PLAN-CONTEXTUALIZE only:** write the Approval Record. Replace the existing Approval Record block with a single entry:
+   ```
+   - YYYY-MM-DD HH:MM — Plan approved — "[approval-quote verbatim]" — plan: [task-slug]
+   ```
+   On any other transition, leave the Approval Record block untouched.
+6. **Update Progress.** Prepend one bullet (newest at top):
    ```
    - YYYY-MM-DD HH:MM — [transition-from] → [transition-to][: brief note if relevant]
    ```
-6. **On debrief reset to PLAN/IDLE only:**
+7. **On debrief reset to PLAN/IDLE only:**
    - Clear Progress to a single line: `- No active task`
    - Clear Current Task Pointer to all-absent
+   - Clear Approval Record to the empty placeholder: `- [empty until PLAN → PLAN-CONTEXTUALIZE transition]`
    - Append to Recent Debriefs (newest at top):
      ```
      YYYY-MM-DD — [post-task | ad-hoc] — [task-slug or "session"] — [debrief result]
@@ -162,4 +181,6 @@ Current Task Pointer: plan.md [present|absent] · plan_context.md [present|absen
 | State name not in the valid set | Stop. Report invalid value. |
 | Transition not in allowed table (non-recovery) | Stop. Report the invalid pair. |
 | Cycle field mismatch | Stop. Report the expected format. |
+| `approval-quote` missing on PLAN → PLAN-CONTEXTUALIZE | Stop. The hard human gate requires a verbatim quote. |
+| `approval-quote` provided on any other transition | Stop. Approval is recorded once, only on PLAN → PLAN-CONTEXTUALIZE. |
 | `activeContext.md` not readable | Stop. Report path error. |

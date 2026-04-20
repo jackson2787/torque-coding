@@ -1,7 +1,7 @@
 ---
 slug: add-rate-limit-middleware
 date: 2026-04-19
-model-tier: budget (BUILD)
+model-tier: executor (BUILD)
 ---
 
 # Build Log: Add Rate-Limit Middleware

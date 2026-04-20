@@ -104,7 +104,7 @@ See `current-task/plan.md` and `current-task/plan_context.md` for the full plann
 
 <!-- Deliberate framing — not a solution, but a direction. -->
 
-- [Area the budget model did not explore — e.g., "the interaction between X and Y subsystems was not examined"]
+- [Area the executor model did not explore — e.g., "the interaction between X and Y subsystems was not examined"]
 - [Constraint that may have been missed]
 - [Pattern in another part of the codebase that might apply — file:line if known]
 

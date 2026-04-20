@@ -34,7 +34,7 @@
 
 - [x] **7. Worked example (`examples/sample-task/`).** Task `add-rate-limit-middleware` on a fictional Express API. Five artifacts: `README.md`, `plan.md` (Status: Approved), `plan_context.md` (zero-exploration property demonstrated), `build-log.md` (single attempt, does not claim to run tests), `qa-report.md` (six checks, pasted terminal evidence, PASS → DEBRIEF). All file:line citations internally consistent.
 
-- [x] **8. `update-limits` skill.** `skills/memory-bank/update-limits/SKILL.md` — enforces five invariants (final rung = `<user-switched session>`, non-duplicate rungs, soft ≤ hard per state, at least 3 rungs, budget rung never an escalation target). Hard blocks prevent write; warnings ask for confirmation.
+- [x] **8. `update-limits` skill.** `skills/memory-bank/update-limits/SKILL.md` — enforces five invariants (final rung = `<user-switched session>`, non-duplicate rungs, soft ≤ hard per state, at least 3 rungs, executor rung never an escalation target). Hard blocks prevent write; warnings ask for confirmation.
 
 ---
 

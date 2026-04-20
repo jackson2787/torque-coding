@@ -1,20 +1,25 @@
 ---
 name: build-loop
 description: >-
-  BUILD state skill. Consumes plan.md + plan_context.md and applies the implementation
-  with zero codebase exploration. Runs on the budget model. Tracks attempts in
-  build-log.md. Hard stall rule: 3 failed attempts or same error signature twice →
-  escalate. Declares done when the plan is executed; does NOT self-verify — that is QA.
+  BUILD state skill. Consumes plan.md + plan_context.md + doctrine (constitution.md,
+  operational-context.md) and applies the implementation with zero codebase exploration.
+  Runs on the executor model (fast/local/cheap — role is execution, not reasoning).
+  Tracks attempts in build-log.md. Hard stall rule: 3 failed attempts or same error
+  signature twice → escalate. Declares done when the plan is executed; does NOT
+  self-verify — that is QA.
 metadata:
   author: torque-coding
-  version: "2.2"
+  version: "2.3"
   state-machine: v2
   state: BUILD
-  model-tier: budget
+  model-tier: executor
   requires:
+    - .memory-bank-v2/machine/constitution.md
+    - .memory-bank-v2/machine/operational-context.md
     - .memory-bank-v2/machine/current-task/plan.md
     - .memory-bank-v2/machine/current-task/plan_context.md
     - .memory-bank-v2/machine/limits.md (for per-attempt hard cap)
+    - rules/execution-discipline.md
   produces:
     - applied changes (git diff)
     - .memory-bank-v2/machine/current-task/build-log.md
@@ -29,7 +34,7 @@ metadata:
 
 BUILD is mechanical. The plan says what to change, the context pack says exactly where and how. BUILD applies the changes, logs each attempt, and hands off to QA.
 
-This skill is designed for a budget model. The tone of the skill reflects that: short, checklist-driven, minimal reasoning.
+This skill is designed for the executor model tier (fast/local/cheap — whatever is quick and available for the developer's current setup). The tone of the skill reflects that: short, checklist-driven, minimal reasoning.
 
 ## When to Use
 
@@ -46,16 +51,23 @@ This skill is designed for a budget model. The tone of the skill reflects that: 
 ## Preconditions
 
 - [ ] `plan.md` and `plan_context.md` both present in `current-task/`
+- [ ] `plan.md` Status = `Approved`
+- [ ] `activeContext.md` State ∈ {BUILD, QA} (last transition recorded)
+- [ ] `activeContext.md` Approval Record contains an entry for this task (not the empty placeholder)
 - [ ] Cycle counter checked (attempts remaining < 3)
 - [ ] No `escalation-brief.md` blocking
 
+**Hard gate**: if the Approval Record is empty, BUILD must refuse to run even if `plan.md` and `plan_context.md` exist. An approved plan without a recorded approval is evidence the flow was bypassed — return to PLAN. This is the single gate that enforces "no building without human approval."
+
 ## The zero-exploration rule
 
-BUILD does not run `Glob`, `Grep`, or open files beyond what `plan_context.md` contains.
+BUILD does not run `Glob`, `Grep`, or read arbitrary codebase files. Exploration = iterative search on the repo; that is what the executor model is bad at and slow on.
 
-If BUILD finds a gap — a file not in the pack, a pattern not extracted, an integration point missing — that is a signal the pack is incomplete. The correct response is to **stop and escalate to PLAN-CONTEXTUALIZE**, not to explore.
+**Fixed doctrine reads are allowed** (and required): `constitution.md`, `operational-context.md`, `plan.md`, `plan_context.md`, and `rules/execution-discipline.md`. These are four-to-five known paths, not exploration. They are the executor's rulebook.
 
-The principle: exploration and execution are different cognitive modes running on different model tiers. Do not cross the streams.
+If BUILD finds a repo-level gap — a file not in the pack, a pattern not extracted, an integration point missing — that is a signal the pack is incomplete. The correct response is to **stop and escalate to PLAN-CONTEXTUALIZE**, not to open the file.
+
+The principle: doctrine is static and always available; codebase exploration is dynamic and belongs to the planner.
 
 ## Procedure
 
@@ -78,10 +90,17 @@ Estimate input size for this attempt: plan + plan_context + current-task artifac
 
 ### 2. Read the pack
 
-- Read `plan.md` (objective, steps, acceptance criteria, out-of-scope)
-- Read `plan_context.md` end to end (pasted files, patterns, constraints, integration points, test patterns, dead ends)
+If not already loaded in session context, read:
 
-Do not open any other file in the repo.
+- `constitution.md` — the hard doctrinal floor (scope, boundaries, stable truths)
+- `operational-context.md` — current do/don't directives, active patterns, constraints
+- `plan.md` — objective, steps, acceptance criteria, out-of-scope
+- `plan_context.md` — pasted files, patterns, integration points, test patterns, dead ends
+- `rules/execution-discipline.md` — simplicity, surgical changes, surface ambiguity
+
+These four-to-five reads are the executor's full rulebook. Do not open any other repo file.
+
+If a constitutional boundary or operational-context directive conflicts with a plan step, **stop immediately**. Do not apply. Surface the conflict — the plan needs revision, not a workaround.
 
 ### 3. Execute the implementation steps
 
@@ -161,7 +180,11 @@ On declared-done:
 
 | Flag | Action |
 |---|---|
+| `activeContext.md` Approval Record empty | Stop. The hard human gate was bypassed. Return to PLAN — do not build without recorded approval. |
+| `activeContext.md` State is still PLAN or PLAN-CONTEXTUALIZE | Stop. BUILD cannot run until the transition to BUILD is recorded. |
 | A required file is not in `plan_context.md` | Do NOT explore. Escalate — the pack is incomplete. |
+| Plan step conflicts with `constitution.md` or an `operational-context.md` hard directive | Stop. Do not apply. Return to PLAN — the plan needs revision, not a workaround. |
+| Urge to "improve" adjacent code outside the plan | Stop. Note it for DEBRIEF instead. `rules/execution-discipline.md#Surgical-Changes`. |
 | Applying the step produces an error signature seen before | Escalate immediately. |
 | Cycle count would exceed 3 | Escalate. |
 | The plan step is ambiguous enough that two reasonable implementations exist | Escalate — the planner needs to disambiguate. |

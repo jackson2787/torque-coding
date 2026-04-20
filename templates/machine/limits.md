@@ -10,7 +10,7 @@
 
 ## Why this file exists
 
-Torque Coding is built for the mid-tier developer on a £20/month plan. At that tier, a budget model running BUILD can exhaust its monthly cap well before a hard task completes. Without explicit per-state budgets:
+Torque Coding is built for the mid-tier developer on a £20/month plan. At that tier, an executor model running BUILD can exhaust its monthly cap well before a hard task completes. Without explicit per-state budgets:
 
 - The user discovers cap exhaustion mid-task and loses context
 - There is no distinction between "the model couldn't solve it" and "the model ran out of room"
@@ -28,8 +28,8 @@ Budgets are input-token targets. Soft cap: proceed but log a warning. Hard cap: 
 |---|---|---|---|---|
 | PLAN | powerful | 15,000 | 25,000 | surface to user |
 | PLAN-CONTEXTUALIZE | powerful | 25,000 | 40,000 | surface to user |
-| BUILD (per attempt) | budget | 10,000 | 15,000 | stall (counts as 1 attempt) |
-| QA (per cycle) | budget | 8,000 | 12,000 | stall (counts as 1 cycle) |
+| BUILD (per attempt) | executor | 10,000 | 15,000 | stall (counts as 1 attempt) |
+| QA (per cycle) | executor | 8,000 | 12,000 | stall (counts as 1 cycle) |
 | ESCALATE (subagent) | powerful | 30,000 | 50,000 | step up ladder or surface |
 | DEBRIEF | any | 10,000 | 20,000 | trim candidates, note in report |
 
@@ -71,7 +71,7 @@ On stall, ESCALATE steps up this ladder in order. Each escalation within the sam
 ### Default ladder
 
 ```
-1. sonnet     (budget tier, normal operation — not actually used for escalation; listed for completeness)
+1. sonnet     (executor tier, normal operation — not actually used for escalation; listed for completeness)
 2. opus       (default first escalation target)
 3. <user-switched session>   (final fallback — memory bank carries context)
 ```
@@ -101,7 +101,7 @@ A project may define its own ladder in this file. Example — a project with acc
 ```
 
 Rules for a valid ladder:
-- Rung 1 is the default budget tier (not actually invoked by ESCALATE; listed for clarity)
+- Rung 1 is the default executor tier (not actually invoked by ESCALATE; listed for clarity)
 - Must end with `<user-switched session>` as the final rung — this is the graceful fallback
 - Each rung must be a strictly stronger model than the previous (no lateral moves)
 - Minimum viable ladder is the default above (opus + user fallback)
@@ -119,7 +119,7 @@ Budgets and ladder entries are expected to drift as:
 When a cap feels wrong:
 - **Crossing soft caps routinely but completing successfully** → raise soft cap or lower it intentionally to force earlier scope reduction
 - **Hitting hard caps without actually stalling the logic** → raise hard cap, or split the state (the task is too large for one pass)
-- **Escalations are always going straight to user fallback** → review whether the middle rung is actually stronger than the budget tier for this kind of problem
+- **Escalations are always going straight to user fallback** → review whether the middle rung is actually stronger than the executor tier for this kind of problem
 
 Record tuning changes in `human/rationale/` so the team can see why a limit was adjusted.
 

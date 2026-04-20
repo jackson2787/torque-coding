@@ -23,7 +23,7 @@ metadata:
 
 ## Overview
 
-Escalation is the state machine's answer to stall. When a budget model cannot solve a problem in three tries — or keeps hitting the same error — it is time for a stronger model.
+Escalation is the state machine's answer to stall. When the executor model cannot solve a problem in three tries — or keeps hitting the same error — it is time for a stronger model.
 
 The design tenet: the memory bank is canonical. Everything needed to hand a task to a different model lives on disk under `current-task/`. Escalation just routes that pack to a stronger model.
 
@@ -71,7 +71,7 @@ Do not skip this step. Environment detection is the first thing the skill does.
 Read `.memory-bank-v2/machine/limits.md#Escalation-ladder` for the configured ladder.
 
 Check `current-task/escalation-brief.md` for the current ladder step:
-- **Does not exist** → this is the first escalation for this task. Next rung = rung 2 (first non-budget tier — default `opus`).
+- **Does not exist** → this is the first escalation for this task. Next rung = rung 2 (first non-executor tier — default `opus`).
 - **Exists with `Ladder step: N`** → previous escalation was at rung N. Advance: next rung = N+1.
 
 If the next rung is the final rung (`<user-switched session>`):
@@ -202,7 +202,7 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 - Does NOT skip writing `escalation-brief.md` even on the primary path — the brief is also the audit trail.
 - Does NOT run tests or the linter — that is QA's job after resume.
 - Does NOT auto-escalate constitutional violations — those go to the human directly.
-- Does NOT promote a budget model to a stronger model mid-session by wishful thinking — the only mechanisms are Agent subagent override or user-switched session.
+- Does NOT promote the executor model to a stronger model mid-session by wishful thinking — the only mechanisms are Agent subagent override or user-switched session.
 
 ## Red Flags — Stop
 
@@ -213,7 +213,7 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 | `limits.md` missing or unreadable | Fall back to the default ladder embedded in this skill's documentation (`sonnet → opus → user-switched`). Log the fallback. |
 | Subagent edits `plan.md` or `plan_context.md` directly | Reject the fix. Route to PLAN for human revision. |
 | Subagent edits `constitution.md` or `operational-context.md` | Reject. Those writes go through their dedicated skills only. |
-| Fallback path triggered but user returns without switching models | The same budget model will stall again. Re-run escalate; if that was already attempted, surface to human. |
+| Fallback path triggered but user returns without switching models | The same executor model will stall again. Re-run escalate; if that was already attempted, surface to human. |
 | `escalation-brief.md` already present when escalation triggers (previous unresolved) | Do NOT overwrite. Surface to human — previous escalation was not completed. |
 
 ## Configuration: the model ladder
@@ -221,13 +221,13 @@ Last transition: YYYY-MM-DD HH:MM — ESCALATE → PLAN (plan revision)
 Escalation reads the ladder from `.memory-bank-v2/machine/limits.md#Escalation-ladder`. The default ladder is:
 
 ```
-1. sonnet                       (budget tier — not an escalation destination; listed for clarity)
+1. sonnet                       (executor tier — not an escalation destination; listed for clarity)
 2. opus                         (first escalation target)
 3. <user-switched session>      (graceful fallback — memory bank carries the context)
 ```
 
 Per-project overrides are allowed. Rules:
-- Rung 1 is the default budget tier (listed for clarity — ESCALATE never targets it).
+- Rung 1 is the default executor tier (listed for clarity — ESCALATE never targets it).
 - Each rung must be a strictly stronger model than the previous.
 - The final rung must always be `<user-switched session>`.
 

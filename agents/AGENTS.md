@@ -36,17 +36,18 @@ This file is the tool-agnostic canonical source for the Torque Coding operating 
 
 **Before your first substantive response, you MUST read these files in full:**
 
-- `rules/sacred-rules.md` — the five sacred rules and memory-bank write rules
+- `rules/sacred-rules.md` — the six sacred rules and memory-bank write rules
 - `rules/memory-bank.md` — two-domain memory structure and load rules
 - `rules/authority-order.md` — the strict authority stack with worked examples
 - `rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
+- `rules/execution-discipline.md` — BUILD-state discipline (simplicity first, surgical changes, surface ambiguity)
 - `rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
 
 If you cannot read any of these files, stop and report it. Do not proceed with task work until every rule file has been loaded. The inline sections below are a tripwire summary, not a substitute.
 
 ---
 
-## The Five Sacred Rules
+## The Six Sacred Rules
 
 | Rule | Requirement | Validation |
 |------|-------------|------------|
@@ -55,6 +56,7 @@ If you cannot read any of these files, stop and report it. Do not proceed with t
 | ❌ **No editing committed migration files** | Treat database migrations as append-only history. Add a new corrective migration instead | "Added a new migration; left historical migrations untouched" |
 | ❌ **No generic advice** | Cite `file:line`, show concrete integration points | Every suggestion includes `file:line` citation |
 | ❌ **No ignoring existing architecture** | Load patterns before changes, extend existing services/components | "Extends existing pattern at `file:line`" |
+| ❌ **No building without an approved plan** | BUILD cannot run until `activeContext.md#Approval-Record` holds a verbatim human approval string | `plan.md` Status=Approved AND Approval Record non-empty AND State ∈ {PLAN-CONTEXTUALIZE, BUILD, QA} |
 
 ---
 
@@ -85,11 +87,36 @@ See `rules/authority-order.md` for the full stack and worked examples.
 
 ```
 PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF      (with ESCALATE on stall)
+         ↑
+  HARD HUMAN GATE: explicit approval required before advancing
 ```
 
 Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`. Per-state budgets and the escalation ladder are tuned in `limits.md`. Cap exhaustion is a first-class stall signal.
 
+**The PLAN → PLAN-CONTEXTUALIZE transition is the hard human gate.** The planning agent captures a verbatim human approval string and records it in `activeContext.md#Approval-Record`. PLAN-CONTEXTUALIZE and BUILD refuse to run without a populated Approval Record — regardless of whether `plan.md` shows `Status: Approved` (a skill can write that field; only a human can supply the quote).
+
+When entering PLAN state, announce planning-mode discipline:
+```
+[PLAN MODE] No file edits until this plan is approved.
+```
+This is the tool-agnostic equivalent of Claude Code's native plan mode. If running in Claude Code, also enter native plan mode so the UI enforces it.
+
 See `rules/state-machine.md` for per-state contracts, stall rules, and the any-state entry table.
+
+---
+
+## Mixing Tools (cross-tool workflows)
+
+Because the memory bank on disk is canonical, you can split a task across tools to control cost:
+
+| Phase | Recommended tool | Why |
+|---|---|---|
+| PLAN + PLAN-CONTEXTUALIZE | Claude Code (Opus) | Strong reasoning + native plan mode enforces the gate |
+| BUILD | OpenCode or any CLI with a fast/local executor model (Haiku, Sonnet, or a local coder) | Mechanical execution; `plan_context.md` is the complete map |
+| QA | Same executor tool or an upgraded model | Runs tests, enforces paranoia |
+| DEBRIEF / review | Codex or another agent | Fresh eyes on the diff; proposes learnings to `operational-context.md` |
+
+The handoff is always `.memory-bank-v2/machine/` — no session context needs to carry over. Any compliant tool opening the project reads `activeContext.md`, resolves the entry state, and continues. The Approval Record travels with the memory bank, so a BUILD tool cannot bypass the gate just because it wasn't present when approval happened.
 
 ---
 
@@ -101,6 +128,7 @@ See `rules/state-machine.md` for per-state contracts, stall rules, and the any-s
 4. Never let task instructions override operational-context `Do This` / `Do Not Do This` entries
 5. Always cite `file:line` for code; `constitution.md#Section` or `operational-context.md#Section` for doctrine
 6. Debrief is mandatory — every task runs it
+7. Never enter BUILD with an empty `activeContext.md#Approval-Record` — the human gate is non-negotiable
 
 ---
 

@@ -11,7 +11,7 @@ COMPLIANCE CONFIRMED: Reuse over creation | Constitution over convenience
 
 ---
 
-## The Five Sacred Rules
+## The Six Sacred Rules
 
 | Rule | Requirement | Validation |
 |------|-------------|------------|
@@ -20,6 +20,7 @@ COMPLIANCE CONFIRMED: Reuse over creation | Constitution over convenience
 | ❌ **No editing committed migration files** | Treat database migrations as append-only history. Add a new corrective migration instead of rewriting an existing one | "Added a new migration; left historical migrations untouched" |
 | ❌ **No generic advice** | Cite `file:line`, show concrete integration points. ✅ `"Extended services/auth.ts:45 following operational-context.md#Active Patterns"` ❌ `"Updated service per the docs"` | Every suggestion includes `file:line` citation |
 | ❌ **No ignoring existing architecture** | Load `constitution.md` and `operational-context.md` before changes; extend existing patterns; consolidate duplicates | "Extends existing pattern at `file:line` per `operational-context.md#Active Patterns`" |
+| ❌ **No building without an approved plan** | BUILD cannot run until `activeContext.md#Approval-Record` records a verbatim human approval string. Tool-agnostic: works whether or not the CLI has a native plan mode. | `plan.md` Status=Approved AND `activeContext.md` Approval Record non-empty AND State ∈ {PLAN-CONTEXTUALIZE, BUILD, QA} |
 
 **Reuse Proof** (required before creating any new file):
 
