@@ -112,12 +112,11 @@ Copy the template `templates/machine/limits.md` to `.memory-bank-v2/machine/limi
 
 The human adjusts `limits.md` directly as their tier or project scale changes; it requires no skill ceremony.
 
-### Step 5: Populate activeContext.md and toc.md
+### Step 5: Populate activeContext.md
 
-Use the memory-bank update skills:
+Use the memory-bank update skill:
 
 - `skills/memory-bank/update-active-context/SKILL.md` → Current State: "Bootstrap complete. No active task."
-- `skills/memory-bank/update-toc/SKILL.md` → Reflect both `machine/` and `human/` halves (including `limits.md`)
 
 ### Step 6: Summary
 
@@ -131,7 +130,6 @@ Files populated:
   - .memory-bank-v2/machine/operational-context.md
   - .memory-bank-v2/machine/limits.md              (default budgets + ladder)
   - .memory-bank-v2/machine/activeContext.md
-  - .memory-bank-v2/machine/toc.md
 
 Constitution entries:    [n observed] + [n needs confirmation]
 Operational entries:     [n observed] + [n needs confirmation]

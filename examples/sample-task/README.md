@@ -49,6 +49,5 @@ After QA PASS, the `debrief` skill would have:
 - Applied the five-gate rubric to the task — the rate-limiter middleware registration pattern is generalisable, evidenced at `src/app.js:34`, and expected to be durable → proposed adding to `operational-context.md#Active-Patterns`
 - Written task history to `human/tasks/2026-04/190426_add-rate-limit-middleware.md`
 - Called `update-active-context` to reset `activeContext.md` to `State: PLAN/IDLE`
-- Called `update-toc` to update `toc.md` with the new task history entry
 
 No `current-task/` archive is shown here to avoid scaffolding the full `human/` tree inside the example.

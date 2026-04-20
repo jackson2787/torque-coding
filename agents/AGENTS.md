@@ -1,8 +1,8 @@
-# CLAUDE.md
+# AGENTS.md
 
-**Version**: 3.0.0-dev | **Compatibility**: Claude Code
+**Version**: 3.0.0-dev | **Compatibility**: Codex, Cursor, Copilot, Cline, Aider, and every AGENTS.md-compatible tool
 
-This file is Claude Code's view of the Torque Coding operating model. `AGENTS.md` is the tool-agnostic canonical source read by Codex, Cursor, Aider, and every other AGENTS.md-compatible tool — the tripwire sections below are byte-identical to AGENTS.md. The only difference is the loader: Claude Code uses `@-imports`, other tools use an explicit read contract.
+This file is the tool-agnostic canonical source for the Torque Coding operating model. Claude Code reads `CLAUDE.md`, which `@-imports` the same underlying rule files — so both entry points resolve to the same behaviour, by different loading mechanisms.
 
 ---
 
@@ -19,7 +19,6 @@ This file is Claude Code's view of the Torque Coding operating model. `AGENTS.md
    - [ ] .memory-bank-v2/machine/operational-context.md
    - [ ] .memory-bank-v2/machine/limits.md             (per-state budgets + escalation ladder)
    - [ ] .memory-bank-v2/machine/activeContext.md
-   - [ ] .memory-bank-v2/machine/toc.md
    - [ ] .memory-bank-v2/machine/current-task/*        (any files present)
    ```
 4. Do NOT load human-side memory at startup
@@ -35,19 +34,15 @@ This file is Claude Code's view of the Torque Coding operating model. `AGENTS.md
 
 ## Loading the Rules
 
-Claude Code loads the doctrine files via `@-imports` at the end of this section. They are in context before your first response — no explicit read step is required.
+**Before your first substantive response, you MUST read these files in full:**
 
-- [Sacred Rules](@rules/sacred-rules.md)
-- [Memory Bank](@rules/memory-bank.md)
-- [Authority Order](@rules/authority-order.md)
-- [State Machine](@rules/state-machine.md)
-- [Compaction](@rules/compaction.md)
+- `rules/sacred-rules.md` — the five sacred rules and memory-bank write rules
+- `rules/memory-bank.md` — two-domain memory structure and load rules
+- `rules/authority-order.md` — the strict authority stack with worked examples
+- `rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
+- `rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
 
-@rules/sacred-rules.md
-@rules/memory-bank.md
-@rules/authority-order.md
-@rules/state-machine.md
-@rules/compaction.md
+If you cannot read any of these files, stop and report it. Do not proceed with task work until every rule file has been loaded. The inline sections below are a tripwire summary, not a substitute.
 
 ---
 

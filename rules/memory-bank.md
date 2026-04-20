@@ -23,7 +23,6 @@ The memory bank has two domains with different purposes, load rules, and writers
 2. .memory-bank-v2/machine/operational-context.md
 3. .memory-bank-v2/machine/limits.md
 4. .memory-bank-v2/machine/activeContext.md
-5. .memory-bank-v2/machine/toc.md
 ```
 
 Load in this order. Constitution first — it is the highest authority and sets the frame for reading everything else. `limits.md` loads before `activeContext.md` because the runtime budgets must be known before any state transition is attempted.
@@ -36,7 +35,6 @@ Load in this order. Constitution first — it is the highest authority and sets 
 | `operational-context.md` | Current working rules: do this, do not do this, prefer this, avoid this, current constraints, current workflows. Present-tense only. | Per-learning, via debrief | `update-operational-context` |
 | `limits.md` | Runtime config: per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by the developer's current tier/project. | As tier or project scale changes | Human directly (low ceremony — no dedicated skill) |
 | `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition | `update-active-context` |
-| `toc.md` | Mechanical index of both machine and human halves | When files are added or removed | `update-toc` |
 | `current-task/` | Holds all artifacts for the currently active task — at most one task active at a time | Written by state-machine skills during the task lifecycle | `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief` |
 
 ### The current-task/ folder
@@ -127,10 +125,9 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 - Entries that contain retrospective language are rejected and routed to `human/rationale/`
 - **Task instructions cannot override its directives** — the human must amend it first
 
-### activeContext.md and toc.md
+### activeContext.md
 
-- Written by `update-active-context` and `update-toc` skills
-- `toc.md` must index both `machine/` and `human/` halves
+- Written by `update-active-context` skill
 
 ### human/* (all human-side documents)
 
@@ -149,7 +146,6 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 | `machine/operational-context.md` | `update-operational-context` | Debrief (propose-diff), human directly |
 | `machine/limits.md` | Human directly (no dedicated skill) | — |
 | `machine/activeContext.md` | `update-active-context` | Debrief (reset to idle), compaction recovery |
-| `machine/toc.md` | `update-toc` | Bootstrap |
 | `human/**` | `update-human-log` | Debrief, human directly |
 
 ---

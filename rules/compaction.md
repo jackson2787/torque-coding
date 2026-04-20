@@ -37,7 +37,6 @@ Run these steps in order when starting a new session after compaction:
    .memory-bank-v2/machine/operational-context.md
    .memory-bank-v2/machine/limits.md
    .memory-bank-v2/machine/activeContext.md
-   .memory-bank-v2/machine/toc.md
    ```
 3. Read the rule files (if not already loaded via `@-imports`):
    ```

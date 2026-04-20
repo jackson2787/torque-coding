@@ -40,7 +40,7 @@ COMPLIANCE CONFIRMED: Reuse over creation | Constitution over convenience
 |------|-------------|------------|
 | ❌ **No writing constitution.md from task work** | `constitution.md` is written only by `update-constitution` skill, only after human says `ratified` | Stop, route to `human/decisions/` proposal |
 | ❌ **No writing operational-context.md directly** | Only `update-operational-context` skill writes it, called by debrief with propose-diff | Debrief always shows the human a diff before applying |
-| ❌ **No loading human-side memory at startup** | Human side (`human/`) is on-demand only | Default load set is machine side: `constitution.md`, `operational-context.md`, `activeContext.md`, `toc.md` |
+| ❌ **No loading human-side memory at startup** | Human side (`human/`) is on-demand only | Default load set is machine side: `constitution.md`, `operational-context.md`, `limits.md`, `activeContext.md` |
 | ❌ **No task instruction overriding operational-context** | `Do This` / `Do Not Do This` / `Current Known Constraints` directives cannot be overridden by task instructions | Flag conflict, ask human to amend `operational-context.md` first |
 | ❌ **No skipping debrief** | Debrief runs after every task, including tasks where nothing was learned (produces at minimum a task history entry) | Debrief is mandatory |
 

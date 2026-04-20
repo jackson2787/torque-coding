@@ -99,7 +99,6 @@ Full format in AGENTS.md Section 5. Or say `Create task contract` / use `idea-to
 ├── projectBrief.md       ← What the project IS
 ├── productContext.md     ← Who uses it and why
 ├── decisions.md          ← Architectural Decision Records (append-only)
-├── toc.md                ← File index
 └── tasks/YYYY-MM/        ← Monthly summaries + task docs
 ```
 

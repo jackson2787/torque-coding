@@ -49,7 +49,6 @@ my-project/
     │   ├── operational-context.md  ← [NEEDS CONFIRMATION] placeholders
     │   ├── limits.md               ← default token budgets (ready to use)
     │   ├── activeContext.md        ← State: PLAN/IDLE
-    │   ├── toc.md                  ← snapshot index (empty at init)
     │   └── current-task/           ← empty — populated by state-machine skills
     └── human/
         ├── README.md

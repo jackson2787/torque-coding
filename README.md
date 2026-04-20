@@ -67,7 +67,6 @@ The memory bank splits into a machine-facing domain (loaded every session) and a
 | `operational-context.md` | Current working rules — present-tense directives: do this, do not do this, prefer this, avoid this, current constraints. Updates when the repo evolves. | Per-learning, via debrief |
 | `limits.md` | Runtime config — per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by developer tier. | When the developer's tier or project scale changes |
 | `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition |
-| `toc.md` | Mechanical index of both memory halves | When files are added or removed |
 | `current-task/` | At most one active task. Holds `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, `escalation-brief.md` as applicable. | Written by state-machine skills during the task lifecycle |
 
 ### Human-facing memory — loaded on demand only
@@ -134,8 +133,9 @@ See [`rules/state-machine.md`](./rules/state-machine.md).
 
 ```
 .
-├── AGENTS.md                       ← tool-agnostic entry point (Codex, Cursor, Aider, …)
-├── CLAUDE.md                       ← Claude Code entry point (uses @-imports)
+├── agents/
+│   ├── AGENTS.md                   ← tool-agnostic entry point (Codex, Cursor, Aider, …)
+│   └── CLAUDE.md                   ← Claude Code entry point (uses @-imports)
 ├── bootstrap-memory-bank-contract.md ← cold-start contract for a target repo
 ├── ROADMAP.md                      ← what's left to make this complete start-to-finish
 ├── rules/
