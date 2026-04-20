@@ -31,7 +31,8 @@ The installer will:
 - Ask to confirm the target directory (default: current directory)
 - Warn you if `.memory-bank-v2/` already exists and ask before overwriting templates
 - Create the full memory-bank directory tree and copy the machine templates
-- Deploy `AGENTS.md`, `CLAUDE.md`, and the `rules/` + `skills/` directories to tool-specific locations
+- Ask which platform to configure: `Claude Code`, `Other`, or `Both`
+- Deploy the entry files and supporting `rules/` / `skills/` directories to the correct platform-specific locations
 
 What appears on disk after `init`:
 
@@ -40,6 +41,10 @@ my-project/
 ├── AGENTS.md                       ← entry point for Codex, Cursor, Aider, etc.
 ├── CLAUDE.md                       ← entry point for Claude Code (@-imports)
 ├── bootstrap-memory-bank-contract.md
+├── .agent/
+│   ├── rules/                      ← rules for AGENTS.md-compatible tools
+│   └── skills/                     ← skills for AGENTS.md-compatible tools
+├── rules/                          ← project-root rules for Claude Code's @rules imports
 ├── .claude/
 │   ├── rules/                      ← copy of rules for Claude Code's native convention
 │   └── skills/                     ← copy of skills for Claude Code
@@ -250,7 +255,7 @@ When a new version of `torque-coding` is released, re-sync the rules and skills 
 torque-coding update
 ```
 
-This updates `.claude/rules/`, `.claude/skills/`, and offers to update the root-level entry files if you want the latest versions. It never touches `.memory-bank-v2/`.
+This updates `.agent/rules/`, `.agent/skills/`, and, when Claude Code is installed, `rules/`, `.claude/rules/`, `.claude/skills/`. It offers to update the relevant root-level entry files if you want the latest versions. It never touches `.memory-bank-v2/`.
 
 ---
 
@@ -259,9 +264,9 @@ This updates `.claude/rules/`, `.claude/skills/`, and offers to update the root-
 | Problem | Cause | Fix |
 |---|---|---|
 | Agent reads `constitution.md` and surfaces `[NEEDS CONFIRMATION]` | Bootstrap hasn't run yet | Run the bootstrap prompt (Step 3) |
-| Agent says "`update-active-context` skill not found" | Skill files not in `.claude/skills/` | Run `torque-coding update` |
+| Agent says "`update-active-context` skill not found" | Skill files not in the expected platform directory (`.agent/skills/` or `.claude/skills/`) | Run `torque-coding update` |
 | QA fails Check 1: "no tests found" | BUILD claimed to add tests but didn't | Return to BUILD with QA's specific issue; BUILD will add the missing tests in its next attempt |
-| Session compacted mid-task | Context window truncated by the tool | Read `rules/compaction.md` — start a new session, load machine memory, check `activeContext.md` for the resume state |
+| Session compacted mid-task | Context window truncated by the tool | Read `.agent/rules/compaction.md` for AGENTS.md-compatible tools, or `rules/compaction.md` in Claude Code — start a new session, load machine memory, check `activeContext.md` for the resume state |
 | Task description produces a very large plan | Task too broad for current limits | Split the task; or raise the PLAN hard cap in `limits.md` |
 
 ---
@@ -271,6 +276,8 @@ This updates `.claude/rules/`, `.claude/skills/`, and offers to update the root-
 - `AGENTS.md` — the full operating model and authority rules
 - `CLAUDE.md` — Claude Code entry point with @-imports
 - `examples/sample-task/` — complete worked example (all five artifacts for `add-rate-limit-middleware`)
-- `rules/state-machine.md` — full state contracts, stall rules, any-state entry table
-- `rules/compaction.md` — compaction recovery procedure
+- `.agent/rules/state-machine.md` — full state contracts, stall rules, any-state entry table for AGENTS.md-compatible tools
+- `.agent/rules/compaction.md` — compaction recovery procedure for AGENTS.md-compatible tools
+- `rules/state-machine.md` — Claude Code state-machine reference
+- `rules/compaction.md` — Claude Code compaction reference
 - `ROADMAP.md` — what is planned next

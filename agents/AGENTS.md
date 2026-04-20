@@ -2,7 +2,7 @@
 
 **Version**: 3.0.0-dev | **Compatibility**: Codex, Cursor, Copilot, Cline, Aider, and every AGENTS.md-compatible tool
 
-This file is the tool-agnostic canonical source for the Torque Coding operating model. Claude Code reads `CLAUDE.md`, which `@-imports` the same underlying rule files — so both entry points resolve to the same behaviour, by different loading mechanisms.
+This file is the tool-agnostic canonical source for the Torque Coding operating model. Claude Code reads `CLAUDE.md`, which `@-imports` the same underlying rule files from the project-root `rules/` directory. Other tools use `AGENTS.md` plus the `.agent/` deployment layout — so both entry points resolve to the same behaviour, by different loading mechanisms.
 
 ---
 
@@ -36,12 +36,14 @@ This file is the tool-agnostic canonical source for the Torque Coding operating 
 
 **Before your first substantive response, you MUST read these files in full:**
 
-- `rules/sacred-rules.md` — the six sacred rules and memory-bank write rules
-- `rules/memory-bank.md` — two-domain memory structure and load rules
-- `rules/authority-order.md` — the strict authority stack with worked examples
-- `rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
-- `rules/execution-discipline.md` — BUILD-state discipline (simplicity first, surgical changes, surface ambiguity)
-- `rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
+- `.agent/rules/sacred-rules.md` — the six sacred rules and memory-bank write rules
+- `.agent/rules/memory-bank.md` — two-domain memory structure and load rules
+- `.agent/rules/authority-order.md` — the strict authority stack with worked examples
+- `.agent/rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
+- `.agent/rules/execution-discipline.md` — BUILD-state discipline (simplicity first, surgical changes, surface ambiguity)
+- `.agent/rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
+
+When a state-machine or memory-bank skill is invoked, load it from `.agent/skills/...`.
 
 If you cannot read any of these files, stop and report it. Do not proceed with task work until every rule file has been loaded. The inline sections below are a tripwire summary, not a substitute.
 
@@ -79,7 +81,7 @@ constitution.md > operational-context.md > task instructions > reasoning
 
 Task instructions cannot override hard directives in `operational-context.md` (`Do This` / `Do Not Do This` / `Current Known Constraints` / `Currently Accepted Workflows`). Hard directives require a memory-bank amendment first. Soft directives (`Preferred` / `Avoid`) may be overridden with explicit, scoped justification.
 
-See `rules/authority-order.md` for the full stack and worked examples.
+See `.agent/rules/authority-order.md` for the full stack and worked examples.
 
 ---
 
@@ -101,7 +103,7 @@ When entering PLAN state, announce planning-mode discipline:
 ```
 This is the tool-agnostic equivalent of Claude Code's native plan mode. If running in Claude Code, also enter native plan mode so the UI enforces it.
 
-See `rules/state-machine.md` for per-state contracts, stall rules, and the any-state entry table.
+See `.agent/rules/state-machine.md` for per-state contracts, stall rules, and the any-state entry table.
 
 ---
 

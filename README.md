@@ -27,7 +27,7 @@ cd my-project
 torque-coding init
 ```
 
-This scaffolds `.memory-bank-v2/` and deploys `AGENTS.md`, `CLAUDE.md`, and the `rules/` + `skills/` directories. After `init`, open a new session with your AI agent and ask it to:
+This scaffolds `.memory-bank-v2/` and deploys `AGENTS.md` plus `.agent/rules/` + `.agent/skills/` for tool-agnostic agents, and `CLAUDE.md` plus `rules/` + `.claude/rules/` + `.claude/skills/` for Claude Code. After `init`, open a new session with your AI agent and ask it to:
 
 > "Read `bootstrap-memory-bank-contract.md` and follow the bootstrap procedure to populate `.memory-bank-v2/machine/constitution.md` and `.memory-bank-v2/machine/operational-context.md` for this project."
 
