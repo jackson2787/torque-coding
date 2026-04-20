@@ -1,6 +1,6 @@
 {
   "name": "torque-coding",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "description": "Torque Coding — tool-agnostic AI agent operating model with stateless memory bank",
   "license": "MIT",
   "author": "Ian Jackson",
