@@ -2,7 +2,21 @@
 
 **Version**: 3.0.0-dev
 
-A tool-agnostic operating model for AI-assisted coding, designed around a stateless memory bank that survives session loss, tool switching, and model changes.
+> **A tool-agnostic operating model that survives wherever your rate-limit takes you that hour / day / week / month.**
+
+---
+
+## What problem is this project solving?
+
+Torque Coding is designed for the mid-tier AI-coding developer (£20/month plans, not £200) who cannot afford tool lock-in — so it treats the **memory bank on disk as canonical** and the agent session as replaceable.
+
+The concrete problems it solves:
+
+1. **Ecosystem lock-in is expensive.** Frontier tools assume you stay in one session. Torque Coding lets you plan in Claude Code, build in OpenCode with a fast/local executor model, review in Codex — the hand-off is files on disk, not session state.
+2. **Context loss is routine at this tier.** Rate limits, compaction, session switches. `activeContext.md` + `current-task/` means any compliant tool can resume exactly where the last one stopped.
+3. **Planner-executor cost asymmetry.** Planning burns tokens once per task; execution burns continuously. Putting them on the same powerful tier wastes the monthly cap. The state machine forces the split via `plan_context.md` — a pack complete enough that the executor model needs zero exploration.
+4. **Agents declare victory too early.** QA is paranoid by design — six checks, all executed (never reasoned about), constitutional boundaries stop immediately.
+5. **Silent drift from doctrine.** A hard human gate (verbatim approval quote in `activeContext.md#Approval-Record`) blocks BUILD until a plan is explicitly approved. Debrief proposes learnings back into `operational-context.md` rather than letting them rot in chat history.
 
 ---
 
@@ -47,7 +61,7 @@ This positioning costs portability tax inside any single tool:
 - Protocols (propose-diff, ratification keyword, approval gates) are conversational rituals rather than structured tool calls — auditability trades for portability
 - Escalation is sequential (one stronger model, one retry) rather than parallel fan-out/gather — because at £20/month you cannot afford three concurrent subagents
 
-These are deliberate choices, not catching-up. Inside Claude Code specifically, some of this work could be native to the Agent SDK. But Torque Coding is not a Claude Code product — it is a tool-agnostic operating model that has to survive wherever the developer's budget takes them that week.
+These are deliberate choices, not catching-up. Inside Claude Code specifically, some of this work could be native to the Agent SDK. But Torque Coding is not a Claude Code product — it is a tool-agnostic operating model that has to survive wherever the developer's rate-limit takes them that hour.
 
 ### The shape of the claim
 

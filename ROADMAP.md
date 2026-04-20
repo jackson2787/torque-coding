@@ -44,17 +44,19 @@
 
 Stack-specific packs (Next.js + Supabase, Python CLI, etc.) that layer concrete patterns onto the base operating model. None exist yet.
 
-### 10. Telemetry feedback into `limits.md`
+### [x] 10. Telemetry feedback into `limits.md`
 
-The "you crossed the soft cap 8/10 times this week — consider raising it" loop. Deferred to a future pass; worth it but not blocking.
+Cap-crossing detection added to `debrief` skill as Phase 3.5. Scans `build-log.md` and `qa-report.md` for soft/hard cap crossings per attempt/cycle. Advisory recommendations surface in the Debrief Report. No writes — human adjusts `limits.md` directly.
 
-### 11. `docs/` doctrine prose
+### [x] 11. `docs/` doctrine prose
 
-Authority-order worked examples, constitution vs operational-context boundary cases, doctrine essays. The rule files carry the load today; docs would make them teachable.
+Two teaching docs created under `docs/doctrine/`:
+- `where-rules-live.md` — constitution vs operational-context decision guide with the gray-area cases
+- `authority-order-gray-areas.md` — 7 hard cases the rule file's worked examples don't cover (implicit contradictions, stale directives, task-as-policy promotion, etc.)
 
-### 12. Structural validator
+### [x] 12. Structural validator
 
-A `torque-coding check` command that asserts `.memory-bank-v2/` has the right shape, `limits.md` ladder is valid, no orphan `current-task/` without an `activeContext.md` state, etc. Today all invariants live in prose across skills.
+`skills/memory-bank/check/SKILL.md` — nine-check read-only validator. Asserts: directory scaffold, required machine files, `limits.md` invariants (via `update-limits`), `activeContext.md` state validity, `current-task/` consistency with state, Approval Record gate, ghost tasks, debrief hygiene, legacy v1 artifacts. Invoked as `torque-coding check` or explicit "run check".
 
 ---
 

@@ -53,6 +53,29 @@ Before writing, classify each candidate fact:
 
 ## Procedure
 
+### Step 0: Legacy-Artifact Scan
+
+Before touching the evidence sweep, check whether the repo already carries artefacts from an earlier Torque Coding (or pre-v3) install. This is non-destructive — scan, report, move on. The human uses `mb-rebase` afterwards to decide what to migrate or scrub.
+
+Scan for (presence only — do not read contents):
+
+| Path / pattern | What it signals | Suggested resolution (for the summary) |
+|---|---|---|
+| `.memory-bank/` directory | Pre-v3 memory bank (v1/v2 path before the `-v2` suffix) | Migrate selected sections into `.memory-bank-v2/machine/` via `mb-rebase`; archive the rest under `.memory-bank-v2/human/rationale/legacy/` |
+| `claude-rules/` directory | Pre-rename rules directory (now `rules/`) | Delete after confirming no local edits; v3 ships `rules/` |
+| `docs/memory-bank/toc.md` (or `.memory-bank*/toc.md`) | Retired index file (removed in v3.0.0-dev) | Delete — v3 does not use a TOC |
+| Any file containing the v1 state string `PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS` | v1 state-machine references in docs or agent files | Flag file paths in the summary; update during `mb-rebase` |
+| `AGENTS.md` / `CLAUDE.md` at repo root with a Torque Coding header and no `PLAN-CONTEXTUALIZE` / `DEBRIEF` references | Pre-v3 agent manifest | Replace via `torque-coding update` (or manual re-deploy from `agents/`); do not merge by hand |
+| `@memory/` or `@.memory-bank/` @-imports in `CLAUDE.md` | Stale loader paths | Replace with `.memory-bank-v2/machine/*` references |
+| `.agent/skills/` directory | Pre-v3 skill layout | Note presence; v3 uses `skills/` at repo root |
+
+Record findings in the final summary under a `Legacy artefacts detected:` block. Do not delete, rewrite, or migrate anything during bootstrap — bootstrap is populate-only. If zero artefacts are found, say so explicitly (`Legacy artefacts detected: none`).
+
+Two rules bound this step:
+
+- **Never modify legacy artefacts during bootstrap.** The human's `mb-rebase` pass is the migration path.
+- **Absence of v1 artefacts is not evidence of anything.** Proceed to Step 1 regardless of what Step 0 found.
+
 ### Step 1: Evidence Sweep
 
 Scan the repository. Focus on:
@@ -125,6 +148,9 @@ Output:
 ```
 BOOTSTRAP COMPLETE
 
+Legacy artefacts detected:
+  - [path — signal — suggested resolution]        (or: none)
+
 Files populated:
   - .memory-bank-v2/machine/constitution.md
   - .memory-bank-v2/machine/operational-context.md
@@ -137,6 +163,8 @@ Limits:                  default template (tune in limits.md if needed)
 
 Next step: Run mb-rebase on constitution.md and operational-context.md
            to ratify bootstrap entries with human confirmation.
+           If legacy artefacts were detected, mb-rebase is also where
+           you decide to migrate, archive, or scrub them.
 ```
 
 ---

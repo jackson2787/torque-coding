@@ -8,7 +8,7 @@ description: >-
   before writing. Routes task history and decisions to the human side. Replaces v1 DOCS.
 metadata:
   author: torque-coding
-  version: "2.2"
+  version: "2.3"
   state-machine: v2
   state: DEBRIEF
   model-tier: any
@@ -214,6 +214,35 @@ If in doubt, ask: "If this were wrong, would it take a major, deliberate convers
 
 ---
 
+## Phase 3.5: Limits Tuning Check
+
+Scan `build-log.md` and `qa-report.md` for cap crossings in the just-completed task. This is a config advisory — the output is a recommendation in the Debrief Report, not a write to `limits.md`. The human adjusts `limits.md` directly.
+
+### What to scan
+
+| Signal | Where to look | Recommendation to surface |
+|---|---|---|
+| BUILD attempt crossed soft cap | `build-log.md` Cap status field per attempt | Raise BUILD soft cap in `limits.md` |
+| BUILD attempt hit hard cap (cap exhaustion) | `build-log.md` Result: FAIL (cap exhaustion) | Raise BUILD hard cap, or split task scope |
+| QA cycle crossed soft cap | `qa-report.md` Cap status field | Raise QA soft cap in `limits.md` |
+| QA cycle hit hard cap | `qa-report.md` Overall: FAIL (cap exhaustion) | Raise QA hard cap, or slim the context pack |
+| 2+ attempts/cycles crossed soft cap in this task | Pattern across the log | Strong signal — cap is routinely tight for this codebase |
+
+### Thresholds
+
+- **1 soft-cap crossing**: note in report ("crossed soft cap once — watch for recurrence").
+- **2+ soft-cap crossings in the same state across this task**: active recommendation ("crossed soft cap N times in BUILD — consider raising soft cap from X to Y in `limits.md`").
+- **Any hard-cap hit**: active recommendation, regardless of recurrence count.
+- **0 crossings**: write "Limits: no tuning suggested" and stop.
+
+### What NOT to recommend
+
+- Do not recommend lowering caps — Torque Coding errs toward giving the model room to work.
+- Do not recommend specific numeric values — the human knows their tier. Recommend direction only: "consider raising", not "raise to 18,000".
+- Do not change `limits.md` — advisory only, never a write.
+
+---
+
 ## Phase 4: Propose Diff (if any memory-worthy learning)
 
 If at least one candidate passed the rubric and was classified as new/updated/retired directive:
@@ -332,6 +361,12 @@ OR:
 OR:
 - Proposed: "[what" — Requires ratification. See: human/decisions/YYYY/YYYY-MM-DD-<slug>.md
 
+### Limits tuning
+[none — no soft/hard cap crossings in this task]
+OR:
+- BUILD crossed soft cap [N] time(s) — consider raising BUILD soft cap in `limits.md`
+- QA hit hard cap — consider raising QA hard cap or slimming the context pack
+
 ### Human-side writes
 - human/tasks/YYYY-MM/DDMMDD_<task>.md ✓
 - human/decisions/YYYY/YYYY-MM-DD-<slug>.md ✓ (if applicable)
@@ -366,6 +401,7 @@ Debrief is complete when all of the following are true:
 
 Both modes:
 - [ ] Five-gate rubric applied to all candidates (or explicitly deferred under cap exhaustion)
+- [ ] Limits tuning check complete — crossings noted or confirmed none
 - [ ] operational-context.md change proposed and either applied or confirmed as none (or skipped under minimal-debrief path)
 - [ ] `human/tasks/YYYY-MM/DDMMDD_<task>.md` written
 - [ ] `human/decisions/` written (if applicable)
