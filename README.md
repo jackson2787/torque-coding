@@ -1,6 +1,6 @@
 # Torque Coding — Operating Model
 
-**Version**: 3.0.0-dev
+**Version**: 3.0.0-beta.1 — **public beta**. Feature-complete and internally dogfooded, but not yet battle-tested on external projects. Feedback and bug reports welcome at [github.com/jackson2787/torque-coding/issues](https://github.com/jackson2787/torque-coding/issues) — especially "I tried to bootstrap and got stuck at X" reports.
 
 > **A tool-agnostic operating model that survives wherever your rate-limit takes you that hour / day / week / month.**
 

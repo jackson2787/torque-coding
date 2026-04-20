@@ -1,7 +1,7 @@
 {
   "name": "torque-coding",
-  "version": "3.0.0-dev",
-  "description": "Torque Coding v2 — tool-agnostic AI agent operating model with stateless memory bank",
+  "version": "3.0.0-beta.1",
+  "description": "Torque Coding — tool-agnostic AI agent operating model with stateless memory bank",
   "license": "MIT",
   "author": "Ian Jackson",
   "repository": {
@@ -27,7 +27,8 @@
     "CLAUDE.md",
     "GETTING-STARTED.md",
     "bootstrap-memory-bank-contract.md",
-    "ROADMAP.md"
+    "ROADMAP.md",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=18"
