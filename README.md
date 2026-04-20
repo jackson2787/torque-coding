@@ -7,8 +7,33 @@
 ---
 
 <p align="center">
-  <img src="./.assets/0d39f7870f3a26463bc3cd6cd8b3abfde956f386fde2b3a01aa59f833d752ee7.jpg" alt="Torque Coding" width="720" />
+   <img src="./.assets/0d39f7870f3a26463bc3cd6cd8b3abfde956f386fde2b3a01aa59f833d752ee7.jpg" alt="Torque Coding" width="720" />
 </p>
+
+## Install
+
+```bash
+# Install globally
+npm install -g torque-coding
+
+# Or run without installing
+npx torque-coding init
+```
+
+Inside your project root:
+
+```bash
+cd my-project
+torque-coding init
+```
+
+This scaffolds `.memory-bank-v2/` and deploys `AGENTS.md`, `CLAUDE.md`, and the `rules/` + `skills/` directories. After `init`, open a new session with your AI agent and ask it to:
+
+> "Read `bootstrap-memory-bank-contract.md` and follow the bootstrap procedure to populate `.memory-bank-v2/machine/constitution.md` and `.memory-bank-v2/machine/operational-context.md` for this project."
+
+Full walkthrough — first task, bootstrap, debrief — in [GETTING-STARTED.md](GETTING-STARTED.md).
+
+---
 
 ## What problem is this project solving?
 
