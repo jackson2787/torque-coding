@@ -8,7 +8,7 @@ description: >-
   here — BUILD reads those files directly. The hand-off to BUILD is files on disk.
 metadata:
   author: torque-coding
-  version: "2.3"
+  version: "2.4"
   state-machine: v2
   state: PLAN-CONTEXTUALIZE
   model-tier: powerful
@@ -32,6 +32,32 @@ The output, `plan_context.md`, is the repo map. BUILD reads it alongside doctrin
 **Scope**: this skill packs **repo-exploration output only** — touched files, patterns with code examples, integration points, test patterns, dead ends. It does **NOT** extract or restate doctrine. BUILD reads `constitution.md` and `operational-context.md` directly; those are fixed paths, not exploration. Removing doctrine extraction eliminates the fragility of "did the planner remember every rule that might fire?" — the executor has the full rulebook in hand.
 
 **The target property is strict**: an executor reading `plan.md` + `plan_context.md` + doctrine should need ZERO codebase-exploration tool calls to start coding. If BUILD finds itself needing to Glob or Grep, the context pack is incomplete and the task returns here.
+
+## Tasks that resist packing
+
+Not every task is a good fit for the planner-executor split. Before building the pack, check for signals that this task should be run on the powerful model throughout instead:
+
+| Signal | Why it resists packing |
+|---|---|
+| The plan says "explore X to decide Y" as a build step | Packing exploration is a category error — the exploration *is* the work. |
+| Acceptance depends on runtime behaviour discoverable only by running the code | You cannot pre-pack something that emerges from execution. |
+| Touched-file set is genuinely unbounded — the plan references "wherever pattern X appears" without a finite list | If the planner cannot enumerate the files, the executor cannot receive them. |
+| The pack estimate crosses the hard cap even after reasonable scope tightening | The task is too large for one pass; split it before planning, or run the whole thing on the powerful model. |
+| The task is trivially small (1-5 line change, one known file) | The pack ceremony costs more than the work. Either run BUILD directly against the plan, or skip straight to a minimal edit with the plan gate waived per `rules/authority-order.md` worked examples. |
+
+**If two or more signals fire**, stop and surface to the human:
+
+```
+This task shows signs it may resist packing: [list signals].
+Options:
+1. Run the whole task on the powerful model, skipping PLAN-CONTEXTUALIZE and BUILD's executor split.
+2. Split the plan into sub-tasks that each pack cleanly.
+3. Proceed anyway and accept that BUILD is likely to escalate.
+
+Which would you prefer?
+```
+
+This is not a failure of the operating model — it is the operating model acknowledging that not every task fits the mechanical-application pattern. Catching this before writing the pack is cheaper than catching it mid-BUILD.
 
 ## When to Use
 

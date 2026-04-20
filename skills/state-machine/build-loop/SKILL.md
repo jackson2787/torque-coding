@@ -2,14 +2,15 @@
 name: build-loop
 description: >-
   BUILD state skill. Consumes plan.md + plan_context.md + doctrine (constitution.md,
-  operational-context.md) and applies the implementation with zero codebase exploration.
+  operational-context.md) and applies the implementation with zero codebase exploration
+  in the happy path; escalates to PLAN-CONTEXTUALIZE when the pack proves insufficient.
   Runs on the executor model (fast/local/cheap — role is execution, not reasoning).
   Tracks attempts in build-log.md. Hard stall rule: 3 failed attempts or same error
   signature twice → escalate. Declares done when the plan is executed; does NOT
   self-verify — that is QA.
 metadata:
   author: torque-coding
-  version: "2.3"
+  version: "2.4"
   state-machine: v2
   state: BUILD
   model-tier: executor
@@ -61,7 +62,9 @@ This skill is designed for the executor model tier (fast/local/cheap — whateve
 
 ## The zero-exploration rule
 
-BUILD does not run `Glob`, `Grep`, or read arbitrary codebase files. Exploration = iterative search on the repo; that is what the executor model is bad at and slow on.
+BUILD does not run `Glob`, `Grep`, or read arbitrary codebase files **in the happy path**. Exploration = iterative search on the repo; that is what the executor model is bad at and slow on.
+
+**The target, not a guarantee.** Zero-exploration is what a well-scoped task with a complete pack looks like. It is not a promise that every task will reach BUILD with a pack this complete. When the pack proves insufficient, BUILD has a defined escape: stop and escalate to PLAN-CONTEXTUALIZE. That escape is part of the design, not a failure of it.
 
 **Fixed doctrine reads are allowed** (and required): `constitution.md`, `operational-context.md`, `plan.md`, `plan_context.md`, and `rules/execution-discipline.md`. These are four-to-five known paths, not exploration. They are the executor's rulebook.
 
