@@ -6,6 +6,10 @@
 
 ---
 
+<p align="center">
+  <img src="./.assets/0d39f7870f3a26463bc3cd6cd8b3abfde956f386fde2b3a01aa59f833d752ee7.jpg" alt="Torque Coding" width="720" />
+</p>
+
 ## What problem is this project solving?
 
 Torque Coding is designed for the mid-tier AI-coding developer (£20/month plans, not £200) who cannot afford tool lock-in — so it treats the **memory bank on disk as canonical** and the agent session as replaceable.
