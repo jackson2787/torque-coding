@@ -8,7 +8,7 @@ First public beta. Feature-complete and internally coherent; awaits external end
 
 ### Added — operating model
 
-- Six-state machine: `PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF`, with `ESCALATE` as a stall-break state reachable from any active state.
+- Seven-state machine: `DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF`, with `ESCALATE` as a stall-break state reachable from any active state.
 - Two-domain memory bank (`.memory-bank-v2/machine/` always-loaded, `.memory-bank-v2/human/` on-demand).
 - Hard human approval gate via `activeContext.md#Approval-Record` — verbatim quote required before BUILD runs.
 - Cap exhaustion as a first-class stall signal with per-state soft/hard caps and a configurable escalation ladder in `limits.md`.
@@ -16,7 +16,7 @@ First public beta. Feature-complete and internally coherent; awaits external end
 
 ### Added — skills
 
-- Six state-machine skills: `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief`.
+- Seven state-machine skills: `idea-refine`, `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief`.
 - Six memory-bank maintenance skills: `update-active-context`, `update-toc`, `update-limits`, `update-constitution`, `update-operational-context`, `update-human-log`, `mb-rebase`, `check`.
 - `check` — read-only nine-check structural validator, invokable as "torque-coding check" or in natural language.
 

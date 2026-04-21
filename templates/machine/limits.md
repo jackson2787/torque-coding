@@ -26,6 +26,7 @@ Budgets are input-token targets. Soft cap: proceed but log a warning. Hard cap: 
 
 | State | Model tier | Soft cap (input) | Hard cap (input) | On hard cap |
 |---|---|---|---|---|
+| DEFINE | powerful | 10,000 | 15,000 | surface to user |
 | PLAN | powerful | 15,000 | 25,000 | surface to user |
 | PLAN-CONTEXTUALIZE | powerful | 25,000 | 40,000 | surface to user |
 | BUILD (per attempt) | executor | 10,000 | 15,000 | stall (counts as 1 attempt) |
@@ -53,6 +54,7 @@ When a state hits its hard cap, the state machine treats it identically to a fai
 
 | State | Cap exhaustion → |
 |---|---|
+| DEFINE | surface to user ("definition is exceeding budget for this idea — narrow the idea or defer lower-priority branches") |
 | PLAN | surface to user ("planning is exceeding budget for this task — consider smaller scope or stronger tier") |
 | PLAN-CONTEXTUALIZE | surface to user (same framing) |
 | BUILD | counts as a failed attempt; build-log.md records "Result: FAIL (cap exhaustion)"; attempt N+1 starts with tighter scope |

@@ -39,7 +39,7 @@ This file is the tool-agnostic canonical source for the Torque Coding operating 
 - `.agent/rules/sacred-rules.md` — the six sacred rules and memory-bank write rules
 - `.agent/rules/memory-bank.md` — two-domain memory structure and load rules
 - `.agent/rules/authority-order.md` — the strict authority stack with worked examples
-- `.agent/rules/state-machine.md` — PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
+- `.agent/rules/state-machine.md` — DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF flow, with ESCALATE on stall
 - `.agent/rules/execution-discipline.md` — BUILD-state discipline (simplicity first, surgical changes, surface ambiguity)
 - `.agent/rules/compaction.md` — compaction recovery protocol (pre/post checklist and restore procedure)
 
@@ -88,12 +88,12 @@ See `.agent/rules/authority-order.md` for the full stack and worked examples.
 ## State Flow (summary)
 
 ```
-PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF      (with ESCALATE on stall)
-         ↑
+DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF      (with ESCALATE on stall)
+                  ↑
   HARD HUMAN GATE: explicit approval required before advancing
 ```
 
-Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`. Per-state budgets and the escalation ladder are tuned in `limits.md`. Cap exhaustion is a first-class stall signal.
+DEFINE refines raw ideas into `current-task/definition.md`. PLAN consumes that definition and writes `current-task/plan.md`. Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`. Per-state budgets and the escalation ladder are tuned in `limits.md`. Cap exhaustion is a first-class stall signal.
 
 **The PLAN → PLAN-CONTEXTUALIZE transition is the hard human gate.** The planning agent captures a verbatim human approval string and records it in `activeContext.md#Approval-Record`. PLAN-CONTEXTUALIZE and BUILD refuse to run without a populated Approval Record — regardless of whether `plan.md` shows `Status: Approved` (a skill can write that field; only a human can supply the quote).
 
@@ -113,7 +113,7 @@ Because the memory bank on disk is canonical, you can split a task across tools 
 
 | Phase | Recommended tool | Why |
 |---|---|---|
-| PLAN + PLAN-CONTEXTUALIZE | Claude Code (Opus) | Strong reasoning + native plan mode enforces the gate |
+| DEFINE + PLAN + PLAN-CONTEXTUALIZE | Claude Code (Opus) | Strong reasoning + native plan mode enforces the gate |
 | BUILD | OpenCode or any CLI with a fast/local executor model (Haiku, Sonnet, or a local coder) | Mechanical execution; `plan_context.md` is the complete map |
 | QA | Same executor tool or an upgraded model | Runs tests, enforces paranoia |
 | DEBRIEF / review | Codex or another agent | Fresh eyes on the diff; proposes learnings to `operational-context.md` |

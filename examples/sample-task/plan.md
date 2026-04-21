@@ -13,6 +13,13 @@ Protect the login endpoint from brute-force attacks by adding per-route rate lim
 
 User-visible outcome: repeated failed login attempts from the same IP are throttled automatically, without any application restart or config change.
 
+## Definition Traceability
+
+- Source definition: `definition.md`
+- Target user preserved from definition: yes — unauthenticated login users and operators managing account-access abuse
+- MVP scope preserved from definition: yes — route-scoped per-IP rate limiting for `POST /api/auth/login`
+- Not Doing boundaries preserved from definition: yes — no global throttling, account-level lockout, CAPTCHA, or progressive challenges
+
 ## Acceptance Criteria
 
 1. `npm test -- --testPathPattern=src/middleware/rateLimiter.test.js` exits 0 with all tests passing

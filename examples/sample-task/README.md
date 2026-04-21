@@ -26,6 +26,7 @@ Add per-route rate limiting to protect the login endpoint from brute-force attac
 
 | File | Produced by | State | What it demonstrates |
 |---|---|---|---|
+| `definition.md` | `idea-refine` skill | DEFINE | Refined problem, target user, MVP scope, assumptions, and Not Doing list |
 | `plan.md` | `writing-plans` skill | PLAN | Authority check, reuse analysis, acceptance criteria, implementation steps |
 | `plan_context.md` | `plan-contextualize` skill | PLAN-CONTEXTUALIZE | "Zero exploration" context pack for the executor model |
 | `build-log.md` | `build-loop` skill | BUILD | Single successful attempt; does NOT claim to have run tests |
@@ -35,10 +36,11 @@ Add per-route rate limiting to protect the login endpoint from brute-force attac
 
 ## Reading order
 
-1. `plan.md` — understand what was agreed
-2. `plan_context.md` — understand what the executor model was given to work with
-3. `build-log.md` — see what BUILD did (and did not do)
-4. `qa-report.md` — see how QA verified the work
+1. `definition.md` — understand how the raw idea was narrowed
+2. `plan.md` — understand what was agreed
+3. `plan_context.md` — understand what the executor model was given to work with
+4. `build-log.md` — see what BUILD did (and did not do)
+5. `qa-report.md` — see how QA verified the work
 
 ---
 

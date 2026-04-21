@@ -43,7 +43,7 @@ The concrete problems it solves:
 
 1. **Ecosystem lock-in is expensive.** Frontier tools assume you stay in one session. Torque Coding lets you plan in Claude Code, build in OpenCode with a fast/local executor model, review in Codex — the hand-off is files on disk, not session state.
 2. **Context loss is routine at this tier.** Rate limits, compaction, session switches. `activeContext.md` + `current-task/` means any compliant tool can resume exactly where the last one stopped.
-3. **Planner-executor cost asymmetry.** Planning burns tokens once per task; execution burns continuously. Putting them on the same powerful tier wastes the monthly cap. The state machine forces the split via `plan_context.md` — a pack complete enough that the executor model needs zero exploration.
+3. **Planner-executor cost asymmetry.** Definition and planning burn tokens once per task; execution burns continuously. Putting them on the same powerful tier wastes the monthly cap. The state machine forces the split via `definition.md` and `plan_context.md` — a refined brief plus a pack complete enough that the executor model needs zero exploration.
 4. **Agents declare victory too early.** QA is paranoid by design — six checks, all executed (never reasoned about), constitutional boundaries stop immediately.
 5. **Silent drift from doctrine.** A hard human gate (verbatim approval quote in `activeContext.md#Approval-Record`) blocks BUILD until a plan is explicitly approved. Debrief proposes learnings back into `operational-context.md` rather than letting them rot in chat history.
 
@@ -78,7 +78,7 @@ None of those paths require paying for a single ecosystem. They require paying f
 
 ### Why the planner-executor split follows from the budget
 
-The state machine runs planning on a powerful model and execution on an executor-tier model (fast/local/cheap — whatever is available), with the hand-off as files on disk (`plan.md` + `plan_context.md`).
+The state machine runs definition and planning on a powerful model and execution on an executor-tier model (fast/local/cheap — whatever is available), with the hand-off as files on disk (`definition.md` + `plan.md` + `plan_context.md`).
 
 At £200/month this is an architectural nicety. At £20/month it is the difference between one complex task per day and five on the same subscription. Planning burns tokens but happens once per task; execution burns tokens continuously. Putting them on different tiers — with a context pack complete enough that the executor model needs zero exploration — stretches the cap where it matters.
 
@@ -110,7 +110,7 @@ The memory bank splits into a machine-facing domain (loaded every session) and a
 | `operational-context.md` | Current working rules — present-tense directives: do this, do not do this, prefer this, avoid this, current constraints. Updates when the repo evolves. | Per-learning, via debrief |
 | `limits.md` | Runtime config — per-state token budgets (soft/hard caps) and the escalation ladder. Tunable by developer tier. | When the developer's tier or project scale changes |
 | `activeContext.md` | Compaction recovery anchor: current state, progress, session data, pointer to `current-task/` | Every state transition |
-| `current-task/` | At most one active task. Holds `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, `escalation-brief.md` as applicable. | Written by state-machine skills during the task lifecycle |
+| `current-task/` | At most one active task. Holds `definition.md`, `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, `escalation-brief.md` as applicable. | Written by state-machine skills during the task lifecycle |
 
 ### Human-facing memory — loaded on demand only
 
@@ -148,14 +148,15 @@ See [`rules/authority-order.md`](./rules/authority-order.md) for worked examples
 ## State machine
 
 ```
-PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  ↔  QA  →  DEBRIEF
-                                        ↓ (3 stalls OR cap exhaustion)
-                                    ESCALATE (ladder-stepped)
+DEFINE  →  PLAN  →  PLAN-CONTEXTUALIZE  →  BUILD  ↔  QA  →  DEBRIEF
+                                                  ↓ (3 stalls OR cap exhaustion)
+                                              ESCALATE (ladder-stepped)
 ```
 
 Each state declares a model tier, an input contract (files on disk), and a token budget loaded from `limits.md`.
 
-- **PLAN** — powerful model. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria. Hard cap (default): 25k input tokens.
+- **DEFINE** — powerful model. Produces `current-task/definition.md` — refined problem, target user, success criteria, assumptions, MVP scope, and Not Doing list. Hard cap (default): 15k input tokens.
+- **PLAN** — powerful model. Consumes `definition.md` when present. Produces `current-task/plan.md` — task contract, authority check, reuse analysis, acceptance criteria. Hard cap (default): 25k input tokens.
 - **PLAN-CONTEXTUALIZE** — powerful model. Produces `current-task/plan_context.md` — a context pack so complete that BUILD needs zero exploration. Hard cap (default): 40k.
 - **BUILD** — executor model. Applies the plan, logs attempts. Max 3 attempts OR cap exhaustion before escalation. Hard cap per attempt (default): 15k.
 - **QA** — executor model, skeptical by design. Six fixed checks, all executed (not reasoned about). Constitutional crossings stop immediately. Hard cap per cycle (default): 12k.
@@ -185,8 +186,9 @@ See [`rules/state-machine.md`](./rules/state-machine.md).
 │   ├── sacred-rules.md             ← six sacred rules + memory-bank write rules
 │   ├── memory-bank.md              ← two-domain structure and load rules
 │   ├── authority-order.md          ← strict authority stack with worked examples
-│   └── state-machine.md            ← PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF
+│   └── state-machine.md            ← DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF
 ├── skills/
+│   ├── idea-refine/SKILL.md        ← DEFINE
 │   ├── memory-bank/
 │   │   ├── update-constitution/SKILL.md
 │   │   ├── update-operational-context/SKILL.md
@@ -205,6 +207,7 @@ See [`rules/state-machine.md`](./rules/state-machine.md).
 │   │   ├── limits.md
 │   │   ├── activeContext.md
 │   │   └── current-task/
+│   │       ├── definition.md
 │   │       ├── plan.md
 │   │       ├── plan_context.md
 │   │       ├── build-log.md

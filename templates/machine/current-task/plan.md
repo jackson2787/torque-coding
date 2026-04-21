@@ -6,6 +6,7 @@
 **Status**: Draft | Approved | Superseded
 
 <!-- Written by: skills/state-machine/writing-plans-v2
+     Source brief: definition.md when DEFINE was used
      Consumed by: plan-contextualize (next state)
      Archived to: human/tasks/YYYY-MM/DDMMDD_<slug>/plan.md on debrief -->
 
@@ -14,6 +15,15 @@
 ### Objective
 
 [One paragraph. What is being changed and why. State the user-visible outcome, not the implementation.]
+
+### Definition traceability
+
+<!-- If DEFINE was used, map the definition into this plan. If DEFINE was intentionally skipped, state why. -->
+
+- Source definition: [definition.md | DEFINE skipped — reason]
+- Target user preserved from definition: [yes/no/n/a]
+- MVP scope preserved from definition: [yes/no/n/a]
+- Not Doing boundaries preserved from definition: [yes/no/n/a]
 
 ### Acceptance criteria
 

@@ -62,7 +62,7 @@ Run these steps in order when starting a new session after compaction:
 |---|---|
 | All `current-task/` files on disk | In-session reasoning and chain-of-thought |
 | `activeContext.md` state fields | Tool call results not written to disk |
-| `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md` | Conversation history not captured in a `current-task/` file |
+| `definition.md`, `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md` | Conversation history not captured in a `current-task/` file |
 | `operational-context.md` directives | Ephemeral session notes not written to `activeContext.md#Session-Data` |
 | The escalation ladder position (in `activeContext.md`) | Any reasoning that was not acted upon (no file written, no state updated) |
 

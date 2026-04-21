@@ -1,6 +1,6 @@
 # Getting Started with Torque Coding
 
-This guide walks you from a clean project to completing your first task through the full PLAN → BUILD → QA → DEBRIEF cycle. It assumes you have read `AGENTS.md` and understand what the memory bank is. If you haven't, read `AGENTS.md` first.
+This guide walks you from a clean project to completing your first task through the full DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF cycle. It assumes you have read `AGENTS.md` and understand what the memory bank is. If you haven't, read `AGENTS.md` first.
 
 ---
 
@@ -93,6 +93,33 @@ This section walks through the complete state flow for a fictional task — addi
 
 ---
 
+### DEFINE
+
+**What you do**: describe the raw idea or task in natural language.
+
+> "I want to protect login from abuse without making normal users miserable."
+
+**What the agent does**:
+1. Runs the `idea-refine` skill
+2. Asks a small number of sharpening questions
+3. Explores alternative directions and trade-offs
+4. Writes `definition.md` with the target user, success criteria, assumptions, MVP scope, and Not Doing list
+5. Asks whether to proceed to PLAN
+
+**What appears on disk**:
+```
+.memory-bank-v2/machine/current-task/definition.md
+```
+
+**State announcement you will see**:
+```
+[STATE: DEFINE] Task: add-rate-limit-middleware
+```
+
+If your task is already precise and has clear acceptance criteria, you can intentionally skip DEFINE and go straight to PLAN.
+
+---
+
 ### PLAN
 
 **What you do**: describe the task to your agent in natural language.
@@ -102,8 +129,9 @@ This section walks through the complete state flow for a fictional task — addi
 **What the agent does**:
 1. Loads machine memory and the rule files
 2. Checks the task against `constitution.md` and `operational-context.md` for conflicts
-3. Runs the `writing-plans` skill — analyzes existing files, performs a reuse analysis, writes `plan.md`
-4. Presents the plan and waits for your approval
+3. Reads `definition.md` if DEFINE was used
+4. Runs the `writing-plans` skill — analyzes existing files, performs a reuse analysis, writes `plan.md`
+5. Presents the plan and waits for your approval
 
 **What appears on disk**:
 ```
@@ -267,7 +295,8 @@ This updates `.agent/rules/`, `.agent/skills/`, and, when Claude Code is install
 | Agent says "`update-active-context` skill not found" | Skill files not in the expected platform directory (`.agent/skills/` or `.claude/skills/`) | Run `torque-coding update` |
 | QA fails Check 1: "no tests found" | BUILD claimed to add tests but didn't | Return to BUILD with QA's specific issue; BUILD will add the missing tests in its next attempt |
 | Session compacted mid-task | Context window truncated by the tool | Read `.agent/rules/compaction.md` for AGENTS.md-compatible tools, or `rules/compaction.md` in Claude Code — start a new session, load machine memory, check `activeContext.md` for the resume state |
-| Task description produces a very large plan | Task too broad for current limits | Split the task; or raise the PLAN hard cap in `limits.md` |
+| Task description is fuzzy or too broad | DEFINE was skipped or ended too early | Run `idea-refine` / DEFINE and produce `definition.md` before PLAN |
+| Task description produces a very large plan | Task too broad for current limits | Split the task; or raise the DEFINE or PLAN hard cap in `limits.md` |
 
 ---
 
@@ -275,7 +304,7 @@ This updates `.agent/rules/`, `.agent/skills/`, and, when Claude Code is install
 
 - `AGENTS.md` — the full operating model and authority rules
 - `CLAUDE.md` — Claude Code entry point with @-imports
-- `examples/sample-task/` — complete worked example (all five artifacts for `add-rate-limit-middleware`)
+- `examples/sample-task/` — complete worked example (all six artifacts for `add-rate-limit-middleware`)
 - `.agent/rules/state-machine.md` — full state contracts, stall rules, any-state entry table for AGENTS.md-compatible tools
 - `.agent/rules/compaction.md` — compaction recovery procedure for AGENTS.md-compatible tools
 - `rules/state-machine.md` — Claude Code state-machine reference

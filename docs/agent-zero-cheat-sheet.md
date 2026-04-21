@@ -1,6 +1,6 @@
 # Agent Zero — User Cheat Sheet
 
-> Quick reference for humans working with the AGENTS 2.3 state machine.
+> Legacy quick reference for humans working with the Torque Coding state machine.
 > This is not the spec — read `AGENTS.md` for the full operating model.
 
 ---
@@ -11,19 +11,19 @@ These phrases control the state machine. Use them to move forward, go back, or f
 
 | You say | Agent hears | Transition |
 |---------|-------------|------------|
-| *[paste task contract]* | "I have work to do" | EXPLORE → PLAN |
-| "approved" / "looks good" / "proceed" | "Plan is confirmed" | PLAN → BUILD |
-| "change X" / "fix Y" / "try again" | "Go back and revise" | APPROVAL → BUILD |
-| "approved" / "looks good" / "ship it" | "Code is confirmed" | APPROVAL → APPLY |
-| "document it" / "update the memory bank" | "Write the docs" | APPLY → DOCS |
-| "revert" | "Throw it all away" | Any → discard, back to EXPLORE |
+| *[paste raw idea]* | "Define the work before planning" | PLAN/IDLE → DEFINE |
+| *[paste precise task contract]* | "I have scoped work to plan" | PLAN/IDLE → PLAN |
+| "approved" / "looks good" / "proceed" | "Plan is confirmed" | PLAN → PLAN-CONTEXTUALIZE |
+| "change X" / "fix Y" / "try again" | "Revise the plan or rebuild after QA" | PLAN or QA → BUILD |
+| "debrief" / "capture what we learned" | "Close or summarize the task" | Any → DEBRIEF |
+| "revert" | "Throw it all away" | Any → abandon current task |
 
 ### Forcing / Recovering State
 
 | You say | What it does |
 |---------|-------------|
 | "What state are you in?" | Agent announces current position |
-| "You are in EXPLORE. No file changes." | Corrects an agent that jumped ahead |
+| "You are in DEFINE. No file changes." | Corrects an agent that jumped ahead |
 | "Re-read activeContext.md and resume." | Recovery after compaction or confusion |
 | "Stop. Go back to PLAN." | Forces a retreat when approach is wrong |
 | "You're in BUILD, not PLAN. Execute the approved plan." | Corrects an agent replanning instead of building |
@@ -33,38 +33,36 @@ These phrases control the state machine. Use them to move forward, go back, or f
 ## The Loop
 
 ```
-EXPLORE → PLAN → BUILD → DIFF → QA → APPROVAL → APPLY → DOCS → EXPLORE
+DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF
 ```
 
 | State | What happens | You do | Agent does |
 |-------|-------------|--------|------------|
-| **EXPLORE** | Read-only investigation | Ask questions, explore ideas | Reads code, discusses, researches. Changes nothing. |
+| **DEFINE** | Refine the task | Answer sharpening questions | Writes `definition.md`. Changes no product code. |
 | **PLAN** | Design the approach | Review and approve the plan | Cites `file:line`, maps reuse, identifies risks |
-| **BUILD** | Write the code | Wait (or watch) | Implements plan, writes tests, generates diff. Does NOT apply. |
-| **DIFF** | Present changes | Review the diff | Shows rationale, MB references, integration points |
-| **QA** | Run tests | Wait (or grant waiver) | Tests, lints, coverage, build verification |
-| **APPROVAL** | Human gate | Say "approved" or request changes | Presents summary, waits for your word |
-| **APPLY** | Apply to branch | Nothing | Applies diff, verifies, reports |
-| **DOCS** | Update memory bank | Nothing | Uses per-document skills to update MB files |
+| **PLAN-CONTEXTUALIZE** | Build the executor pack | Optionally review | Writes `plan_context.md` |
+| **BUILD** | Write the code | Wait (or watch) | Implements plan and logs attempts |
+| **QA** | Run tests | Wait | Tests, lints, build verification, acceptance checks |
+| **DEBRIEF** | Capture learning | Approve any memory updates | Archives task and resets active context |
 
 ---
 
 ## Starting A Session
 
-Every session lands in **EXPLORE**. From there:
+Every fresh task starts from **PLAN/IDLE**. From there:
 
 | You want to... | Do this |
 |----------------|---------|
-| Jump straight to work | Paste a task contract |
-| Shape a vague idea first | Say `Create task contract` or use the `idea-to-task` skill, then paste the output |
-| Just understand the code | Ask questions — stay in EXPLORE as long as you want |
-| Fix a bug quickly | Paste a minimal task contract, agent uses Fast Track MB load |
+| Jump straight to planning | Paste a precise task contract |
+| Shape a vague idea first | Say `idea-refine` or `define this`, then proceed from `definition.md` |
+| Just understand the code | Ask questions — no state-machine task is needed |
+| Fix a bug quickly | Paste a minimal task contract and explicitly skip DEFINE if scope is already clear |
 
 ---
 
 ## Writing A Task Contract
 
-The agent needs this to leave EXPLORE. Minimum viable contract:
+The agent needs this to skip DEFINE and enter PLAN directly. Minimum viable contract:
 
 ```
 Task: [what to do]
@@ -76,7 +74,7 @@ Constraints: [must/must not]
 Instructions: Create a plan for approval. Do not code until approved.
 ```
 
-Full format in AGENTS.md Section 5. Or say `Create task contract` / use `idea-to-task` to generate one from conversation. When the skill runs, it will announce `Ideas to Task Contract running...` in-session first.
+Full format lives in `AGENTS.md` and `rules/state-machine.md`. For vague ideas, run `idea-refine` first and let it write `current-task/definition.md`.
 
 ---
 
@@ -84,8 +82,8 @@ Full format in AGENTS.md Section 5. Or say `Create task contract` / use `idea-to
 
 | Say this | Agent does |
 |----------|-----------|
-| "approved" / "looks good" / "ship it" | Proceeds to APPLY |
-| "change X" / "fix Y" | Returns to BUILD |
+| "approved" / "looks good" / "proceed" | Records plan approval and proceeds to PLAN-CONTEXTUALIZE |
+| "change X" / "fix Y" | Revises the plan or returns QA failures to BUILD |
 | "revert" | Discards everything |
 
 ---
@@ -142,8 +140,8 @@ For API/framework docs (not behaviour), the agent queries **Context7 MCP** autom
 
 | Symptom | What's happening | Fix |
 |---------|-----------------|-----|
-| Agent writes code in EXPLORE | Skipped the state machine | Tell it: "You're in EXPLORE. No file changes." |
-| Agent applies without approval | Broke the APPROVAL gate | Revert. Re-state the rule. |
+| Agent writes code in DEFINE or PLAN | Skipped the state machine | Tell it: "You're in [STATE]. No file changes." |
+| Agent builds without plan approval | Broke the PLAN approval gate | Revert. Re-state the rule. |
 | Same diff twice | Stall detected | Agent should halt. Give it more context or a different approach. |
 | Agent ignores accessibility / security | Injected skills not loaded | Check injection files. Add the missing skill. |
 | Post-compaction confusion | Context was compressed | Agent should auto-recover from activeContext.md. If not: "Re-read activeContext.md and resume." |
@@ -169,6 +167,6 @@ If the agent breaks these, call it out. They're non-negotiable.
 |------|--------|
 | Bootstrap memory bank | `Read docs/memory-bank/bootstrap-memory-bank-contract.md and execute it.` |
 | Rebase a document | `mb-rebase architecture.md` |
-| Start from an idea | Use `idea-to-task` skill, then paste the contract |
+| Start from an idea | Run `idea-refine` / DEFINE, then proceed from `definition.md` |
 | Force state awareness | `"What state are you in? Show your state machine position."` |
 | Recover after compaction | Usually automatic. If not: `"Re-read activeContext.md and resume from saved state."` |

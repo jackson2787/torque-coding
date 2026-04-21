@@ -13,7 +13,7 @@ metadata:
   model-tier: powerful (via subagent) or user-switched — determined by the ladder
   requires:
     - stalled BUILD or QA (3 attempts, same-signature repeat, or cap exhaustion)
-    - current-task/ populated (plan, plan_context, build-log, and usually qa-report)
+    - current-task/ populated (definition when present, plan, plan_context, build-log, and usually qa-report)
     - .memory-bank-v2/machine/limits.md (for the escalation ladder)
   produces: .memory-bank-v2/machine/current-task/escalation-brief.md
   resumes-to: BUILD or QA (whichever stalled)

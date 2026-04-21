@@ -4,28 +4,29 @@
 
 ## Overview
 
-`PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF` with `ESCALATE` as a recovery state.
+`DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF` with `ESCALATE` as a recovery state.
 
 ```
-PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
-                          ↑_______↓
-                     [QA fails → BUILD, cycle n+1 of 3]
-                              ↓
-                    [3 stalls at any point → ESCALATE]
-                              ↓
-                     [Resolved → resume stalled state]
+DEFINE → PLAN → CONTEXTUALIZE → BUILD → QA → DEBRIEF
+                                   ↑_______↓
+                              [QA fails → BUILD, cycle n+1 of 3]
+                                       ↓
+                             [3 stalls at any point → ESCALATE]
+                                       ↓
+                              [Resolved → resume stalled state]
 ```
 
 ### Key properties
 
-1. **Planner-executor split.** PLAN and PLAN-CONTEXTUALIZE use a powerful model. BUILD and QA use an executor model. The hand-off is files on disk.
-2. **No DIFF state.** BUILD presents its work to QA directly.
-3. **QA is skeptical by design.** Exists to catch an executor model declaring victory too early. Paranoid. Runs tests — does not just look at them.
-4. **Memory bank is canonical.** `current-task/` folder holds all task artifacts. Sessions can be lost or handed off; the memory bank contains enough to resume.
-5. **Any-state entry.** A session starts in the earliest state whose input contract is satisfied.
-6. **Stateless operation.** Each state skill declares its inputs and outputs explicitly. States are loosely coupled, not a strict FSM.
-7. **Per-state token budgets.** Every state declares a soft and hard cap from `limits.md`. Cap exhaustion is a first-class stall signal.
-8. **Configurable escalation ladder.** `ESCALATE` reads the ladder from `limits.md` and steps up one rung per escalation within a task.
+1. **Definition before planning.** DEFINE turns a raw idea into a bounded task definition before PLAN spends effort on implementation detail.
+2. **Planner-executor split.** DEFINE, PLAN, and PLAN-CONTEXTUALIZE use a powerful model. BUILD and QA use an executor model. The hand-off is files on disk.
+3. **No DIFF state.** BUILD presents its work to QA directly.
+4. **QA is skeptical by design.** Exists to catch an executor model declaring victory too early. Paranoid. Runs tests — does not just look at them.
+5. **Memory bank is canonical.** `current-task/` folder holds all task artifacts. Sessions can be lost or handed off; the memory bank contains enough to resume.
+6. **Any-state entry.** A session starts in the earliest state whose input contract is satisfied.
+7. **Stateless operation.** Each state skill declares its inputs and outputs explicitly. States are loosely coupled, not a strict FSM.
+8. **Per-state token budgets.** Every state declares a soft and hard cap from `limits.md`. Cap exhaustion is a first-class stall signal.
+9. **Configurable escalation ladder.** `ESCALATE` reads the ladder from `limits.md` and steps up one rung per escalation within a task.
 
 ### State announcement rule
 
@@ -42,7 +43,8 @@ Each state is entered if and only if its input contract is satisfied. Contracts 
 
 | State | Required inputs | Location |
 |---|---|---|
-| **PLAN** | Task description; memory bank | Conversation + `machine/` |
+| **DEFINE** | Raw idea or task description; memory bank | Conversation + `machine/` |
+| **PLAN** | `definition.md` or a precise task description; memory bank | `machine/current-task/definition.md` or conversation + `machine/` |
 | **PLAN-CONTEXTUALIZE** | Approved `plan.md` | `machine/current-task/plan.md` |
 | **BUILD** | `plan.md` + `plan_context.md` + memory bank | `machine/current-task/` |
 | **QA** | Applied changes + memory bank | Repo + `machine/` |
@@ -60,6 +62,7 @@ Every state enforces a soft and hard input-token cap loaded from `.memory-bank-v
 
 | State | Soft cap (default) | Hard cap (default) | On hard cap |
 |---|---|---|---|
+| DEFINE | 10,000 | 15,000 | Surface to user |
 | PLAN | 15,000 | 25,000 | Surface to user |
 | PLAN-CONTEXTUALIZE | 25,000 | 40,000 | Surface to user |
 | BUILD (per attempt) | 10,000 | 15,000 | Counts as failed attempt |
@@ -101,13 +104,59 @@ Because the memory bank is canonical, rung 3 (user-switched session) is genuinel
 
 ---
 
+## DEFINE
+
+**Model**: Powerful (Opus 4.7 recommended)
+**Skill**: `skills/idea-refine/SKILL.md`
+
+**In**: Raw idea or task description + memory bank
+**Out**: `current-task/definition.md`
+**Exit**: User confirms the refined direction and proceeds to PLAN
+
+### Purpose
+
+Convert ambiguous intent into a bounded task definition before planning implementation. DEFINE answers "what are we trying to achieve, for whom, and what are we explicitly not doing?"
+
+### Definition content (required)
+
+```markdown
+## Problem statement
+[One-sentence "How might we..." framing]
+
+## Target user
+[Specific user or actor]
+
+## Success criteria
+1. [Observable outcome]
+2. [Observable outcome]
+
+## Recommended direction
+[Chosen direction and why]
+
+## Key assumptions to validate
+- [ ] [Assumption] — [how to validate]
+
+## MVP scope
+[Smallest useful version]
+
+## Not doing
+- [Explicit exclusion] — [reason]
+
+## Planning brief
+[Concrete handoff to PLAN]
+```
+
+**Exit**: User says to proceed to PLAN. This is not the hard BUILD approval gate; the approval quote is still captured on PLAN → PLAN-CONTEXTUALIZE.
+
+---
+
 ## PLAN
 
 **Model**: Powerful (Opus 4.7 recommended)
 **Claude Code integration**: Invoked inside Claude Code plan mode where available
 **Skill**: `skills/state-machine/writing-plans/SKILL.md`
 
-**In**: Task description + memory bank
+**In**: `current-task/definition.md` + memory bank, or precise task description + memory bank when DEFINE is intentionally skipped
 **Out**: `current-task/plan.md`
 **Exit**: User approves the plan
 
@@ -116,6 +165,7 @@ Because the memory bank is canonical, rung 3 (user-switched session) is genuinel
 Before writing, load and read:
 1. `constitution.md` — check task does not contradict any constitutional rule or scope boundary
 2. `operational-context.md` — check task respects hard directives
+3. `definition.md` if present — preserve target user, success criteria, MVP scope, assumptions, and Not Doing boundaries
 
 If conflict found: stop and resolve via `authority-order.md`.
 
@@ -259,7 +309,7 @@ All checks green. QA report archived. Transition to DEBRIEF.
 
 ### Primary path (Claude Code — Agent tool available)
 
-1. Write `escalation-brief.md` — original plan, plan_context, all attempts, last known error, current code state, hypotheses explored, **current ladder step**
+1. Write `escalation-brief.md` — original definition when present, plan, plan_context, all attempts, last known error, current code state, hypotheses explored, **current ladder step**
 2. Read the next rung from `limits.md#Escalation-ladder`. Spawn an Agent subagent with `model: "<next-rung>"`
 3. Pass the escalation-brief as the subagent's prompt
 4. Subagent attempts a fix; returns result
@@ -275,7 +325,7 @@ All checks green. QA report archived. Transition to DEBRIEF.
 
 ### Fallback is graceful by design
 
-Because the memory bank already contains `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and `escalation-brief.md`, no "paste this into the next session" ritual is needed. The next session is self-sufficient.
+Because the memory bank already contains `definition.md` when present, `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and `escalation-brief.md`, no "paste this into the next session" ritual is needed. The next session is self-sufficient.
 
 ---
 
@@ -308,6 +358,7 @@ Same five-gate rubric applied to session observations. Writes to `human/tasks/YY
 | BUILD internal iterations | 3 | Escalate |
 | QA → BUILD cycles | 3 | Escalate |
 | Same error signature twice | 2 | Early escalation candidate |
+| **Hard cap exhaustion in DEFINE** | 1 occurrence | Surface to user — idea too broad for current tier |
 | **Hard cap exhaustion in BUILD** | 1 occurrence | Counts as a failed attempt; increment cycle counter |
 | **Hard cap exhaustion in QA** | 1 occurrence | Counts as a failed cycle; return to BUILD or escalate |
 | **Hard cap exhaustion in PLAN or PLAN-CONTEXTUALIZE** | 1 occurrence | Surface to user — task too large for current tier |
@@ -333,7 +384,13 @@ A session starting mid-flow resolves the entry state from `activeContext.md` fir
 ### Fallback table (files only)
 
 ```
-IF task description provided, no current-task/:
+IF raw idea or ambiguous task description provided, no current-task/:
+    → DEFINE
+ELSE IF precise implementation task provided, no current-task/:
+    → PLAN (DEFINE intentionally skipped)
+ELSE IF current-task/definition.md Draft, no plan.md:
+    → DEFINE
+ELSE IF current-task/definition.md Ready for PLAN, no plan.md:
     → PLAN
 ELSE IF current-task/plan.md Draft, no plan_context.md:
     → PLAN (awaiting approval)
@@ -361,6 +418,7 @@ ELSE:
 
 | Phase | Preferred model | Why |
 |---|---|---|
+| DEFINE | Powerful (e.g. Opus) | Product reasoning, scope control, assumption surfacing |
 | PLAN | Powerful (e.g. Opus) | Reasoning, exploration, authority check |
 | PLAN-CONTEXTUALIZE | Powerful (e.g. Opus) | Codebase reading, pattern extraction |
 | BUILD | Executor (e.g. Haiku, Sonnet) | Mechanical execution; plan_context is the map |
@@ -368,7 +426,7 @@ ELSE:
 | ESCALATE | Powerful (subagent per ladder) | Debugging beyond executor model's reach |
 | DEBRIEF | Any | Rubric application; doesn't need top-tier reasoning |
 
-The planner-executor split is the financial mechanic: spend the big model on PLAN and PLAN-CONTEXTUALIZE (where it matters), and let the executor model follow the map. Escalate only when the map runs out.
+The planner-executor split is the financial mechanic: spend the big model on DEFINE, PLAN, and PLAN-CONTEXTUALIZE (where ambiguity is expensive), and let the executor model follow the map. Escalate only when the map runs out.
 
 ---
 
@@ -376,7 +434,10 @@ The planner-executor split is the financial mechanic: spend the big model on PLA
 
 | From | Event | To |
 |---|---|---|
-| (idle) | User provides task | PLAN |
+| (idle) | User provides raw idea or ambiguous task | DEFINE |
+| (idle) | User provides precise implementation task | PLAN |
+| DEFINE | Definition ready for planning | PLAN |
+| DEFINE | Hard cap exhausted | Surface to user |
 | PLAN | Plan approved | PLAN-CONTEXTUALIZE |
 | PLAN | Hard cap exhausted | Surface to user |
 | PLAN-CONTEXTUALIZE | plan_context.md complete | BUILD |
@@ -396,4 +457,3 @@ The planner-executor split is the financial mechanic: spend the big model on PLA
 | (any) | User invokes debrief | DEBRIEF (ad-hoc) |
 
 ---
-

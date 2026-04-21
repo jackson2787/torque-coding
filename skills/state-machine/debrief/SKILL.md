@@ -1,7 +1,7 @@
 ---
 name: debrief
 description: >-
-  Terminal phase of the v2 state machine (PLAN → BUILD LOOP → DEBRIEF). Runs after
+  Terminal phase of the v2 state machine (DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF). Runs after
   every task — never skipped. Compares the task outcome against operational-context.md
   to determine whether anything memory-worthy was learned. Applies the five-gate rubric
   to candidate learnings. Proposes diffs to operational-context.md with human approval
@@ -45,7 +45,7 @@ Two invocation modes:
 
 Always. After every task. After changes are applied and the user has approved.
 
-- Input source: `.memory-bank-v2/machine/current-task/*` — plan, plan_context, build-log, qa-report
+- Input source: `.memory-bank-v2/machine/current-task/*` — definition, plan, plan_context, build-log, qa-report
 - Archives `current-task/` to `human/tasks/YYYY-MM/DDMMDD_<slug>/` on successful completion
 - Clears `current-task/` at the end
 - Resets `activeContext.md` to PLAN/IDLE
@@ -75,6 +75,7 @@ When in doubt which mode applies: if `current-task/` has a populated `qa-report.
 
 Gather these before beginning debrief:
 
+- [ ] `current-task/definition.md` (if present — refined task definition from DEFINE)
 - [ ] `current-task/plan.md` (the task contract — objective, acceptance criteria, constraints)
 - [ ] `current-task/plan_context.md` (the context pack used by BUILD)
 - [ ] `current-task/build-log.md` (iteration history)
@@ -318,7 +319,7 @@ Write a constitutional proposal. Set `Status: Proposed`. Note that ratification 
 
 ### Post-task mode
 
-1. **Archive `current-task/`**. Move all files from `.memory-bank-v2/machine/current-task/` to `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/`. Include `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and any `escalation-brief.md`.
+1. **Archive `current-task/`**. Move all files from `.memory-bank-v2/machine/current-task/` to `.memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/`. Include `definition.md`, `plan.md`, `plan_context.md`, `build-log.md`, `qa-report.md`, and any `escalation-brief.md`.
 2. **Clear `current-task/`**. The directory exists but is empty after archive.
 3. **Reset `activeContext.md`**. Load `skills/memory-bank/update-active-context/SKILL.md`. Update Current State section:
    ```
@@ -419,4 +420,3 @@ Ad-hoc mode only:
 - [ ] Debrief line appended to `activeContext.md` Recent Debriefs
 
 ---
-

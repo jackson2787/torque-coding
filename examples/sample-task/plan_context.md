@@ -7,7 +7,7 @@ for: BUILD — executor model reads this; zero exploration required
 
 # Context Pack: Add Rate-Limit Middleware
 
-**Target property**: reading `plan.md` and this file, the executor model should need **zero exploration tool calls** to implement the task.
+**Target property**: reading `definition.md`, `plan.md`, and this file, the executor model should need **zero exploration tool calls** to implement the task.
 
 ---
 

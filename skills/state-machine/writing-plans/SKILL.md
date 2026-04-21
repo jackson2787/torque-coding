@@ -12,6 +12,7 @@ metadata:
   state: PLAN
   model-tier: powerful
   requires:
+    - .memory-bank-v2/machine/current-task/definition.md (unless DEFINE intentionally skipped)
     - .memory-bank-v2/machine/constitution.md
     - .memory-bank-v2/machine/operational-context.md
     - .memory-bank-v2/machine/limits.md (for PLAN hard cap)
@@ -25,14 +26,15 @@ metadata:
 
 ## Overview
 
-Planning is the first state of the state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
+Planning follows DEFINE in the default state machine. Its output is a single file on disk — `current-task/plan.md` — that serves as the contract between PLAN and everything downstream.
 
-The goal is a plan that can survive model switching, session handoff, and compaction. If the planning session is lost, a fresh session should be able to read `plan.md` alone and understand the task as well as the original planner did.
+The goal is a plan that can survive model switching, session handoff, and compaction. If the planning session is lost, a fresh session should be able to read `definition.md` + `plan.md` and understand the task as well as the original planner did.
 
 ## When to Use
 
-- New task assigned and `current-task/` is empty or cleanly archived
+- `current-task/definition.md` is present with `Status: Ready for PLAN`
 - User explicitly says "plan this", "let's plan X", or invokes Claude Code plan mode
+- User provides a precise implementation task and explicitly skips DEFINE
 - Re-planning after a stronger model concludes the original plan is wrong (previous `plan.md` is archived with status `Superseded`)
 
 ## When NOT to Use
@@ -45,6 +47,7 @@ The goal is a plan that can survive model switching, session handoff, and compac
 
 - [ ] `constitution.md` has been read in this session
 - [ ] `operational-context.md` has been read in this session
+- [ ] `current-task/definition.md` has been read, unless DEFINE was intentionally skipped
 - [ ] `current-task/plan.md` does not already exist (or exists with `Status: Superseded`)
 - [ ] The task description from the human is unambiguous enough to write acceptance criteria
 
@@ -60,7 +63,7 @@ Re-read `constitution.md` and `operational-context.md` before planning, even if 
 
 Read `limits.md` for the PLAN hard cap (default 25k input tokens).
 
-Estimate input size: task description + constitution + operational-context + files you plan to read for reuse analysis.
+Estimate input size: definition/task description + constitution + operational-context + files you plan to read for reuse analysis.
 
 - Estimate > hard cap → do NOT draft the plan. Surface to the human: "This task is too large to plan under the current tier's PLAN cap ([X] tokens estimated, [hard-cap] hard cap). Options: (a) narrow scope, (b) split into multiple tasks, (c) raise the PLAN cap in `limits.md` if your tier permits." Stop. Cap exhaustion at PLAN is a human decision, not an auto-escalation — planning failures cannot be fixed by a stronger executor.
 - Estimate > soft cap → proceed, but note "crossed PLAN soft cap" in the plan's Risks section.
@@ -75,6 +78,18 @@ For every piece of the task contract, ask:
 - Does it override an `operational-context.md` Preferred / Avoid directive? → acceptable only with explicit scoped justification in the plan.
 
 Do not proceed to write the plan while any flag is unresolved.
+
+### 2a. Preserve the definition
+
+If `definition.md` exists, treat it as the source brief for PLAN:
+
+- Convert `definition.md#Success-criteria` into testable acceptance criteria
+- Preserve `definition.md#MVP-scope` as positive scope
+- Preserve `definition.md#Not-doing` as out-of-scope boundaries
+- Carry `definition.md#Key-assumptions-to-validate` into Risks or acceptance criteria
+- Use `definition.md#Planning-brief` to seed analyzed areas and reuse analysis
+
+If PLAN needs to contradict or widen the definition, stop and return to DEFINE for revision. Do not silently expand scope.
 
 ### 3. Reuse analysis (Sacred Rule)
 
@@ -161,6 +176,7 @@ A valid `plan.md` must have:
 - [ ] Risks and mitigations
 - [ ] Test strategy
 - [ ] Out-of-scope
+- [ ] Definition traceability: success criteria, MVP scope, and Not Doing boundaries from `definition.md` are preserved when present
 
 A plan missing any of these is incomplete. Fix before handing off.
 
@@ -181,4 +197,6 @@ A plan missing any of these is incomplete. Fix before handing off.
 | Acceptance criteria are subjective ("looks better") | Refuse. Rewrite as testable or cut. |
 | `current-task/plan.md` already exists with Status ≠ Superseded | Stop. Either complete the current task (debrief) or explicitly abandon. |
 | The task description is too vague to write acceptance criteria | Stop. Ask the human clarifying questions. Do not guess. |
+| `definition.md` exists but is still Draft | Stop. Return to DEFINE for completion before planning. |
+| PLAN would expand beyond the definition's Not Doing list | Stop. Return to DEFINE for revision or ask the human to explicitly revise scope. |
 | Estimated PLAN input exceeds the hard cap in `limits.md` | Stop. Surface to the human — narrow scope, split the task, or raise the cap. Do not auto-escalate; planning failures are not fixed by a stronger executor. |

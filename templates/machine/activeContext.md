@@ -9,7 +9,7 @@
 ## Current State
 
 ```
-State: [PLAN/IDLE | PLAN | PLAN-CONTEXTUALIZE | BUILD | QA | ESCALATE | DEBRIEF]
+State: [PLAN/IDLE | DEFINE | PLAN | PLAN-CONTEXTUALIZE | BUILD | QA | ESCALATE | DEBRIEF]
 Task:  [task slug | none]
 Model tier (expected): [powerful | executor | subagent]
 Cycle: [n/3 for BUILD or QA; n/a otherwise]
@@ -21,6 +21,7 @@ Last transition: YYYY-MM-DD HH:MM — [from-state] → [to-state]
 ## Current Task Pointer
 
 ```
+- definition.md: [present — Ready for PLAN | present — Draft | absent]
 - plan.md: [present — Approved | present — Draft | absent]
 - plan_context.md: [present | absent]
 - build-log.md: [present — [n] attempts | absent]
@@ -70,9 +71,12 @@ If `State:` is missing or corrupted, fall back to the file-presence table:
 
 | Files present in current-task/ | Entry state |
 |---|---|
-| all absent | PLAN/IDLE (or PLAN if a task is now being assigned) |
-| plan.md only (Draft) | PLAN (awaiting approval) |
+| all absent | PLAN/IDLE (or DEFINE if a raw idea/task is now being assigned) |
+| definition.md only (Draft) | DEFINE |
+| definition.md only (Ready for PLAN) | PLAN |
+| definition.md + plan.md (Draft) | PLAN (awaiting approval) |
 | plan.md only (Approved) | PLAN-CONTEXTUALIZE |
+| definition.md + plan.md (Approved) | PLAN-CONTEXTUALIZE |
 | plan.md (Approved) + plan_context.md | BUILD |
 | + build-log.md with attempts, no qa-report or FAIL qa-report | QA or BUILD (depending on last transition) |
 | + qa-report.md with all-green PASS | DEBRIEF |

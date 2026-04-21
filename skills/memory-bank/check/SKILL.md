@@ -95,7 +95,7 @@ Surface failures and warnings exactly as `update-limits` defines them.
 Read `activeContext.md#Current State`. Assert:
 
 - `State:` field is present
-- `State:` value is one of: `PLAN/IDLE`, `PLAN`, `PLAN-CONTEXTUALIZE`, `BUILD`, `QA`, `ESCALATE`, `DEBRIEF`
+- `State:` value is one of: `PLAN/IDLE`, `DEFINE`, `PLAN`, `PLAN-CONTEXTUALIZE`, `BUILD`, `QA`, `ESCALATE`, `DEBRIEF`
 - `Cycle:` format: `N/3` if State ∈ {BUILD, QA}; `n/a` otherwise
 - `Model tier (expected):` is one of: `powerful`, `executor`, `subagent`, `any`
 
@@ -108,7 +108,8 @@ Read `activeContext.md#Current State` and scan which files are present in `curre
 | activeContext State | current-task/ expected shape | FAIL condition |
 |---|---|---|
 | PLAN/IDLE | all absent | any file present |
-| PLAN | plan.md present | plan.md absent |
+| DEFINE | definition.md present | definition.md absent |
+| PLAN | definition.md or plan.md present | both definition.md and plan.md absent |
 | PLAN-CONTEXTUALIZE | plan.md (Approved) present | plan.md absent or Status ≠ Approved |
 | BUILD | plan.md + plan_context.md present | either absent |
 | QA | plan.md + plan_context.md + build-log.md present | any of the three absent |
@@ -131,7 +132,7 @@ WARN: current-task/ has files but State is PLAN/IDLE.
 Read `activeContext.md#Approval-Record`. Assert:
 
 - If State ∈ {PLAN-CONTEXTUALIZE, BUILD, QA, DEBRIEF}: Approval Record must be non-empty (not the placeholder `- [empty until PLAN → PLAN-CONTEXTUALIZE transition]`).
-- If State ∈ {PLAN/IDLE, PLAN}: Approval Record must be empty (the placeholder) — a non-empty record with no active task is a sign of incomplete debrief.
+- If State ∈ {PLAN/IDLE, DEFINE, PLAN}: Approval Record must be empty (the placeholder) — a non-empty record before plan approval is a sign of bypassed flow or incomplete debrief.
 - If State = ESCALATE: Approval Record must be non-empty (escalation implies a plan was in flight).
 
 **FAIL** if the gate is violated. This is a hard gate — downstream states refuse to run when it is empty.
@@ -147,7 +148,7 @@ FAIL: Approval Record is empty but State is BUILD.
 
 A ghost task is a task slug in `activeContext.md#Current Task Pointer` that does not match any `current-task/` files.
 
-Check: if `Task:` is not `none`, at least one of the five expected files must be present in `current-task/`.
+Check: if `Task:` is not `none`, at least one expected task artifact must be present in `current-task/`.
 
 **WARN** if Task slug is set but `current-task/` is completely empty.
 

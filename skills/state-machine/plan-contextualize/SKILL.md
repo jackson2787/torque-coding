@@ -13,6 +13,7 @@ metadata:
   state: PLAN-CONTEXTUALIZE
   model-tier: powerful
   requires:
+    - .memory-bank-v2/machine/current-task/definition.md (if DEFINE was used)
     - .memory-bank-v2/machine/current-task/plan.md (Status = Approved)
     - .memory-bank-v2/machine/limits.md (for PLAN-CONTEXTUALIZE hard cap)
   produces: .memory-bank-v2/machine/current-task/plan_context.md
@@ -85,13 +86,13 @@ This is not a failure of the operating model — it is the operating model ackno
 
 ### 1. Read the plan
 
-Read `plan.md` end to end. Note every file mentioned, every pattern referenced, every acceptance criterion.
+Read `definition.md` if present, then read `plan.md` end to end. Note every file mentioned, every pattern referenced, every acceptance criterion, and every Not Doing boundary inherited from DEFINE.
 
 ### 1a. Cap check
 
 Read `limits.md` for the PLAN-CONTEXTUALIZE hard cap (default 40k input tokens).
 
-Estimate input size: plan + all files in `plan.md#Analyzed-files` + expected integration-point files + doctrine slices.
+Estimate input size: definition + plan + all files in `plan.md#Analyzed-files` + expected integration-point files + doctrine slices.
 
 - Estimate > hard cap → do NOT build the pack. Surface to the human: "Context-pack token budget ([X] tokens estimated) exceeds hard cap ([hard-cap]). Options: (a) split the task so each sub-task has a smaller touched-file set, (b) raise the CONTEXTUALIZE cap in `limits.md`, (c) ship a slimmer pack and accept that BUILD may have to escalate more often." Stop. Like PLAN, cap exhaustion here is a human decision — a stronger executor cannot fix a too-large scope.
 - Estimate > soft cap → proceed, but add a warning note in `plan_context.md` header ("crossed PLAN-CONTEXTUALIZE soft cap — pack may be lean in non-critical sections").
@@ -168,6 +169,7 @@ A valid `plan_context.md` must have:
 - [ ] Dead ends from planning
 - [ ] Success criteria as mechanical checks
 - [ ] Out-of-scope paths
+- [ ] Any Not Doing boundaries from `definition.md` carried forward when present
 - [ ] Self-audit confirmation
 
 **Does NOT contain**: extracted slices of `constitution.md` or `operational-context.md`. BUILD reads those files directly.

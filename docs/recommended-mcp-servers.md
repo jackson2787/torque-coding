@@ -9,7 +9,7 @@ AGENTS.md lists "MCP Preferred" as a Non-Negotiable. This guide explains which M
 
 ## How MCP Servers Fit the Workflow
 
-AGENTS.md defines a state machine (`PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF`, with `ESCALATE` on stall) with supporting systems (Memory Bank, compaction protocol, reuse enforcement, per-state token budgets). MCP servers improve this workflow by giving the agent structured tool access to operations it would otherwise do through raw shell commands or brute-force file reads.
+AGENTS.md defines a state machine (`DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD ↔ QA → DEBRIEF`, with `ESCALATE` on stall) with supporting systems (Memory Bank, compaction protocol, reuse enforcement, per-state token budgets). MCP servers improve this workflow by giving the agent structured tool access to operations it would otherwise do through raw shell commands or brute-force file reads.
 
 The agent doesn't need MCP servers to function — the system works with direct file access and shell commands as a baseline. MCP servers are an upgrade path that makes specific states faster, more reliable, or more context-efficient.
 

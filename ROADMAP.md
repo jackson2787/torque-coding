@@ -1,6 +1,6 @@
 # Torque Coding — Roadmap
 
-**Status as of 2026-04**: v3.0.0-dev. All Tier 1 and Tier 2 items are now complete. The operating model runs end-to-end: `torque-coding init` → bootstrap → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF, with compaction recovery, escalation, and memory-bank maintenance all covered. Tier 3 is polish and trails.
+**Status as of 2026-04**: v3.0.0-dev. All Tier 1 and Tier 2 items are now complete. The operating model runs end-to-end: `torque-coding init` → bootstrap → DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF, with compaction recovery, escalation, and memory-bank maintenance all covered. Tier 3 is polish and trails.
 
 ---
 
@@ -13,7 +13,7 @@
 - [x] **Align AGENTS.md and CLAUDE.md.** Byte-identical tripwire sections. CLAUDE.md uses `@-imports`; AGENTS.md uses an explicit "read these files in full" contract.
 - [x] **Scrub v1/v2 framing.** No "Relationship to v1" appendices, no `(v2.2)` inline tags, frontmatter names normalised.
 - [x] **`limits.md` template.** Per-state soft/hard caps and escalation ladder.
-- [x] **All six state-machine skills.** `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief`.
+- [x] **All seven state-machine skills.** `idea-refine`, `writing-plans`, `plan-contextualize`, `build-loop`, `qa`, `escalate`, `debrief`.
 - [x] **Three ceremony memory-bank skills.** `update-constitution`, `update-operational-context`, `update-human-log`.
 
 ### Tier 1 — Completed (2026-04)
@@ -24,7 +24,7 @@
 
 - [x] **3. `update-toc` skill + `templates/machine/toc.md`.** `templates/machine/toc.md` defines the snapshot structure (machine half, current-task sub-table, human half). `skills/memory-bank/update-toc/SKILL.md` overwrites the file on each call. Coupled to `update-human-log` — called automatically after every human-side write.
 
-- [x] **4. `GETTING-STARTED.md`.** Walks a new user from `torque-coding init` through bootstrap, first task (PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF), and debrief. References `examples/sample-task/` throughout. Includes a common-problems table.
+- [x] **4. `GETTING-STARTED.md`.** Walks a new user from `torque-coding init` through bootstrap, first task (DEFINE → PLAN → PLAN-CONTEXTUALIZE → BUILD → QA → DEBRIEF), and debrief. References `examples/sample-task/` throughout. Includes a common-problems table.
 
 ### Tier 2 — Completed (2026-04)
 
@@ -32,7 +32,7 @@
 
 - [x] **6. `mb-rebase` skill.** `skills/memory-bank/mb-rebase/SKILL.md` — three-category rubric (merge near-duplicates, retire outdated to `human/rationale/`, extract narrative leak). Human reviews all candidates before any write. Never silently deletes a directive.
 
-- [x] **7. Worked example (`examples/sample-task/`).** Task `add-rate-limit-middleware` on a fictional Express API. Five artifacts: `README.md`, `plan.md` (Status: Approved), `plan_context.md` (zero-exploration property demonstrated), `build-log.md` (single attempt, does not claim to run tests), `qa-report.md` (six checks, pasted terminal evidence, PASS → DEBRIEF). All file:line citations internally consistent.
+- [x] **7. Worked example (`examples/sample-task/`).** Task `add-rate-limit-middleware` on a fictional Express API. Six artifacts: `README.md`, `definition.md` (Status: Ready for PLAN), `plan.md` (Status: Approved), `plan_context.md` (zero-exploration property demonstrated), `build-log.md` (single attempt, does not claim to run tests), `qa-report.md` (six checks, pasted terminal evidence, PASS → DEBRIEF). All file:line citations internally consistent.
 
 - [x] **8. `update-limits` skill.** `skills/memory-bank/update-limits/SKILL.md` — enforces five invariants (final rung = `<user-switched session>`, non-duplicate rungs, soft ≤ hard per state, at least 3 rungs, executor rung never an escalation target). Hard blocks prevent write; warnings ask for confirmation.
 

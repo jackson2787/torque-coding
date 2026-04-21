@@ -27,6 +27,8 @@ Every state transition calls this skill. The table below lists every caller and 
 
 | Caller skill | Triggering event | New state recorded |
 |---|---|---|
+| `idea-refine` | Definition started | DEFINE |
+| `idea-refine` | Definition ready for planning | PLAN |
 | `writing-plans` | Plan approved by user | PLAN-CONTEXTUALIZE |
 | `plan-contextualize` | Context pack complete | BUILD (Cycle: 1/3) |
 | `build-loop` | Declares done | QA |
@@ -51,7 +53,7 @@ Callers must pass these values explicitly. This skill cannot infer them from dis
 
 | Field | Required value | Notes |
 |---|---|---|
-| `state` | New state name | Must be one of the 7 valid states |
+| `state` | New state name | Must be one of the 8 valid states |
 | `task-slug` | Slug string or `none` | `none` on PLAN/IDLE |
 | `model-tier` | `powerful`, `executor`, `subagent`, or `any` | Matches the state's expected tier |
 | `cycle` | `N/3` or `n/a` | Required for BUILD and QA; must be `n/a` for all others |
@@ -67,13 +69,13 @@ Run all four before writing anything.
 ### 1. Valid state name
 
 The `state` value must be one of:
-`PLAN/IDLE`, `PLAN`, `PLAN-CONTEXTUALIZE`, `BUILD`, `QA`, `ESCALATE`, `DEBRIEF`
+`PLAN/IDLE`, `DEFINE`, `PLAN`, `PLAN-CONTEXTUALIZE`, `BUILD`, `QA`, `ESCALATE`, `DEBRIEF`
 
 If invalid:
 ```
 Cannot write activeContext.md.
 Reason: "[value]" is not a valid state name.
-Valid states: PLAN/IDLE, PLAN, PLAN-CONTEXTUALIZE, BUILD, QA, ESCALATE, DEBRIEF
+Valid states: PLAN/IDLE, DEFINE, PLAN, PLAN-CONTEXTUALIZE, BUILD, QA, ESCALATE, DEBRIEF
 ```
 
 ### 2. Valid transition
@@ -127,8 +129,9 @@ Reason: approval-quote [missing on PLAN → PLAN-CONTEXTUALIZE | provided on [fr
    Started: [YYYY-MM-DD HH:MM — preserve original Started date if resuming the same task; update only if new task]
    Last transition: YYYY-MM-DD HH:MM — [transition-from] → [transition-to]
    ```
-4. **Write the Current Task Pointer block.** Scan `current-task/` and record `present` or `absent` for each of the five files. For `qa-report.md`, if present, note PASS or FAIL from the Overall field. This is a mechanical directory scan — do not read file contents.
+4. **Write the Current Task Pointer block.** Scan `current-task/` and record `present` or `absent` for each task artifact. For `qa-report.md`, if present, note PASS or FAIL from the Overall field. This is a mechanical directory scan — do not read file contents.
    ```
+   - definition.md: [present — Ready for PLAN | present — Draft | absent]
    - plan.md: [present — Approved | present — Draft | absent]
    - plan_context.md: [present | absent]
    - build-log.md: [present — [n] attempts | absent]
@@ -163,7 +166,7 @@ State: [new state]
 Task:  [slug or none]
 Transition: [transition-from] → [transition-to]
 Cycle: [N/3 or n/a]
-Current Task Pointer: plan.md [present|absent] · plan_context.md [present|absent] · build-log.md [present|absent] · qa-report.md [present|absent] · escalation-brief.md [present|absent]
+Current Task Pointer: definition.md [present|absent] · plan.md [present|absent] · plan_context.md [present|absent] · build-log.md [present|absent] · qa-report.md [present|absent] · escalation-brief.md [present|absent]
 ```
 
 ## What This Skill Does NOT Do

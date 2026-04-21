@@ -81,7 +81,7 @@ Test fixtures and test mocks are acceptable. Production fake data is never accep
 
 ## Versioning & Rollback
 
-**Rollback triggers**: APPLY fails | User requests revert | Critical error | Security vulnerability
+**Rollback triggers**: BUILD/QA introduces a bad change | User requests revert | Critical error | Security vulnerability
 
 **Rollback protocol**:
 1. Identify last known good state
