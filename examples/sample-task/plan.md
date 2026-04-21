@@ -50,6 +50,33 @@ User-visible outcome: repeated failed login attempts from the same IP are thrott
 - `operational-context.md#Active-Patterns` — middleware registration directive
 - `operational-context.md#Active-Anti-Patterns` — package.json dependency directive
 
+## Task Decomposition
+
+### Dependency Graph
+
+- `package.json` dependency → `src/middleware/rateLimiter.js`
+- `src/middleware/rateLimiter.js` → `src/app.js` middleware registration
+- `src/app.js` registration → `src/middleware/rateLimiter.test.js` integration coverage
+
+### Slice Strategy
+
+- Vertical slice: yes — deliver one complete login-rate-limit path from dependency to middleware to route registration to tests.
+- High-risk work front-loaded: yes — first validate the route registration point and package dependency before writing tests around it.
+- Parallelization: sequential — the test slice depends on the middleware export and app registration contract.
+
+### Task Slices
+
+| Slice | Scope | Dependencies | Files likely touched | Verification |
+|---|---|---|---|---|
+| 1. Add middleware dependency and implementation | S | None | `package.json`, `src/middleware/rateLimiter.js` | Import succeeds; middleware exports `loginRateLimiter` |
+| 2. Register login-only middleware | S | Slice 1 | `src/app.js` | Manual diff check confirms only `/api/auth/login` path is wrapped |
+| 3. Add route-level tests | M | Slices 1-2 | `src/middleware/rateLimiter.test.js` | `npm test -- --testPathPattern=src/middleware/rateLimiter.test.js` |
+
+### Checkpoints
+
+- After slice 2: confirm middleware is scoped to `/api/auth/login` only before writing tests.
+- After slice 3: QA runs targeted tests, lint, and acceptance checks.
+
 ## Implementation Steps
 
 1. Add `express-rate-limit` to `package.json` dependencies and run `npm install`

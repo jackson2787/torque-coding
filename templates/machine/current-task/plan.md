@@ -66,6 +66,31 @@ Conclusion:
 - `path/to/file.ext` — [role in this task]
 - `path/to/other.ext` — [role in this task]
 
+## Task decomposition
+
+<!-- Required for anything larger than a trivial one-file change. Keep slices small, dependency-ordered, and independently verifiable. -->
+
+### Dependency graph
+
+- [Foundation dependency] → [dependent task/step]
+- [Shared contract/API/schema] → [consumer]
+
+### Slice strategy
+
+- Vertical slice: [yes/no — if no, explain why horizontal/foundation-first work is necessary]
+- High-risk work front-loaded: [yes/no — identify the first high-risk check]
+- Parallelization: [safe independent slices | sequential because dependencies/shared state | not applicable]
+
+### Task slices
+
+| Slice | Scope | Dependencies | Files likely touched | Verification |
+|---|---|---|---|---|
+| 1. [Short title] | [XS/S/M; avoid L+] | [None or prior slice] | `[file]`, `[test]` | `[command/manual check]` |
+
+### Checkpoints
+
+- After slice [N]: [tests/build/manual review/human checkpoint]
+
 ## Implementation steps
 
 <!-- Ordered. Each step is concrete enough for an executor model to execute without exploration. -->

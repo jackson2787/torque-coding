@@ -99,11 +99,40 @@ Before proposing any new file, search the codebase for candidates to extend. Rec
 
 Read — do not modify — every file the plan will touch. Note line ranges. Note every integration point (caller, dependency, consumer).
 
-### 5. Extract applicable patterns
+### 5. Decompose and sequence the work
+
+Before writing implementation steps, map the task's dependency graph:
+
+- Foundations before dependents (schema/config/contracts before consumers)
+- Shared contracts before parallel consumers
+- High-risk or unknown work early, so failure happens before broad implementation
+
+Prefer vertical slices: one complete, testable feature path at a time. Avoid horizontal slicing ("all schema, then all API, then all UI") unless a foundation genuinely must exist first. If horizontal/foundation-first work is necessary, justify it in `plan.md#Task-decomposition`.
+
+Size each slice:
+
+| Size | Expected scope |
+|---|---|
+| XS | 1 file, single function/config change |
+| S | 1-2 files, one component/endpoint |
+| M | 3-5 files, one complete feature slice |
+| L+ | 5+ files; split unless tightly coupled and justified |
+
+Break the task down further if any are true:
+
+- A slice touches more than about 5 files
+- A slice title needs "and"
+- Acceptance criteria cannot fit in 3 focused bullets
+- Two independent subsystems are mixed without a dependency reason
+- The work would likely exceed one focused executor session
+
+For multi-slice plans, add checkpoints after every 2-3 slices and before irreversible/shared-state changes. Note safe parallelization opportunities only when slices do not share write targets or unresolved contracts.
+
+### 6. Extract applicable patterns
 
 For each relevant directive in `operational-context.md`, find at least one real example in the codebase. Pair directive with example — this gets passed forward to PLAN-CONTEXTUALIZE.
 
-### 6. Draft acceptance criteria
+### 7. Draft acceptance criteria
 
 Each criterion is:
 - Numbered
@@ -112,11 +141,11 @@ Each criterion is:
 
 If a criterion cannot be stated testably, break it down further or drop it.
 
-### 7. Write `current-task/plan.md`
+### 8. Write `current-task/plan.md`
 
-Use the template at `templates/machine/current-task/plan.md`. Fill every section. Do not skip "Out of scope" — explicit negative scope prevents BUILD from wandering.
+Use the template at `templates/machine/current-task/plan.md`. Fill every section. Do not skip "Task decomposition" or "Out of scope" — explicit sequencing and negative scope prevent BUILD from wandering.
 
-### 8. Present for approval
+### 9. Present for approval
 
 Announce planning-mode discipline before presenting the plan:
 
@@ -135,6 +164,7 @@ Objective: [one sentence]
 Files to touch: [n]
 New files: [n, with justification]
 Acceptance criteria: [n]
+Task slices: [n; largest size XS/S/M/L+]
 Doctrine conflicts: [none | list]
 
 Approve to advance to PLAN-CONTEXTUALIZE (next state), or request revisions.
@@ -144,7 +174,7 @@ Wait for explicit approval. Capture the human's verbatim approval string (e.g. `
 
 An ambiguous response ("maybe", "I guess", "sure if you think so") is NOT approval — ask for a clear confirmation.
 
-### 9. Record state transition
+### 10. Record state transition
 
 On approval, flip `plan.md` Status from `Draft` to `Approved`. Then call `update-active-context` with:
 
@@ -170,6 +200,7 @@ A valid `plan.md` must have:
 - [ ] Authority check (constitution and operational-context read; conflicts resolved)
 - [ ] Reuse analysis (Sacred Rule compliance)
 - [ ] Analyzed files
+- [ ] Task decomposition: dependency graph, slice strategy, slice sizing, verification per slice, checkpoints when multi-slice
 - [ ] Implementation steps (ordered, concrete enough for the executor model)
 - [ ] Integration points
 - [ ] Patterns to follow with `file:line` evidence
@@ -194,6 +225,10 @@ A plan missing any of these is incomplete. Fix before handing off.
 | Task contradicts a hard operational-context directive | Stop. Surface conflict. Ask human to amend operational-context first. |
 | Task crosses a constitutional boundary | Stop. Surface. Do not plan around it. |
 | Reuse analysis is skipped or hand-waved | Refuse to proceed — Sacred Rule violation. |
+| Dependency order is not considered for multi-part work | Stop. Add dependency graph and ordered slices before presenting. |
+| Work is horizontally sliced without justification | Stop. Prefer vertical slices or justify foundation-first sequencing. |
+| Any slice is L+ (5+ files) without tight-coupling justification | Stop. Split the slice or explain why it cannot be split safely. |
+| A slice has no verification path | Stop. Add test/build/manual verification before presenting. |
 | Acceptance criteria are subjective ("looks better") | Refuse. Rewrite as testable or cut. |
 | `current-task/plan.md` already exists with Status ≠ Superseded | Stop. Either complete the current task (debrief) or explicitly abandon. |
 | The task description is too vague to write acceptance criteria | Stop. Ask the human clarifying questions. Do not guess. |

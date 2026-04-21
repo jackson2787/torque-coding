@@ -86,7 +86,7 @@ This is not a failure of the operating model — it is the operating model ackno
 
 ### 1. Read the plan
 
-Read `definition.md` if present, then read `plan.md` end to end. Note every file mentioned, every pattern referenced, every acceptance criterion, and every Not Doing boundary inherited from DEFINE.
+Read `definition.md` if present, then read `plan.md` end to end. Note every file mentioned, every pattern referenced, every task slice, every checkpoint, every acceptance criterion, and every Not Doing boundary inherited from DEFINE.
 
 ### 1a. Cap check
 
@@ -165,6 +165,7 @@ A valid `plan_context.md` must have:
 - [ ] Every file in `plan.md#Analyzed-files` represented under `Files-to-touch` with current content pasted and line numbers
 - [ ] Every pattern in `plan.md#Patterns-to-follow` paired with a concrete repo example (code pasted, `file:line` cited)
 - [ ] Integration points with `file:line` for each caller, dependency, consumer
+- [ ] Task decomposition reflected: files and context are grouped so BUILD can execute slices in dependency order
 - [ ] At least one test pattern to mirror (if tests are in scope)
 - [ ] Dead ends from planning
 - [ ] Success criteria as mechanical checks
