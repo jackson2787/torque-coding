@@ -11,7 +11,8 @@ This directory contains material that is valuable for people but not needed in a
 | Directory | What it contains |
 |---|---|
 | `decisions/` | Architectural decision records — one file per decision. Full rationale, alternatives considered, consequences. |
-| `tasks/` | Task histories — what was built, files modified, patterns applied, outcomes. Organised by month. |
+| `tasks/` | Developer-facing task histories — what happened, choices made, files modified, patterns applied, outcomes. Organised by month. |
+| `consumer-guides/` | Consumer-facing explanations — plain-language usage docs for non-dev users when a task changes user-visible behavior. |
 | `meetings/` | Meeting outcomes, discussion summaries, alignment notes. |
 | `rationale/` | Standing "why we do X" documents. These back up directives in `../machine/operational-context.md`. |
 | `progress/` | Quarterly progress notes, trajectory, known-gap rollups. |
@@ -70,6 +71,10 @@ human/
 │   └── YYYY-MM/
 │       ├── README.md              ← monthly digest
 │       └── DDMMDD_<task>.md       ← individual task history
+├── consumer-guides/
+│   ├── INDEX.md
+│   └── YYYY-MM/
+│       └── DDMMDD_<slug>.md       ← user-facing guide/explanation
 ├── meetings/
 │   ├── INDEX.md
 │   └── YYYY-MM-DD-<topic>.md

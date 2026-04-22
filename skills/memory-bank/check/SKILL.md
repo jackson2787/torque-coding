@@ -59,6 +59,7 @@ Assert that these paths exist:
 .memory-bank-v2/machine/current-task/
 .memory-bank-v2/human/
 .memory-bank-v2/human/tasks/
+.memory-bank-v2/human/consumer-guides/
 .memory-bank-v2/human/decisions/
 .memory-bank-v2/human/rationale/
 ```

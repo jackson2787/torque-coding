@@ -5,7 +5,8 @@ description: >-
   every task — never skipped. Compares the task outcome against operational-context.md
   to determine whether anything memory-worthy was learned. Applies the five-gate rubric
   to candidate learnings. Proposes diffs to operational-context.md with human approval
-  before writing. Routes task history and decisions to the human side. Replaces v1 DOCS.
+  before writing. Routes developer-facing task history, decisions, rationale, and
+  consumer-facing user guides to the human side. Replaces v1 DOCS.
 metadata:
   author: torque-coding
   version: "2.3"
@@ -21,6 +22,7 @@ metadata:
   produces:
     - proposed operational-context.md diff (via update-operational-context)
     - .memory-bank-v2/human/tasks/YYYY-MM/DDMMDD_<slug>/
+    - .memory-bank-v2/human/consumer-guides/YYYY-MM/DDMMDD_<slug>.md (when user-visible)
   replaces: v1 DOCS state
   default-hard-cap: 20000 input tokens
 ---
@@ -29,11 +31,16 @@ metadata:
 
 ## Overview
 
-Debrief is the last phase of every task. Its job is to answer one question cleanly:
+Debrief is the last phase of every task. It has two human audiences:
+
+1. **Developers** need a durable engineering record: what happened, what changed, what choices were made, what was verified, and what future agents/developers should learn.
+2. **Consumers of the code** need plain-language guidance when behavior changes: what users can now do, how to use it, limits/caveats, and troubleshooting.
+
+It also answers one machine-memory question cleanly:
 
 > Did this task teach us something that should change how future agents work?
 
-Most tasks answer "no." That is correct. The human side still gets a task history. The machine side stays clean.
+Most tasks answer "no" to the machine-memory question. That is correct. The human side still gets a developer-facing task history, and user-visible work may also get a consumer-facing guide. The machine side stays clean unless a learning passes the rubric.
 
 When the answer is "yes," debrief applies a strict rubric, shows the human a diff, waits for approval, then writes. It never writes unilaterally.
 
@@ -281,19 +288,84 @@ Skip Phase 4. Note "No operational-context changes" in the Debrief Report.
 
 ---
 
-## Phase 5: Human-Side Writes
+## Phase 5: Human-Side Audience Split
+
+Before writing human-side files, classify the output for two audiences.
+
+### Developer-facing output — always required
+
+Every post-task debrief writes a developer-facing task history. It should be readable by a developer who was not present for the work.
+
+Include:
+- What changed, in plain English
+- Why the chosen approach was used
+- Key implementation decisions and trade-offs
+- Files/systems touched
+- Verification performed and evidence summary
+- Bugs, surprises, constraints, or rejected alternatives
+- Human-readable learning outcomes
+- Follow-up tasks or technical debt
+- Whether anything was proposed for `operational-context.md`, `human/decisions/`, or `human/rationale/`
+
+### Consumer-facing output — applicability gate
+
+Write a consumer guide only if the task changes at least one of:
+- User-visible behavior or workflow
+- Public API behavior or contract
+- Configuration or setup steps a non-dev/operator must perform
+- Product limits, permissions, errors, notifications, or expected outcomes
+- Support/troubleshooting procedures
+
+Skip consumer docs for:
+- Invisible refactors
+- Tests-only or lint-only changes
+- Internal cleanup
+- Dependency bumps with no behavior change
+- Machine-memory-only changes
+- Security hardening where disclosing detail would increase abuse risk
+
+If skipped, record the reason in the Debrief Report.
+
+### Consumer-facing sensitivity filter
+
+Before writing `consumer-guide`, remove:
+- Secrets, tokens, private URLs, customer data, internal hostnames
+- Exploit details, bypass techniques, or security-sensitive internals
+- Implementation details that do not help a non-dev user
+- File paths unless the audience is an operator who needs them
+
+If a user-visible security change needs explanation, describe the safe user-facing behavior and support path, not the internal mechanism.
+
+---
+
+## Phase 6: Human-Side Writes
 
 After the operational-context question is resolved (applied, discarded, or confirmed as none):
 
-### Always — task history
+### Always — developer task history
 
 Load `update-human-log` with `kind=task`.
 
-The task history is written after every task without exception, including tasks with no learning.
+The task history is written after every task without exception, including tasks with no machine-memory learning.
 
 **Post-task mode**: Required fields: objective, outcome, files modified, patterns applied, debrief result. Status: `Completed` or `Abandoned`.
 
 **Ad-hoc mode**: Set `Status: Ad Hoc`. Objective becomes "Session observation — [user's invocation reason]". Plan/QA sections may read "N/A (ad-hoc debrief)". Files modified reflects actual session diff (if any).
+
+### If user-visible — consumer guide
+
+Load `update-human-log` with `kind=consumer-guide`.
+
+Write a plain-language explanation for non-dev users or support/operator audiences. Include:
+- What changed
+- Who it affects
+- How to use it
+- Examples or before/after behavior
+- Limits and caveats
+- Troubleshooting / FAQ
+- Support notes, if useful
+
+Do not include sensitive implementation details. If the task is not user-visible, do not write a consumer guide; note "Consumer guide: skipped — [reason]" in the Debrief Report.
 
 ### If a decision was made
 
@@ -315,7 +387,7 @@ Write a constitutional proposal. Set `Status: Proposed`. Note that ratification 
 
 ---
 
-## Phase 6: Archive current-task/ and Reset activeContext
+## Phase 7: Archive current-task/ and Reset activeContext
 
 ### Post-task mode
 
@@ -341,7 +413,7 @@ Append to `activeContext.md` a line under "Recent Debriefs" (create the section 
 
 ---
 
-## Phase 7: Debrief Report
+## Phase 8: Debrief Report
 
 Present the Debrief Report to the human. This is the exit confirmation.
 
@@ -370,6 +442,7 @@ OR:
 
 ### Human-side writes
 - human/tasks/YYYY-MM/DDMMDD_<task>.md ✓
+- human/consumer-guides/YYYY-MM/DDMMDD_<task>.md ✓ OR skipped — [reason]
 - human/decisions/YYYY/YYYY-MM-DD-<slug>.md ✓ (if applicable)
 - human/rationale/<topic>.md ✓ (if applicable)
 
@@ -392,6 +465,8 @@ Stop and surface to the human if:
 | A proposed directive is vague or not one imperative sentence | Reject. Rewrite or discard. |
 | A proposed directive has no `file:line` evidence | Reject. Ask for evidence. |
 | A proposed directive is past-tense | Reject. Route to `human/rationale/`. |
+| Consumer guide includes secrets, exploit details, private URLs, or unnecessary internals | Stop. Redact or skip the guide. |
+| User-visible behavior changed but consumer guide applicability was not evaluated | Stop. Run the applicability gate before exit. |
 | The human says "apply" but the proposed change conflicts with `constitution.md` | Stop. Flag the conflict. Do not write. |
 
 ---
@@ -405,6 +480,7 @@ Both modes:
 - [ ] Limits tuning check complete — crossings noted or confirmed none
 - [ ] operational-context.md change proposed and either applied or confirmed as none (or skipped under minimal-debrief path)
 - [ ] `human/tasks/YYYY-MM/DDMMDD_<task>.md` written
+- [ ] Consumer guide applicability evaluated; guide written or skip reason recorded
 - [ ] `human/decisions/` written (if applicable)
 - [ ] `human/rationale/` written (if applicable)
 - [ ] Debrief Report presented to human

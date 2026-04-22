@@ -25,6 +25,7 @@ Accepts a `kind` that determines which subdirectory, filename pattern, template,
 | Kind | Target path | Use for |
 |---|---|---|
 | `task` | `tasks/YYYY-MM/DDMMDD_<slug>.md` | Task histories after completion |
+| `consumer-guide` | `consumer-guides/YYYY-MM/DDMMDD_<slug>.md` | Plain-language user guides/explanations for non-dev consumers |
 | `decision` | `decisions/YYYY/YYYY-MM-DD-<slug>.md` | Architectural decision records; constitutional proposals |
 | `meeting` | `meetings/YYYY-MM-DD-<topic>.md` | Discussion summaries, alignment outcomes |
 | `rationale` | `rationale/<topic>.md` | Standing "why we do X" documents; retired operational-context entries |
@@ -33,6 +34,7 @@ Accepts a `kind` that determines which subdirectory, filename pattern, template,
 ## When to Use
 
 - **Debrief calls this skill** after every task to write the task history (`kind=task`)
+- **Debrief calls this skill** after user-visible tasks to write consumer-facing guidance (`kind=consumer-guide`)
 - **Debrief calls this skill** when a decision was made during the task (`kind=decision`)
 - **Debrief calls this skill** when retiring or updating an operational-context entry (`kind=rationale`)
 - **Human calls this skill** to log a meeting outcome, progress note, or decision directly
@@ -68,6 +70,10 @@ Accepts a `kind` that determines which subdirectory, filename pattern, template,
 
 [One paragraph. What was actually built or changed? Did it meet the acceptance criteria?]
 
+## Summary for Developers
+
+[Plain-English summary of what happened, why it matters, and how the final shape differs from the starting point.]
+
 ## Files Modified
 
 <!-- Specific, verifiable — exact file paths and what changed.
@@ -90,6 +96,23 @@ Accepts a `kind` that determines which subdirectory, filename pattern, template,
 
 - [Decision] → see `decisions/YYYY/YYYY-MM-DD-<slug>.md` (if applicable)
 
+## Trade-offs and Alternatives
+
+- [Chosen approach] — [why chosen]
+- [Alternative considered] — [why rejected or deferred]
+
+## Verification Summary
+
+- [Command/check/manual verification] — [result]
+
+## Human-Readable Learnings
+
+- [Learning outcome for future developers, or "No developer-facing learning beyond the task outcome."]
+
+## Follow-ups
+
+- [Follow-up task, technical debt, documentation gap, or "None."]
+
 ## Debrief Notes
 
 <!-- What the debrief considered and concluded.
@@ -111,6 +134,80 @@ After writing the task file, append a one-line entry to `tasks/YYYY-MM/README.md
 Append to `tasks/INDEX.md`:
 ```
 - YYYY-MM-DD — [task name] — `tasks/YYYY-MM/DDMMDD_<slug>.md`
+```
+
+---
+
+## Kind: consumer-guide
+
+**Target**: `.memory-bank-v2/human/consumer-guides/YYYY-MM/DDMMDD_<slug>.md`
+**Also updates**: `consumer-guides/INDEX.md`
+
+### Template
+
+```markdown
+# Guide: [user-facing title]
+
+**Date**: YYYY-MM-DD
+**Audience**: [non-dev user / support / operator / stakeholder]
+**Related task**: `tasks/YYYY-MM/DDMMDD_<slug>.md`
+**Visibility**: Internal | External-ready draft
+
+## What Changed
+
+[Plain-language description of the user-visible change. Avoid implementation details.]
+
+## Who This Affects
+
+- [User/persona/group affected]
+- [Unaffected users if important]
+
+## How to Use It
+
+1. [Step in user language]
+2. [Step in user language]
+3. [Expected result]
+
+## Examples
+
+[Short example, screenshot placeholder, command, workflow, or before/after behavior.]
+
+## Limits and Caveats
+
+- [Known limitation]
+- [What this does not do]
+
+## Troubleshooting / FAQ
+
+| Question or issue | Answer |
+|---|---|
+| [Question] | [Plain-language answer] |
+
+## Support Notes
+
+[Optional internal notes for support/customer-facing teams. Do not include sensitive implementation details.]
+```
+
+### Applicability
+
+Write this only when the completed task changes user-visible behavior, workflows, configuration, public API behavior, operator procedures, or anything a non-dev user/support person must understand.
+
+Skip this for invisible refactors, tests-only work, internal cleanup, dependency bumps with no user-facing behavior change, or purely machine-side memory maintenance.
+
+### Sensitivity filter
+
+Before writing, remove:
+
+- Secrets, tokens, private URLs, customer data, internal hostnames
+- Exploit details, bypass techniques, or security-sensitive internals
+- Implementation details that do not help a non-dev user
+- File paths unless the audience is an operator who needs them
+
+### INDEX.md update
+
+Append to `consumer-guides/INDEX.md`:
+```
+- YYYY-MM-DD — [title] — [Internal | External-ready draft] — `consumer-guides/YYYY-MM/DDMMDD_<slug>.md`
 ```
 
 ---

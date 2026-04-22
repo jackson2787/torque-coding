@@ -89,6 +89,10 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 │   └── YYYY-MM/
 │       ├── README.md              ← monthly digest
 │       └── DDMMDD_<task>.md       ← full task history
+├── consumer-guides/
+│   ├── INDEX.md
+│   └── YYYY-MM/
+│       └── DDMMDD_<slug>.md       ← non-dev user guide for user-visible changes
 ├── meetings/
 │   ├── INDEX.md
 │   └── YYYY-MM-DD-<topic>.md
@@ -103,7 +107,7 @@ Human documents are **never loaded at session startup**. Load them on demand onl
 
 **All human-side writes go through `update-human-log`.** Never write to `human/` directly.
 
-`update-human-log` accepts `kind ∈ {task, decision, meeting, rationale, progress}` and routes to the correct path and template.
+`update-human-log` accepts `kind ∈ {task, consumer-guide, decision, meeting, rationale, progress}` and routes to the correct path and template.
 
 ---
 

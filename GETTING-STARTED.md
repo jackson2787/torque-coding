@@ -59,6 +59,7 @@ my-project/
         ├── README.md
         ├── decisions/INDEX.md
         ├── tasks/INDEX.md
+        ├── consumer-guides/INDEX.md
         ├── meetings/INDEX.md
         └── rationale/INDEX.md
 ```
@@ -238,7 +239,12 @@ Because the memory bank is canonical, switching tools or models mid-task is seam
 **What you do**: let it run. Debrief is mandatory after every task.
 
 **What the agent does**:
-Runs the `debrief` skill, which applies the five-gate rubric to decide what the task taught us:
+Runs the `debrief` skill. Debrief writes human-facing output for two audiences:
+
+- Developers get a task history: what happened, choices made, verification, learnings, and follow-ups.
+- Consumers/users get a plain-language guide when the task changes user-visible behavior.
+
+It also applies the five-gate rubric to decide what the task taught us for future agent behavior:
 
 1. **Generalisable?** Does this apply beyond the current task?
 2. **Repeatable?** Would we want future agents to do this the same way?
@@ -250,7 +256,8 @@ A learning that passes all five gates is proposed as a diff to `operational-cont
 
 **What debrief produces**:
 - A proposed `operational-context.md` diff (if there is a learning)
-- A task history entry written to `human/tasks/YYYY-MM/DDMMDD_<slug>.md`
+- A developer-facing task history entry written to `human/tasks/YYYY-MM/DDMMDD_<slug>.md`
+- A consumer-facing guide in `human/consumer-guides/YYYY-MM/DDMMDD_<slug>.md` if the task changed user-visible behavior
 - `current-task/` archived to `human/tasks/` and cleared
 - `activeContext.md` reset to `State: PLAN/IDLE`
 
@@ -304,7 +311,7 @@ This updates `.agent/rules/`, `.agent/skills/`, and, when Claude Code is install
 
 - `AGENTS.md` — the full operating model and authority rules
 - `CLAUDE.md` — Claude Code entry point with @-imports
-- `examples/sample-task/` — complete worked example (all six artifacts for `add-rate-limit-middleware`)
+- `examples/sample-task/` — complete worked example (all seven artifacts for `add-rate-limit-middleware`)
 - `.agent/rules/state-machine.md` — full state contracts, stall rules, any-state entry table for AGENTS.md-compatible tools
 - `.agent/rules/compaction.md` — compaction recovery procedure for AGENTS.md-compatible tools
 - `rules/state-machine.md` — Claude Code state-machine reference

@@ -118,6 +118,7 @@ The memory bank splits into a machine-facing domain (loaded every session) and a
 .memory-bank-v2/human/
 ├── decisions/   — architectural decision records, one file per decision
 ├── tasks/       — task histories, outcomes, files modified
+├── consumer-guides/ — plain-language user guides for user-visible changes
 ├── meetings/    — discussion summaries, outcomes
 ├── rationale/   — standing "why we do X" documents
 └── progress/    — quarterly notes

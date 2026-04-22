@@ -31,6 +31,7 @@ Add per-route rate limiting to protect the login endpoint from brute-force attac
 | `plan_context.md` | `plan-contextualize` skill | PLAN-CONTEXTUALIZE | "Zero exploration" context pack for the executor model |
 | `build-log.md` | `build-loop` skill | BUILD | Single successful attempt; does NOT claim to have run tests |
 | `qa-report.md` | `qa` skill | QA | All six checks, pasted terminal evidence, PASS verdict |
+| `consumer-guide.md` | `debrief` skill | DEBRIEF | Plain-language guide for non-dev users/support |
 
 ---
 
@@ -41,6 +42,7 @@ Add per-route rate limiting to protect the login endpoint from brute-force attac
 3. `plan_context.md` — understand what the executor model was given to work with
 4. `build-log.md` — see what BUILD did (and did not do)
 5. `qa-report.md` — see how QA verified the work
+6. `consumer-guide.md` — see the consumer-facing explanation debrief would write for this user-visible change
 
 ---
 
@@ -50,6 +52,7 @@ After QA PASS, the `debrief` skill would have:
 
 - Applied the five-gate rubric to the task — the rate-limiter middleware registration pattern is generalisable, evidenced at `src/app.js:34`, and expected to be durable → proposed adding to `operational-context.md#Active-Patterns`
 - Written task history to `human/tasks/2026-04/190426_add-rate-limit-middleware.md`
+- Written consumer-facing guidance to `human/consumer-guides/2026-04/190426_add-rate-limit-middleware.md`
 - Called `update-active-context` to reset `activeContext.md` to `State: PLAN/IDLE`
 
 No `current-task/` archive is shown here to avoid scaffolding the full `human/` tree inside the example.
